@@ -142,7 +142,7 @@ button_c = QuokkaButton(machine.Pin('X19'))
 button_d = QuokkaButton(machine.Pin('X20'))
 button_b = QuokkaButton(machine.Pin('X21'))
 button_usr = QuokkaButton(machine.Pin('X17'))
-buttons = (button_a, button_b, button_c, button_d,)
+buttons = (button_a, button_b, button_c, button_d, button_usr,)
 
 
 grove_a = QuokkaGrove('X9', 'X10') # I2C SCL/SDA
@@ -175,8 +175,8 @@ class QuokkaDisplay(drivers.SSD1306_SPI):
     self.fill(0)
     self.show()
 
-  def print(self, text, color=1, end='\n'):
-    text += end
+  def print(self, *args, color=1, end='\n'):
+    text = ' '.join(str(x) for x in args) + end
     for c in text:
       if self.text_x >= 128 or c == '\n':
         self.text_x = 0
