@@ -1,9 +1,13 @@
 import machine
+import quokka
 
 class NeoPixel():
   def __init__(self, pin=None, num=8, brightness=100):
     if not pin:
       pin = machine.Pin('X12', machine.Pin.OUT)
+    if isinstance(pin, quokka.QuokkaPin):
+      pin = pin._pin
+    pin.init(mode=machine.Pin.OUT)
     self._pin = pin
     self._pin.off()
     self._num = num
@@ -29,7 +33,6 @@ class NeoPixel():
     else:
       return (255, 0, ((120-h) * 255) // 20,)
 
-  # Should probably update to use indexing (like the micro:bit version).
   def set_pixel(self, n, r, g, b):
     if n < 0 or n >= self._num:
       return
@@ -57,7 +60,7 @@ class NeoPixel():
     g = self._buf[n*3]
     b = self._buf[n*3 + 2]
     return r, g, b
-  
+
   def __getitem__(self, key):
     return self.get_pixel(key)
 

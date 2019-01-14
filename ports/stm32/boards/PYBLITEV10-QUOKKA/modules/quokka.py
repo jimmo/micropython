@@ -125,7 +125,7 @@ class QuokkaGroves():
   def __init__(self):
     self.all = (self.a, self.b, self.c, self.d, self.e, self.f,)
 
-    
+
 red = pyb.LED(1)
 green = pyb.LED(2)
 orange = pyb.LED(3)
@@ -151,7 +151,7 @@ grove_c = QuokkaGrove('X4', 'X3', analog=True)  # ADC, UART 2
 grove_d = QuokkaGrove('X6', 'X8')  # SPI CLK/MOSI
 grove_e = QuokkaGrove('X2', 'X1', analog=True)  # ADC, UART 4
 grove_f = QuokkaGrove('X5', 'Y12', analog=True) # ADC, DAC pin 0
-    
+
 
 sleep = time.sleep_ms
 sleep_us = time.sleep_us
@@ -216,7 +216,7 @@ class QuokkaDisplay(drivers.SSD1306_SPI):
           break
         h = yy
       print(w, h)
-      
+
       for xx in range(w):
         for yy in range(h):
           c = fb.pixel(xx, yy)
