@@ -27,6 +27,8 @@
 // Options to control how MicroPython is built for this port,
 // overriding defaults in py/mpconfig.h.
 
+// Some settings are #ifndef'ed to allow board-specific overrides.
+
 // board specific definitions
 #include "mpconfigboard.h"
 #include "mpconfigboard_common.h"
@@ -72,9 +74,11 @@
 #define MICROPY_HELPER_REPL         (1)
 #define MICROPY_REPL_EMACS_KEYS     (1)
 #define MICROPY_REPL_AUTO_INDENT    (1)
+#ifndef MICROPY_LONGINT_IMPL
 #define MICROPY_LONGINT_IMPL        (MICROPY_LONGINT_IMPL_MPZ)
+#endif
 #define MICROPY_ENABLE_SOURCE_LINE  (1)
-#ifndef MICROPY_FLOAT_IMPL // can be configured by each board via mpconfigboard.mk
+#ifndef MICROPY_FLOAT_IMPL  // can be configured by each board via mpconfigboard.mk (requires CFLAGS changes too)
 #define MICROPY_FLOAT_IMPL          (MICROPY_FLOAT_IMPL_FLOAT)
 #endif
 #define MICROPY_STREAMS_NON_BLOCK   (1)
@@ -106,9 +110,11 @@
 #define MICROPY_PY_BUILTINS_NOTIMPLEMENTED (1)
 #define MICROPY_PY_BUILTINS_INPUT   (1)
 #define MICROPY_PY_BUILTINS_POW3    (1)
+#ifndef MICROPY_PY_BUILTINS_HELP
 #define MICROPY_PY_BUILTINS_HELP    (1)
 #define MICROPY_PY_BUILTINS_HELP_TEXT stm32_help_text
 #define MICROPY_PY_BUILTINS_HELP_MODULES (1)
+#endif
 #define MICROPY_PY_MICROPYTHON_MEM_INFO (1)
 #define MICROPY_PY_ARRAY_SLICE_ASSIGN (1)
 #define MICROPY_PY_COLLECTIONS_DEQUE (1)
@@ -123,7 +129,7 @@
 #define MICROPY_PY_SYS_EXIT         (1)
 #define MICROPY_PY_SYS_STDFILES     (1)
 #define MICROPY_PY_SYS_STDIO_BUFFER (1)
-#ifndef MICROPY_PY_SYS_PLATFORM     // let boards override it if they want
+#ifndef MICROPY_PY_SYS_PLATFORM
 #define MICROPY_PY_SYS_PLATFORM     "pyboard"
 #endif
 #define MICROPY_PY_UERRNO           (1)

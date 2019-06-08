@@ -62,7 +62,7 @@ CFLAGS_CORTEX_M = -mthumb
 ifeq ($(CMSIS_MCU),$(filter $(CMSIS_MCU),STM32F765xx STM32F767xx STM32F769xx STM32H743xx))
 CFLAGS_CORTEX_M += -mfpu=fpv5-d16 -mfloat-abi=hard
 else
-ifeq ($(MCU_SERIES),f0)
+ifeq ($(MCU_SERIES),$(filter $(MCU_SERIES),f0 l0))
 CFLAGS_CORTEX_M += -msoft-float
 else
 CFLAGS_CORTEX_M += -mfpu=fpv4-sp-d16 -mfloat-abi=hard
@@ -73,6 +73,7 @@ endif
 CFLAGS_MCU_f0 = $(CFLAGS_CORTEX_M) -mtune=cortex-m0 -mcpu=cortex-m0
 CFLAGS_MCU_f4 = $(CFLAGS_CORTEX_M) -mtune=cortex-m4 -mcpu=cortex-m4
 CFLAGS_MCU_f7 = $(CFLAGS_CORTEX_M) -mtune=cortex-m7 -mcpu=cortex-m7
+CFLAGS_MCU_l0 = $(CFLAGS_CORTEX_M) -mtune=cortex-m0plus -mcpu=cortex-m0plus
 CFLAGS_MCU_l4 = $(CFLAGS_CORTEX_M) -mtune=cortex-m4 -mcpu=cortex-m4
 CFLAGS_MCU_h7 = $(CFLAGS_CORTEX_M) -mtune=cortex-m7 -mcpu=cortex-m7
 
@@ -86,6 +87,8 @@ CFLAGS += -DMICROPY_HW_VTOR=$(TEXT0_ADDR)
 
 ifeq ($(MICROPY_FLOAT_IMPL),double)
 CFLAGS += -DMICROPY_FLOAT_IMPL=MICROPY_FLOAT_IMPL_DOUBLE
+else ifeq ($(MICROPY_FLOAT_IMPL),none)
+CFLAGS += -DMICROPY_FLOAT_IMPL=MICROPY_FLOAT_IMPL_NONE
 else
 CFLAGS += -DMICROPY_FLOAT_IMPL=MICROPY_FLOAT_IMPL_FLOAT
 CFLAGS += -fsingle-precision-constant -Wdouble-promotion
@@ -198,7 +201,7 @@ SRC_LIBM = $(addprefix lib/libm/,\
 	wf_lgamma.c \
 	wf_tgamma.c \
 	)
-ifeq ($(MCU_SERIES),f0)
+ifeq ($(MCU_SERIES),$(filter $(MCU_SERIES),f0 l0))
 SRC_LIBM += lib/libm/ef_sqrt.c
 else
 SRC_LIBM += lib/libm/thumb_vfp_sqrtf.c
@@ -213,8 +216,8 @@ DRIVERS_SRC_C = $(addprefix drivers/,\
 	bus/softspi.c \
 	bus/softqspi.c \
 	memory/spiflash.c \
-	dht/dht.c \
 	)
+	# dht/dht.c
 
 SRC_C = \
 	main.c \
@@ -287,11 +290,19 @@ SRC_O = \
 	resethandler_m0.o \
 	lib/utils/gchelper_m0.o
 else
+ifeq ($(MCU_SERIES),l0)
+SRC_O = \
+	$(STARTUP_FILE) \
+	system_stm32l0.o \
+	resethandler_m0.o \
+	lib/utils/gchelper_m0.o
+else
 SRC_O = \
 	$(STARTUP_FILE) \
 	system_stm32.o \
 	resethandler.o \
 	lib/utils/gchelper_m3.o
+endif
 endif
 
 SRC_HAL = $(addprefix $(HAL_DIR)/Src/stm32$(MCU_SERIES)xx_,\
@@ -340,7 +351,9 @@ endif
 ifeq ($(CMSIS_MCU),$(filter $(CMSIS_MCU),STM32H743xx))
     SRC_HAL += $(addprefix $(HAL_DIR)/Src/stm32$(MCU_SERIES)xx_, hal_fdcan.c)
 else
+ifneq ($(MCU_SERIES),$(filter $(MCU_SERIES),l0))
     SRC_HAL += $(addprefix $(HAL_DIR)/Src/stm32$(MCU_SERIES)xx_, hal_can.c)
+endif
 endif
 
 SRC_USBDEV = $(addprefix $(USBDEV_DIR)/,\
