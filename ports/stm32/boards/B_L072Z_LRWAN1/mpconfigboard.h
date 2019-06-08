@@ -6,7 +6,7 @@
 #define MICROPY_HW_ENABLE_ADC       (0)
 #define MICROPY_HW_ENABLE_DAC       (0)
 #define MICROPY_HW_ENABLE_TIMER     (0)
-#define MICROPY_HW_ENABLE_USB       (0)
+#define MICROPY_HW_ENABLE_USB       (1)
 #define MICROPY_HW_HAS_SWITCH       (1)
 
 // Disable as much as possible.
@@ -49,6 +49,9 @@
 #define MICROPY_HW_SPI2_SCK     (pin_B13)
 #define MICROPY_HW_SPI2_MISO    (pin_B14)
 #define MICROPY_HW_SPI2_MOSI    (pin_B15)
+
+// USB
+#define MICROPY_HW_USB_FS              (1)
 
 // USER B1 has a pull-up and is active low
 #define MICROPY_HW_USRSW_PIN        (pin_B2)
