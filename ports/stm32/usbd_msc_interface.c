@@ -33,6 +33,10 @@
 #include "storage.h"
 #include "sdcard.h"
 
+#if defined(STM32L0)
+
+#else
+
 // This flag is needed to support removal of the medium, so that the USB drive
 // can be unmounted and won't be remounted automatically.
 #define FLAGS_STARTED (0x01)
@@ -342,3 +346,5 @@ const USBD_StorageTypeDef usbd_msc_fops = {
     usbd_msc_Write,
     usbd_msc_GetMaxLun,
 };
+
+#endif

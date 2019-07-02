@@ -609,6 +609,7 @@ static uint8_t USBD_CDC_MSC_HID_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx) {
         }
     }
 
+    #if !defined(STM32L0)
     if (usbd->usbd_mode & USBD_MODE_IFACE_MSC) {
         // MSC component
 
@@ -656,6 +657,7 @@ static uint8_t USBD_CDC_MSC_HID_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx) {
 
         usbd->hid->state = HID_IDLE;
     }
+    #endif
 
     return 0;
 }
@@ -922,6 +924,7 @@ static uint8_t USBD_CDC_MSC_HID_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum) 
         }
     }
 
+    #if !defined(STM32L0)
     if ((usbd->usbd_mode & USBD_MODE_IFACE_MSC) && epnum == (MSC_IN_EP & 0x7f)) {
         MSC_BOT_DataIn(pdev, epnum);
         return USBD_OK;
@@ -933,6 +936,7 @@ static uint8_t USBD_CDC_MSC_HID_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum) 
         usbd->hid->state = HID_IDLE;
         return USBD_OK;
     }
+    #endif
 
     return USBD_OK;
 }
@@ -948,6 +952,7 @@ static uint8_t USBD_CDC_MSC_HID_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum)
         }
     }
 
+    #if !defined(STM32L0)
     if ((usbd->usbd_mode & USBD_MODE_IFACE_MSC) && epnum == (MSC_OUT_EP & 0x7f)) {
         MSC_BOT_DataOut(pdev, epnum);
         return USBD_OK;
@@ -957,6 +962,7 @@ static uint8_t USBD_CDC_MSC_HID_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum)
         size_t len = USBD_LL_GetRxDataSize(pdev, epnum);
         return usbd_hid_receive(usbd->hid, len);
     }
+    #endif
 
     return USBD_OK;
 }
@@ -1091,6 +1097,8 @@ uint8_t USBD_CDC_ReceivePacket(usbd_cdc_state_t *cdc, uint8_t *buf) {
     return USBD_OK;
 }
 
+#if !defined(STM32L0)
+
 // prepare OUT endpoint for reception
 uint8_t USBD_HID_ReceivePacket(usbd_hid_state_t *hid, uint8_t *buf) {
     // Suspend or Resume USB Out process
@@ -1142,6 +1150,7 @@ uint8_t USBD_HID_ClearNAK(usbd_hid_state_t *hid) {
     USBx_OUTEP(HID_OUT_EP_WITH_CDC)->DOEPCTL |= USB_OTG_DOEPCTL_CNAK;
     return USBD_OK;
 }
+#endif
 
 // CDC/MSC/HID interface class callback structure
 const USBD_ClassTypeDef USBD_CDC_MSC_HID = {

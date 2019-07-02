@@ -303,7 +303,7 @@ void DebugMon_Handler(void) {
   * @param  None
   * @retval None
   */
-#if MICROPY_HW_USB_FS
+#if MICROPY_HW_USB_FS && !defined(STM32L0)
 void OTG_FS_IRQHandler(void) {
     IRQ_ENTER(OTG_FS_IRQn);
     HAL_PCD_IRQHandler(&pcd_fs_handle);
@@ -318,7 +318,7 @@ void OTG_HS_IRQHandler(void) {
 }
 #endif
 
-#if MICROPY_HW_USB_FS || MICROPY_HW_USB_HS
+#if (MICROPY_HW_USB_FS || MICROPY_HW_USB_HS) && !defined(STM32L0)
 /**
   * @brief  This function handles USB OTG Common FS/HS Wakeup functions.
   * @param  *pcd_handle for FS or HS
@@ -367,7 +367,7 @@ STATIC void OTG_CMD_WKUP_Handler(PCD_HandleTypeDef *pcd_handle) {
 }
 #endif
 
-#if MICROPY_HW_USB_FS
+#if MICROPY_HW_USB_FS && !defined(STM32L0)
 /**
   * @brief  This function handles USB OTG FS Wakeup IRQ Handler.
   * @param  None

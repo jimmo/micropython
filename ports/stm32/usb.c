@@ -73,6 +73,7 @@ typedef struct _usb_device_t {
 usb_device_t usb_device = {0};
 pyb_usb_storage_medium_t pyb_usb_storage_medium = PYB_USB_STORAGE_MEDIUM_NONE;
 
+#if !defined(STM32L0)
 // predefined hid mouse data
 STATIC const mp_obj_str_t pyb_usb_hid_mouse_desc_obj = {
     {&mp_type_bytes},
@@ -110,6 +111,7 @@ const mp_rom_obj_tuple_t pyb_usb_hid_keyboard_obj = {
         MP_ROM_PTR(&pyb_usb_hid_keyboard_desc_obj),
     },
 };
+#endif
 
 void pyb_usb_init0(void) {
     for (int i = 0; i < MICROPY_HW_USB_CDC_NUM; ++i) {
@@ -145,6 +147,7 @@ bool pyb_usb_dev_init(uint16_t vid, uint16_t pid, uint8_t mode, size_t msc_n, co
             return false;
         }
 
+        #if MICROPY_HW_ENABLE_STORAGE
         // Configure the MSC interface
         const void *msc_unit_default[1];
         if (msc_n == 0) {
@@ -163,6 +166,7 @@ bool pyb_usb_dev_init(uint16_t vid, uint16_t pid, uint8_t mode, size_t msc_n, co
         }
         usbd_msc_init_lu(msc_n, msc_unit);
         USBD_MSC_RegisterStorage(&usb_dev->usbd_cdc_msc_hid_state, (USBD_StorageTypeDef*)&usbd_msc_fops);
+        #endif
 
         // start the USB device
         USBD_LL_Init(usbd, (mode & USBD_MODE_HIGH_SPEED) != 0);
@@ -236,7 +240,9 @@ STATIC mp_obj_t pyb_usb_mode(size_t n_args, const mp_obj_t *pos_args, mp_map_t *
         { MP_QSTR_vid, MP_ARG_KW_ONLY | MP_ARG_INT, {.u_int = USBD_VID} },
         { MP_QSTR_pid, MP_ARG_KW_ONLY | MP_ARG_INT, {.u_int = -1} },
         { MP_QSTR_msc, MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_PTR(&mp_const_empty_tuple_obj)} },
+        #if !defined(STM32L0)
         { MP_QSTR_hid, MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_rom_obj = MP_ROM_PTR(&pyb_usb_hid_mouse_obj)} },
+        #endif
         #if USBD_SUPPORT_HS_MODE
         { MP_QSTR_high_speed, MP_ARG_KW_ONLY | MP_ARG_BOOL, {.u_bool = false} },
         #endif
@@ -355,6 +361,7 @@ STATIC mp_obj_t pyb_usb_mode(size_t n_args, const mp_obj_t *pos_args, mp_map_t *
     // Get MSC logical units
     size_t msc_n = 0;
     const void *msc_unit[USBD_MSC_MAX_LUN];
+    #if MICROPY_HW_ENABLE_STORAGE
     if (mode & USBD_MODE_IFACE_MSC) {
         mp_obj_t *items;
         mp_obj_get_array(args[ARG_msc].u_obj, &msc_n, &items);
@@ -377,9 +384,11 @@ STATIC mp_obj_t pyb_usb_mode(size_t n_args, const mp_obj_t *pos_args, mp_map_t *
             }
         }
     }
+    #endif
 
     // get hid info if user selected such a mode
     USBD_HID_ModeInfoTypeDef hid_info;
+    #if !defined(STM32L0)
     if (mode & USBD_MODE_IFACE_HID) {
         mp_obj_t *items;
         mp_obj_get_array_fixed_n(args[ARG_hid].u_obj, 5, &items);
@@ -395,6 +404,7 @@ STATIC mp_obj_t pyb_usb_mode(size_t n_args, const mp_obj_t *pos_args, mp_map_t *
         // need to keep a copy of this so report_desc does not get GC'd
         MP_STATE_PORT(pyb_hid_report_desc) = items[4];
     }
+    #endif
 
     #if USBD_SUPPORT_HS_MODE
     if (args[ARG_high_speed].u_bool) {
@@ -681,6 +691,8 @@ const mp_obj_type_t pyb_usb_vcp_type = {
 /******************************************************************************/
 // MicroPython bindings for USB HID
 
+#if !defined(STM32L0)
+
 typedef struct _pyb_usb_hid_obj_t {
     mp_obj_base_t base;
     usb_device_t *usb_dev;
@@ -808,6 +820,8 @@ const mp_obj_type_t pyb_usb_hid_type = {
     .protocol = &pyb_usb_hid_stream_p,
     .locals_dict = (mp_obj_dict_t*)&pyb_usb_hid_locals_dict,
 };
+
+#endif
 
 /******************************************************************************/
 // code for experimental USB OTG support
