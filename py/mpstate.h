@@ -183,6 +183,10 @@ typedef struct _mp_state_vm_t {
     struct _mp_vfs_mount_t *vfs_mount_table;
     #endif
 
+    #if MICROPY_PY_BLUETOOTH
+    mp_obj_t bluetooth;
+    #endif
+
     //
     // END ROOT POINTER SECTION
     ////////////////////////////////////////////////////////////
@@ -217,6 +221,15 @@ typedef struct _mp_state_vm_t {
     // This is a global mutex used to make the VM/runtime thread-safe.
     mp_thread_mutex_t gil_mutex;
     #endif
+
+    // #if MICROPY_PY_BLUETOOTH
+    // // This is a linked list of callbacks registered in the Bluetooth
+    // // object, type mp_bt_characteristic_callback_t*
+    // void *bt_characteristic_callbacks;
+    // // This is a function object called for global events (device
+    // // connect/disconnect).
+    // mp_obj_t bt_event_handler;
+    // #endif
 } mp_state_vm_t;
 
 // This structure holds state that is specific to a given thread.

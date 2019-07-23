@@ -37,7 +37,7 @@ typedef struct _ringbuf_t {
 // byte buf_array[N];
 // ringbuf_t buf = {buf_array, sizeof(buf_array)};
 
-// Dynamic initialization. This creates root pointer!
+// Dynamic initialization. This needs to become findable as a root pointer!
 #define ringbuf_alloc(r, sz) \
 { \
     (r)->buf = m_new(uint8_t, sz); \
@@ -49,8 +49,9 @@ static inline int ringbuf_get(ringbuf_t *r) {
     if (r->iget == r->iput) {
         return -1;
     }
-    uint8_t v = r->buf[r->iget++];
-    if (r->iget >= r->size) {
+    uint8_t v = r->buf[r->iget];
+    r->iget = r->iget + 1;
+    if (r->iget == r->size) {
         r->iget = 0;
     }
     return v;
@@ -58,7 +59,7 @@ static inline int ringbuf_get(ringbuf_t *r) {
 
 static inline int ringbuf_put(ringbuf_t *r, uint8_t v) {
     uint32_t iput_new = r->iput + 1;
-    if (iput_new >= r->size) {
+    if (iput_new == r->size) {
         iput_new = 0;
     }
     if (iput_new == r->iget) {
@@ -66,6 +67,54 @@ static inline int ringbuf_put(ringbuf_t *r, uint8_t v) {
     }
     r->buf[r->iput] = v;
     r->iput = iput_new;
+    return 0;
+}
+
+static inline size_t ringbuf_free(ringbuf_t *r) {
+    return (r->size + r->iget - r->iput - 1) % r->size;
+}
+
+static inline size_t ringbuf_avail(ringbuf_t *r) {
+    return (r->size + r->iput - r->iget) % r->size;
+}
+
+static inline int ringbuf_get16(ringbuf_t *r) {
+    if (r->iget == r->iput) {
+        return -1;
+    }
+    uint32_t iget_a = r->iget + 1;
+    if (iget_a == r->size) {
+        iget_a = 0;
+    }
+    if (iget_a == r->iput) {
+        return -1;
+    }
+    uint16_t v = (r->buf[r->iget] << 8) | (r->buf[iget_a]);
+    r->iget = iget_a + 1;
+    if (r->iget == r->size) {
+        r->iget = 0;
+    }
+    return v;
+}
+
+static inline int ringbuf_put16(ringbuf_t *r, uint16_t v) {
+    uint32_t iput_a = r->iput + 1;
+    if (iput_a == r->size) {
+        iput_a = 0;
+    }
+    if (iput_a == r->iget) {
+        return -1;
+    }
+    uint32_t iput_b = iput_a + 1;
+    if (iput_b == r->size) {
+        iput_b = 0;
+    }
+    if (iput_b == r->iget) {
+        return -1;
+    }
+    r->buf[r->iput] = (v >> 8) & 0xff;
+    r->buf[iput_a] = v & 0xff;
+    r->iput = iput_b;
     return 0;
 }
 

@@ -168,7 +168,7 @@ STATIC mp_obj_t machine_hard_uart_make_new(const mp_obj_type_t *type, size_t n_a
 
     config.parity = NRF_UART_PARITY_EXCLUDED;
 
-#if (BLUETOOTH_SD == 100)
+#if (BLUETOOTH_SD == 110)
     config.interrupt_priority = 3;
 #else
     config.interrupt_priority = 6;
