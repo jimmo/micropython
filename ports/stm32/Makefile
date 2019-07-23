@@ -288,6 +288,7 @@ SRC_C = \
 	servo.c \
 	dac.c \
 	adc.c \
+	bluetooth/bluetooth.c \
 	$(wildcard $(BOARD_DIR)/*.c)
 
 SRC_O = \
@@ -378,7 +379,7 @@ SRC_USBDEV = $(addprefix $(USBDEV_DIR)/,\
 
 ifeq ($(MICROPY_PY_NETWORK_CYW43),1)
 CFLAGS_MOD += -DMICROPY_PY_NETWORK_CYW43=1
-SRC_C += sdio.c
+SRC_C += sdio.c cywbt.c
 EXTMOD_SRC_C += extmod/network_cyw43.c
 DRIVERS_SRC_C += drivers/cyw43/cyw43_ctrl.c drivers/cyw43/cyw43_lwip.c
 LIBS += $(TOP)/drivers/cyw43/libcyw43.a
@@ -437,6 +438,8 @@ OBJ += $(addprefix $(BUILD)/, $(SRC_HAL:.c=.o))
 OBJ += $(addprefix $(BUILD)/, $(SRC_USBDEV:.c=.o))
 OBJ += $(addprefix $(BUILD)/, $(SRC_MOD:.c=.o))
 OBJ += $(BUILD)/pins_$(BOARD).o
+
+include nimble/nimble.mk
 
 # This file contains performance critical functions so turn up the optimisation
 # level.  It doesn't add much to the code size and improves performance a bit.

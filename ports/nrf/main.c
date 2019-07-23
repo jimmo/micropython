@@ -94,7 +94,7 @@ extern uint32_t _heap_start;
 extern uint32_t _heap_end;
 
 int main(int argc, char **argv) {
-    
+
 soft_reset:
     mp_stack_set_top(&_ram_end);
 
@@ -153,7 +153,7 @@ soft_reset:
     }
 #endif
 
-pin_init0();
+    pin_init0();
 
 #if MICROPY_MBFS
     microbit_filesystem_init();
@@ -249,7 +249,12 @@ pin_init0();
     printf("MPY: soft reboot\n");
 
 #if BLUETOOTH_SD
-    sd_softdevice_disable();
+    mp_bt_disable();
+#endif
+
+#if MICROPY_PY_MACHINE_SOFT_PWM
+    pwm_stop();
+    ticker_stop();
 #endif
 
     goto soft_reset;
