@@ -138,7 +138,7 @@ int mp_bt_disconnect(uint16_t conn_handle);
 int mp_bt_scan_start(int32_t duration_ms);
 
 // Stop discovery (if currently active).
-int mp_bt_scan_stop(void);
+void mp_bt_scan_stop(void);
 
 // Connect to a found peripheral.
 int mp_bt_peripheral_connect(uint8_t addr_type, const uint8_t *addr, int32_t duration_ms);

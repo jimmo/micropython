@@ -292,7 +292,6 @@ int mp_bt_add_svc(mp_obj_bt_uuid_t *svc_uuid, mp_obj_bt_uuid_t **chr_uuids, uint
 
         esp_bt_uuid_t uuid = create_esp_uuid(chr_uuids[i]);
 
-        // TODO: Who owns these pointers? (uuid, val, etc).
         esp_err_t err = esp_ble_gatts_add_char(service_handle, &uuid, perm, property, &char_val, &control);
         if (err != 0) {
             return mp_bt_esp_errno(err);
@@ -339,7 +338,8 @@ int mp_bt_chr_value_read(uint16_t value_handle, uint8_t *value, size_t *value_le
     if (err != 0) {
         return mp_bt_esp_errno(err);
     }
-    memcpy(value, bt_ptr, MIN(*value_len, bt_len));
+    *value_len = MIN(*value_len, bt_len);
+    memcpy(value, bt_ptr, *value_len);
     return 0;
 }
 
@@ -385,7 +385,16 @@ STATIC void mp_bt_gap_callback(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_para
             // mp_bt_gatts_callback, but that's OK.
             xSemaphoreGive(mp_bt_call_complete);
             break;
+        case ESP_GAP_BLE_SCAN_START_COMPLETE_EVT:
+            mp_bt_call_status = param->scan_start_cmpl.status;
+            xSemaphoreGive(mp_bt_call_complete);
+            break;
+        case ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT:
+            mp_bt_call_status = param->scan_param_cmpl.status;
+            xSemaphoreGive(mp_bt_call_complete);
+            break;
         case ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT:
+        case ESP_GAP_BLE_SCAN_STOP_COMPLETE_EVT:
             xSemaphoreGive(mp_bt_call_complete);
             break;
         case ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT:
@@ -405,7 +414,7 @@ STATIC void mp_bt_gatts_callback(esp_gatts_cb_event_t event, esp_gatt_if_t gatts
             break;
         case ESP_GATTS_DISCONNECT_EVT:
             mp_bt_central_disconnected(param->disconnect.conn_id);//, UNKNOWN_ADDR_TYPE, param->disconnect.remote_bda);
-            // restart advertisement
+            // restart advertisement (TODO: match other ports)
             mp_bt_advertise_start_internal();
             break;
         case ESP_GATTS_REG_EVT:
@@ -459,11 +468,30 @@ STATIC void mp_bt_gatts_callback(esp_gatts_cb_event_t event, esp_gatt_if_t gatts
 }
 
 int mp_bt_scan_start(int32_t duration_ms) {
-    return 0;
+    esp_ble_scan_params_t scan_params;
+    esp_err_t err = esp_ble_gap_set_scan_params(&scan_params);
+    if (err != 0) {
+        return mp_bt_esp_errno(err);
+    }
+    // Wait for ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT
+    xSemaphoreTake(mp_bt_call_complete, portMAX_DELAY);
+
+    esp_ble_gap_start_scanning(MAX(1, duration_ms / 1000));
+    if (err != 0) {
+        return mp_bt_esp_errno(err);
+    }
+    // Wait for ESP_GAP_BLE_SCAN_START_COMPLETE_EVT
+    xSemaphoreTake(mp_bt_call_complete, portMAX_DELAY);
+    return mp_bt_status_errno();
 }
 
-int mp_bt_scan_stop(void) {
-    return 0;
+void mp_bt_scan_stop(void) {
+    esp_ble_gap_stop_scanning();
+    if (err != 0) {
+        return;
+    }
+    // Wait for ESP_GAP_BLE_SCAN_STOP_COMPLETE_EVT
+    xSemaphoreTake(mp_bt_call_complete, portMAX_DELAY);
 }
 
 int mp_bt_peripheral_connect(uint8_t addr_type, const uint8_t *addr, int32_t duration_ms) {

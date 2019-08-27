@@ -530,7 +530,7 @@ int mp_bt_scan_start(int32_t duration_ms) {
     return ble_hs_err_to_errno(err);
 }
 
-int mp_bt_scan_stop(void) {
+void mp_bt_scan_stop(void) {
     int err = ble_gap_disc_cancel();
     mp_bt_scan_complete();
     return ble_hs_err_to_errno(err);
