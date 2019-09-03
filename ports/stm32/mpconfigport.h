@@ -106,9 +106,9 @@
 #define MICROPY_PY_BUILTINS_NOTIMPLEMENTED (1)
 #define MICROPY_PY_BUILTINS_INPUT   (1)
 #define MICROPY_PY_BUILTINS_POW3    (1)
-#define MICROPY_PY_BUILTINS_HELP    (1)
-#define MICROPY_PY_BUILTINS_HELP_TEXT stm32_help_text
-#define MICROPY_PY_BUILTINS_HELP_MODULES (1)
+#define MICROPY_PY_BUILTINS_HELP    (0)
+//#define MICROPY_PY_BUILTINS_HELP_TEXT stm32_help_text
+#define MICROPY_PY_BUILTINS_HELP_MODULES (0)
 #define MICROPY_PY_MICROPYTHON_MEM_INFO (1)
 #define MICROPY_PY_ARRAY_SLICE_ASSIGN (1)
 #define MICROPY_PY_COLLECTIONS_DEQUE (1)
@@ -135,10 +135,10 @@
 // extended modules
 #define MICROPY_PY_UCTYPES          (1)
 #define MICROPY_PY_UZLIB            (1)
-#define MICROPY_PY_UJSON            (1)
-#define MICROPY_PY_URE              (1)
-#define MICROPY_PY_URE_SUB          (1)
-#define MICROPY_PY_UHEAPQ           (1)
+#define MICROPY_PY_UJSON            (0)
+#define MICROPY_PY_URE              (0)
+#define MICROPY_PY_URE_SUB          (0)
+#define MICROPY_PY_UHEAPQ           (0)
 #define MICROPY_PY_UHASHLIB         (1)
 #define MICROPY_PY_UHASHLIB_MD5     (MICROPY_PY_USSL)
 #define MICROPY_PY_UHASHLIB_SHA1    (MICROPY_PY_USSL)
@@ -258,10 +258,7 @@ extern const struct _mp_obj_module_t mp_module_onewire;
 #define MICROPY_PORT_BUILTIN_MODULE_WEAK_LINKS \
     { MP_ROM_QSTR(MP_QSTR_binascii), MP_ROM_PTR(&mp_module_ubinascii) }, \
     { MP_ROM_QSTR(MP_QSTR_collections), MP_ROM_PTR(&mp_module_collections) }, \
-    { MP_ROM_QSTR(MP_QSTR_re), MP_ROM_PTR(&mp_module_ure) }, \
     { MP_ROM_QSTR(MP_QSTR_zlib), MP_ROM_PTR(&mp_module_uzlib) }, \
-    { MP_ROM_QSTR(MP_QSTR_json), MP_ROM_PTR(&mp_module_ujson) }, \
-    { MP_ROM_QSTR(MP_QSTR_heapq), MP_ROM_PTR(&mp_module_uheapq) }, \
     { MP_ROM_QSTR(MP_QSTR_hashlib), MP_ROM_PTR(&mp_module_uhashlib) }, \
     { MP_ROM_QSTR(MP_QSTR_io), MP_ROM_PTR(&mp_module_io) }, \
     { MP_ROM_QSTR(MP_QSTR_os), MP_ROM_PTR(&mp_module_uos) }, \
