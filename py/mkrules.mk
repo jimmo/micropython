@@ -102,21 +102,51 @@ $(BUILD)/frozen.c: $(wildcard $(FROZEN_DIR)/*) $(HEADER_BUILD) $(FROZEN_EXTRA_DE
 	$(Q)$(MAKE_FROZEN) $(FROZEN_DIR) > $@
 endif
 
-ifneq ($(FROZEN_MPY_DIR),)
-# make a list of all the .py files that need compiling and freezing
-FROZEN_MPY_PY_FILES := $(shell find -L $(FROZEN_MPY_DIR) -type f -name '*.py' | $(SED) -e 's=^$(FROZEN_MPY_DIR)/==')
-FROZEN_MPY_MPY_FILES := $(addprefix $(BUILD)/frozen_mpy/,$(FROZEN_MPY_PY_FILES:.py=.mpy))
+# FROZEN_MPY_DIR is superseded by FROZEN_MPY_PORT_DIR (but continue to allow FROZEN_MPY_DIR)
+FROZEN_MPY_PORT_DIR ?= $(FROZEN_MPY_DIR)
+FROZEN_MPY_MPY_FILES =
 
-# to build .mpy files from .py files
-$(BUILD)/frozen_mpy/%.mpy: $(FROZEN_MPY_DIR)/%.py
+ifneq ($(FROZEN_MPY_PORT_DIR),)
+# make a list of all the port specific .py files that need compiling and freezing
+FROZEN_MPY_PY_FILES := $(shell cd $(FROZEN_MPY_PORT_DIR) && find -L . -type f -name '*.py')
+FROZEN_MPY_MPY_FILES += $(addprefix $(BUILD)/frozen_mpy/,$(FROZEN_MPY_PY_FILES:.py=.mpy))
+
+# to build port .mpy files from .py files
+$(BUILD)/frozen_mpy/%.mpy: $(FROZEN_MPY_PORT_DIR)/%.py
 	@$(ECHO) "MPY $<"
 	$(Q)$(MKDIR) -p $(dir $@)
-	$(Q)$(MPY_CROSS) -o $@ -s $(<:$(FROZEN_MPY_DIR)/%=%) $(MPY_CROSS_FLAGS) $<
+	$(Q)$(MPY_CROSS) -o $@ -s $(<:$(FROZEN_MPY_PORT_DIR)/%=%) $(MPY_CROSS_FLAGS) $<
+endif
 
+ifneq ($(FROZEN_MPY_BOARD_DIR),)
+# make a list of all the board-specific .py files that need compiling and freezing
+FROZEN_MPY_BOARD_PY_FILES := $(shell cd $(FROZEN_MPY_BOARD_DIR) && find -L . -type f -name '*.py')
+FROZEN_MPY_MPY_FILES += $(addprefix $(BUILD)/frozen_mpy/,$(FROZEN_MPY_BOARD_PY_FILES:.py=.mpy))
+
+# to build board .mpy files from .py files
+$(BUILD)/frozen_mpy/%.mpy: $(FROZEN_MPY_BOARD_DIR)/%.py
+	@$(ECHO) "MPY $<"
+	$(Q)$(MKDIR) -p $(dir $@)
+	$(Q)$(MPY_CROSS) -o $@ -s $(<:$(FROZEN_MPY_BOARD_DIR)/%=%) $(MPY_CROSS_FLAGS) $<
+endif
+
+ifneq ($(FROZEN_MPY_APP_DIR),)
+# make a list of all the application .py files that need compiling and freezing
+FROZEN_MPY_APP_PY_FILES := $(shell cd $(FROZEN_MPY_APP_DIR) && find -L . -type f -name '*.py')
+FROZEN_MPY_MPY_FILES += $(addprefix $(BUILD)/frozen_mpy/,$(FROZEN_MPY_APP_PY_FILES:.py=.mpy))
+
+# to build app .mpy files from .py files
+$(BUILD)/frozen_mpy/%.mpy: $(FROZEN_MPY_APP_DIR)/%.py
+	@$(ECHO) "MPY $<"
+	$(Q)$(MKDIR) -p $(dir $@)
+	$(Q)$(MPY_CROSS) -o $@ -s $(<:$(FROZEN_MPY_APP_DIR)/%=%) $(MPY_CROSS_FLAGS) $<
+endif
+
+ifneq ($(FROZEN_MPY_MPY_FILES),)
 # to build frozen_mpy.c from all .mpy files
 $(BUILD)/frozen_mpy.c: $(FROZEN_MPY_MPY_FILES) $(BUILD)/genhdr/qstrdefs.generated.h
 	@$(ECHO) "GEN $@"
-	$(Q)$(MPY_TOOL) -f -q $(BUILD)/genhdr/qstrdefs.preprocessed.h $(FROZEN_MPY_MPY_FILES) > $@
+	$(MPY_TOOL) -f -q $(BUILD)/genhdr/qstrdefs.preprocessed.h $(FROZEN_MPY_MPY_FILES) > $@
 endif
 
 ifneq ($(PROG),)
