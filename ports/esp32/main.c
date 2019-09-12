@@ -37,8 +37,7 @@
 #include "esp_task.h"
 #include "soc/cpu.h"
 #include "esp_log.h"
-//#include "esp_spiram.h"
-//esp32/spiram.h
+#include "esp32/spiram.h"
 
 #include "py/stackctrl.h"
 #include "py/nlr.h"
@@ -71,7 +70,7 @@ void mp_task(void *pvParameter) {
     #endif
     uart_init();
 
-    #if CONFIG_SPIRAM_SUPPORT
+    #if CONFIG_ESP32_SPIRAM_SUPPORT
     // Try to use the entire external SPIRAM directly for the heap
     size_t mp_task_heap_size;
     void *mp_task_heap = (void*)0x3f800000;

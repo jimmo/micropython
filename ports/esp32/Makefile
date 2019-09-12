@@ -50,7 +50,8 @@ SDKCONFIG_COMBINED = $(BUILD)/sdkconfig.combined
 SDKCONFIG_H = $(BUILD)/sdkconfig.h
 
 # the git hash of the currently supported ESP IDF version
-ESPIDF_SUPHASH := 6ccb4cf5b7d1fdddb8c2492f9cbc926abaf230df
+ESPIDF_SUPHASH := 310beae373446ceb9a4ad9b36b5428d7fdf2705f
+#6ccb4cf5b7d1fdddb8c2492f9cbc926abaf230df
 
 # paths to ESP IDF and its components
 ifeq ($(ESPIDF),)
@@ -121,6 +122,7 @@ INC_ESPCOMP += -I$(ESPCOMP)/nvs_flash/include
 INC_ESPCOMP += -I$(ESPCOMP)/freertos/include
 INC_ESPCOMP += -I$(ESPCOMP)/esp_ringbuf/include
 INC_ESPCOMP += -I$(ESPCOMP)/esp_event/include
+INC_ESPCOMP += -I$(ESPCOMP)/esp_event/private_include
 INC_ESPCOMP += -I$(ESPCOMP)/tcpip_adapter/include
 INC_ESPCOMP += -I$(ESPCOMP)/lwip/lwip/src/include
 INC_ESPCOMP += -I$(ESPCOMP)/lwip/port/esp32/include
@@ -139,7 +141,6 @@ INC_ESPCOMP += -I$(ESPCOMP)/xtensa-debug-module/include
 INC_ESPCOMP += -I$(ESPCOMP)/wpa_supplicant/include
 INC_ESPCOMP += -I$(ESPCOMP)/wpa_supplicant/port/include
 INC_ESPCOMP += -I$(ESPCOMP)/wpa_supplicant/include/esp_supplicant
-INC_ESPCOMP += -I$(ESPCOMP)/ethernet/include
 INC_ESPCOMP += -I$(ESPCOMP)/app_trace/include
 INC_ESPCOMP += -I$(ESPCOMP)/app_update/include
 INC_ESPCOMP += -I$(ESPCOMP)/pthread/include
@@ -150,6 +151,7 @@ INC_ESPCOMP += -I$(ESPCOMP)/xtensa/esp32/include
 INC_ESPCOMP += -I$(ESPCOMP)/esp_rom/include
 INC_ESPCOMP += -I$(ESPCOMP)/esp_common/include
 INC_ESPCOMP += -I$(ESPCOMP)/esp_wifi/include
+INC_ESPCOMP += -I$(ESPCOMP)/esp_wifi/esp32/include
 
 # these flags are common to C and C++ compilation
 CFLAGS_COMMON = -Os -ffunction-sections -fdata-sections -fstrict-volatile-bitfields \
@@ -172,6 +174,7 @@ LDFLAGS += --gc-sections -static -EL
 LDFLAGS += -u call_user_start_cpu0 -u uxTopUsedPriority -u ld_include_panic_highint_hdl
 LDFLAGS += -u __cxa_guard_dummy # so that implementation of static guards is taken from cxx_guards.o instead of libstdc++.a
 LDFLAGS += -L$(ESPCOMP)/esp32/ld
+LDFLAGS += -L$(ESPCOMP)/esp_rom/esp32/ld
 LDFLAGS += -T $(BUILD)/esp32_out.ld
 LDFLAGS += -T $(BUILD)/esp32.project.ld
 LDFLAGS += -T esp32.rom.ld
@@ -191,12 +194,15 @@ COPT += -Os -DNDEBUG
 #LDFLAGS += --gc-sections
 endif
 
-# Enable SPIRAM support if CONFIG_SPIRAM_SUPPORT=y in sdkconfig
-ifeq ($(CONFIG_SPIRAM_SUPPORT),y)
+# Enable SPIRAM support if CONFIG_ESP32_SPIRAM_SUPPORT=y in sdkconfig
+ifeq ($(CONFIG_ESP32_SPIRAM_SUPPORT),y)
 CFLAGS_COMMON += -mfix-esp32-psram-cache-issue
 LIBC_LIBM = $(ESPCOMP)/newlib/lib/libc-psram-workaround.a $(ESPCOMP)/newlib/lib/libm-psram-workaround.a
 else
-LDFLAGS += -T esp32.rom.spiram_incompatible_fns.ld
+# Additional newlib symbols that can only be used with spiram disabled.
+LDFLAGS += -T esp32.rom.newlib-funcs.ld
+LDFLAGS += -T esp32.rom.newlib-locale.ld
+LDFLAGS += -T esp32.rom.newlib-data.ld
 LIBC_LIBM = $(ESPCOMP)/newlib/lib/libc.a $(ESPCOMP)/newlib/lib/libm.a
 endif
 
@@ -291,7 +297,8 @@ $(SDKCONFIG_H): $(SDKCONFIG_COMBINED)
 		--env "IDF_TARGET=esp32" \
 		--env "IDF_CMAKE=n" \
 		--env "COMPONENT_KCONFIGS=$(ESPCOMP_KCONFIGS)" \
-		--env "COMPONENT_KCONFIGS_PROJBUILD=$(ESPCOMP_KCONFIGS_PROJBUILD)"
+		--env "COMPONENT_KCONFIGS_PROJBUILD=$(ESPCOMP_KCONFIGS_PROJBUILD)" \
+		--env "IDF_PATH=$(ESPIDF)"
 	$(Q)touch $@
 
 $(HEADER_BUILD)/qstrdefs.generated.h: $(SDKCONFIG_H) $(BOARD_DIR)/mpconfigboard.h
@@ -301,7 +308,9 @@ $(HEADER_BUILD)/qstrdefs.generated.h: $(SDKCONFIG_H) $(BOARD_DIR)/mpconfigboard.
 
 ESPIDF_BOOTLOADER_SUPPORT_O = $(patsubst %.c,%.o,\
 	$(filter-out $(ESPCOMP)/bootloader_support/src/bootloader_init.c,\
-		$(wildcard $(ESPCOMP)/bootloader_support/src/*.c)))
+		$(wildcard $(ESPCOMP)/bootloader_support/src/*.c) \
+		$(wildcard $(ESPCOMP)/bootloader_support/src/idf/*.c) \
+		))
 
 ESPIDF_DRIVER_O = $(patsubst %.c,%.o,$(wildcard $(ESPCOMP)/driver/*.c))
 
@@ -316,21 +325,26 @@ ESPIDF_ESP32_O = \
 	$(patsubst %.c,%.o,$(wildcard $(ESPCOMP)/esp32/hwcrypto/*.c)) \
 	$(patsubst %.S,%.o,$(wildcard $(ESPCOMP)/esp32/*.S)) \
 
+ESPIDF_ESP_COMMON_O = $(patsubst %.c,%.o,$(wildcard $(ESPCOMP)/esp_common/src/*.c))
+
+ESPIDF_ESP_EVENT_O = $(patsubst %.c,%.o,$(wildcard $(ESPCOMP)/esp_event/*.c))
+
 ESPIDF_ESP_RINGBUF_O = $(patsubst %.c,%.o,$(wildcard $(ESPCOMP)/esp_ringbuf/*.c))
+
+ESPIDF_ESP_WIFI_O = $(patsubst %.c,%.o,$(wildcard $(ESPCOMP)/esp_wifi/src/*.c))
 
 ESPIDF_HEAP_O = $(patsubst %.c,%.o,$(wildcard $(ESPCOMP)/heap/*.c))
 
 ESPIDF_SOC_O = $(patsubst %.c,%.o,\
 	$(wildcard $(ESPCOMP)/soc/esp32/*.c) \
 	$(wildcard $(ESPCOMP)/soc/src/*.c) \
+	$(wildcard $(ESPCOMP)/soc/src/hal/*.c) \
 	)
 
 ESPIDF_CXX_O = $(patsubst %.cpp,%.o,$(wildcard $(ESPCOMP)/cxx/*.cpp))
 
-ESPIDF_ETHERNET_O = $(patsubst %.c,%.o,\
-	$(wildcard $(ESPCOMP)/ethernet/*.c) \
-	$(wildcard $(ESPCOMP)/ethernet/eth_phy/*.c) \
-	)
+$(BUILD)/$(ESPCOMP)/esp_eth/src/esp_eth_mac_dm9051.o: CFLAGS += -fno-strict-aliasing
+ESPIDF_ESP_ETH_O = $(patsubst %.c,%.o,$(wildcard $(ESPCOMP)/esp_eth/src/*.c))
 
 ESPIDF_PTHREAD_O = $(patsubst %.c,%.o,$(wildcard $(ESPCOMP)/pthread/*.c))
 
@@ -390,6 +404,7 @@ ESPIDF_LWIP_O = $(patsubst %.c,%.o,\
 ESPIDF_MBEDTLS_O = $(patsubst %.c,%.o,\
 	$(wildcard $(ESPCOMP)/mbedtls/mbedtls/library/*.c) \
 	$(wildcard $(ESPCOMP)/mbedtls/port/*.c) \
+	$(wildcard $(ESPCOMP)/mbedtls/port/esp32/*.c) \
 	)
 
 ESPIDF_MDNS_O = $(patsubst %.c,%.o,$(wildcard $(ESPCOMP)/mdns/*.c))
@@ -401,6 +416,11 @@ ESPIDF_WPA_SUPPLICANT_O = $(patsubst %.c,%.o,\
 	)
 
 ESPIDF_SDMMC_O = $(patsubst %.c,%.o,$(wildcard $(ESPCOMP)/sdmmc/*.c))
+
+ESPIDF_XTENSA_O = $(patsubst %.c,%.o,\
+    $(wildcard $(ESPCOMP)/xtensa/*.c) \
+    $(wildcard $(ESPCOMP)/xtensa/esp32/*.c) \
+    )
 
 OBJ_ESPIDF =
 LIB_ESPIDF =
@@ -418,11 +438,14 @@ $(eval $(call gen_espidf_lib_rule,bootloader_support,$(ESPIDF_BOOTLOADER_SUPPORT
 $(eval $(call gen_espidf_lib_rule,driver,$(ESPIDF_DRIVER_O)))
 $(eval $(call gen_espidf_lib_rule,efuse,$(ESPIDF_EFUSE_O)))
 $(eval $(call gen_espidf_lib_rule,esp32,$(ESPIDF_ESP32_O)))
+$(eval $(call gen_espidf_lib_rule,esp_common,$(ESPIDF_ESP_COMMON_O)))
+$(eval $(call gen_espidf_lib_rule,esp_event,$(ESPIDF_ESP_EVENT_O)))
 $(eval $(call gen_espidf_lib_rule,esp_ringbuf,$(ESPIDF_ESP_RINGBUF_O)))
+$(eval $(call gen_espidf_lib_rule,esp_wifi,$(ESPIDF_ESP_WIFI_O)))
 $(eval $(call gen_espidf_lib_rule,heap,$(ESPIDF_HEAP_O)))
 $(eval $(call gen_espidf_lib_rule,soc,$(ESPIDF_SOC_O)))
 $(eval $(call gen_espidf_lib_rule,cxx,$(ESPIDF_CXX_O)))
-$(eval $(call gen_espidf_lib_rule,ethernet,$(ESPIDF_ETHERNET_O)))
+$(eval $(call gen_espidf_lib_rule,esp_eth,$(ESPIDF_ESP_ETH_O)))
 $(eval $(call gen_espidf_lib_rule,pthread,$(ESPIDF_PTHREAD_O)))
 $(eval $(call gen_espidf_lib_rule,freertos,$(ESPIDF_FREERTOS_O)))
 $(eval $(call gen_espidf_lib_rule,vfs,$(ESPIDF_VFS_O)))
@@ -442,6 +465,7 @@ $(eval $(call gen_espidf_lib_rule,mbedtls,$(ESPIDF_MBEDTLS_O)))
 $(eval $(call gen_espidf_lib_rule,mdns,$(ESPIDF_MDNS_O)))
 $(eval $(call gen_espidf_lib_rule,wpa_supplicant,$(ESPIDF_WPA_SUPPLICANT_O)))
 $(eval $(call gen_espidf_lib_rule,sdmmc,$(ESPIDF_SDMMC_O)))
+$(eval $(call gen_espidf_lib_rule,xtensa,$(ESPIDF_XTENSA_O)))
 
 # Create all destination build dirs before compiling IDF source
 OBJ_ESPIDF_DIRS = $(sort $(dir $(OBJ_ESPIDF))) $(BUILD_ESPIDF_LIB) $(addprefix $(BUILD_ESPIDF_LIB)/,$(LIB_ESPIDF))
@@ -459,21 +483,27 @@ LIB = $(foreach lib,$(LIB_ESPIDF),$(BUILD_ESPIDF_LIB)/$(lib)/lib$(lib).a)
 # ESP IDF ldgen
 
 LDGEN_FRAGMENTS = $(shell find $(ESPCOMP) -name "*.lf")
-LDGEN_SECTIONS_INFO = $(foreach lib,$(LIB_ESPIDF),$(BUILD_ESPIDF_LIB)/$(lib)/lib$(lib).a.sections_info)
-LDGEN_SECTION_INFOS = $(BUILD_ESPIDF_LIB)/ldgen.section_infos
 
-define gen_sections_info_rule
-$(1).sections_info: $(1)
-	$(ECHO) "GEN $(1).sections_info"
-	$(Q)$(OBJDUMP) -h $(1) > $(1).sections_info
-endef
+# LDGEN_SECTIONS_INFO = $(foreach lib,$(LIB_ESPIDF),$(BUILD_ESPIDF_LIB)/$(lib)/lib$(lib).a.sections_info)
+# LDGEN_SECTION_INFOS = $(BUILD_ESPIDF_LIB)/ldgen.section_infos
 
-$(eval $(foreach lib,$(LIB_ESPIDF),$(eval $(call gen_sections_info_rule,$(BUILD_ESPIDF_LIB)/$(lib)/lib$(lib).a))))
+# define gen_sections_info_rule
+# $(1).sections_info: $(1)
+# 	$(ECHO) "GEN $(1).sections_info"
+# 	$(Q)$(OBJDUMP) -h $(1) > $(1).sections_info
+# endef
 
-$(LDGEN_SECTION_INFOS): $(LDGEN_SECTIONS_INFO) $(ESPIDF)/make/ldgen.mk
-	$(Q)printf "$(foreach info,$(LDGEN_SECTIONS_INFO),$(info)\n)" > $@
+# $(eval $(foreach lib,$(LIB_ESPIDF),$(eval $(call gen_sections_info_rule,$(BUILD_ESPIDF_LIB)/$(lib)/lib$(lib).a))))
 
-$(BUILD)/esp32.project.ld: $(ESPCOMP)/esp32/ld/esp32.project.ld.in $(LDGEN_FRAGMENTS) $(SDKCONFIG_COMBINED) $(LDGEN_SECTION_INFOS)
+# $(LDGEN_SECTION_INFOS): $(LDGEN_SECTIONS_INFO) $(ESPIDF)/make/ldgen.mk
+# 	$(Q)printf "$(foreach info,$(LDGEN_SECTIONS_INFO),$(info)\n)" > $@
+
+LDGEN_LIBRARIES=$(foreach lib,$(LIB_ESPIDF),$(BUILD_ESPIDF_LIB)/$(lib)/lib$(lib).a)
+
+$(BUILD_ESPIDF_LIB)/ldgen_libraries: $(LDGEN_LIBRARIES) $(IDF_PATH)/make/ldgen.mk
+	printf "$(foreach library,$(LDGEN_LIBRARIES),$(library)\n)" > $(BUILD_ESPIDF_LIB)/ldgen_libraries
+
+$(BUILD)/esp32.project.ld: $(ESPCOMP)/esp32/ld/esp32.project.ld.in $(LDGEN_FRAGMENTS) $(SDKCONFIG_COMBINED) $(BUILD_ESPIDF_LIB)/ldgen_libraries
 	$(ECHO) "GEN $@"
 	$(Q)$(PYTHON) $(ESPIDF)/tools/ldgen/ldgen.py \
 		--input $< \
@@ -481,10 +511,12 @@ $(BUILD)/esp32.project.ld: $(ESPCOMP)/esp32/ld/esp32.project.ld.in $(LDGEN_FRAGM
 		--config $(SDKCONFIG_COMBINED) \
 		--kconfig $(ESPIDF)/Kconfig \
 		--fragments $(LDGEN_FRAGMENTS) \
+		--libraries-file $(BUILD_ESPIDF_LIB)/ldgen_libraries \
 		--env "IDF_TARGET=esp32" \
 		--env "IDF_CMAKE=n" \
 		--env "COMPONENT_KCONFIGS=$(ESPCOMP_KCONFIGS)" \
-		--env "COMPONENT_KCONFIGS_PROJBUILD=$(ESPCOMP_KCONFIGS_PROJBUILD)"
+		--env "COMPONENT_KCONFIGS_PROJBUILD=$(ESPCOMP_KCONFIGS_PROJBUILD)" \
+		--objdump $(OBJDUMP)
 
 ################################################################################
 # Main targets
@@ -520,7 +552,9 @@ APP_LD_ARGS += --start-group
 APP_LD_ARGS += -L$(dir $(LIBGCC_FILE_NAME)) -lgcc
 APP_LD_ARGS += -L$(dir $(LIBSTDCXX_FILE_NAME)) -lstdc++
 APP_LD_ARGS += $(LIBC_LIBM)
-APP_LD_ARGS += $(ESPCOMP)/esp32/libhal.a
+APP_LD_ARGS += $(ESPCOMP)/xtensa/esp32/libhal.a
+APP_LD_ARGS += $(ESPCOMP)/esp_wifi/lib_esp32/libnet80211.a
+APP_LD_ARGS += $(ESPCOMP)/esp_wifi/lib_esp32/libpp.a
 APP_LD_ARGS += -L$(ESPCOMP)/esp32/lib -lcore -lmesh -lnet80211 -lphy -lrtc -lpp -lwpa -lsmartconfig -lcoexist -lwps -lwpa2
 APP_LD_ARGS += $(OBJ)
 APP_LD_ARGS += $(LIB)
