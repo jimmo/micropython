@@ -70,6 +70,10 @@
 #include "dac.h"
 #include "can.h"
 #include "modnetwork.h"
+#if MICROPY_HW_HAS_F7DLCD
+#include "stm32746g_discovery_lcd.h"
+#endif
+
 
 #if MICROPY_PY_THREAD
 STATIC pyb_thread_t pyb_thread_main;
@@ -732,6 +736,9 @@ soft_reset_exit:
     uart_deinit_all();
     #if MICROPY_HW_ENABLE_CAN
     can_deinit();
+    #endif
+    #if MICROPY_HW_HAS_F7DLCD
+    BSP_LCD_DeInit();
     #endif
     machine_deinit();
 

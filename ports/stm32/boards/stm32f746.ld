@@ -11,6 +11,7 @@ MEMORY
     FLASH_TEXT (rx) : ORIGIN = 0x08020000, LENGTH = 896K    /* sectors 4-7 1*128Kib 3*256KiB = 896K */
     DTCM (xrw)      : ORIGIN = 0x20000000, LENGTH = 64K     /* Used for storage cache */
     RAM (xrw)       : ORIGIN = 0x20010000, LENGTH = 256K    /* SRAM1 = 240K, SRAM2 = 16K */
+    SDRAM (xrw)      : ORIGIN = 0xC0000000, LENGTH = 8M      /* external SDRAM STM32F746G-discovery ONLY ! */
 }
 
 /* produce a link error if there is not this amount of RAM for these sections */
@@ -27,3 +28,19 @@ _ram_start = ORIGIN(RAM);
 _ram_end = ORIGIN(RAM) + LENGTH(RAM);
 _heap_start = _ebss; /* heap starts just after statically allocated memory */
 _heap_end = _sstack;
+
+
+SECTIONS
+{
+    /* This is the External SRAM/SDRAM section */
+    .extsdram (NOLOAD) :
+    {
+        _extsdram = . ;
+        extsdram = . ;
+        PROVIDE (extsdram = .);
+        PROVIDE (_extsdram = .);
+        *(.extsdram .extsdram.*)
+        *(.EXTSDRAM)
+        . = ALIGN(4);
+    } >SDRAM
+}

@@ -16,4 +16,9 @@
 #define HSE_STARTUP_TIMEOUT (5000)
 #define LSE_STARTUP_TIMEOUT (5000)
 
+#include "stm32f7xx_hal_dma2d.h"
+#include "stm32f7xx_hal_ltdc.h"
+#define HAL_DMA2D_MODULE_ENABLED
+#define HAL_LTDC_MODULE_ENABLED
+
 #endif // MICROPY_INCLUDED_STM32F7XX_HAL_CONF_H
