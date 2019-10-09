@@ -1059,6 +1059,16 @@ typedef double mp_float_t;
 #define MICROPY_PY_MICROPYTHON_MEM_INFO (0)
 #endif
 
+// If mem-info is available, whether to support the full block dump.
+#ifndef MICROPY_PY_MICROPYTHON_MEM_INFO_BLOCKS
+#define MICROPY_PY_MICROPYTHON_MEM_INFO_BLOCKS (1)
+#endif
+
+// If mem-info is available, whether to support fragmentation stats.
+#ifndef MICROPY_PY_MICROPYTHON_MEM_INFO_FRAGMENTATION
+#define MICROPY_PY_MICROPYTHON_MEM_INFO_FRAGMENTATION (1)
+#endif
+
 // Whether to provide "micropython.stack_use" function
 #ifndef MICROPY_PY_MICROPYTHON_STACK_USE
 #define MICROPY_PY_MICROPYTHON_STACK_USE (MICROPY_PY_MICROPYTHON_MEM_INFO)

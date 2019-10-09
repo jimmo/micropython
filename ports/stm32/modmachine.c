@@ -226,7 +226,7 @@ STATIC mp_obj_t machine_info(size_t n_args, const mp_obj_t *args) {
 
     if (n_args == 1) {
         // arg given means dump gc allocation table
-        gc_dump_alloc_table();
+        gc_dump_alloc_table(true, true);
     }
 
     return mp_const_none;
