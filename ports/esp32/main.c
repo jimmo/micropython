@@ -74,18 +74,22 @@ void mp_task(void *pvParameter) {
     #endif
     uart_init();
 
+    size_t mp_task_atb_size = 0;
     // TODO: CONFIG_SPIRAM_SUPPORT is for 3.3 compatibility, remove after move to 4.0.
     #if CONFIG_ESP32_SPIRAM_SUPPORT || CONFIG_SPIRAM_SUPPORT
     // Try to use the entire external SPIRAM directly for the heap
     size_t mp_task_heap_size;
     void *mp_task_heap = (void*)0x3f800000;
+    void *mp_task_atb = NULL;
     switch (esp_spiram_get_chip_size()) {
         case ESP_SPIRAM_SIZE_16MBITS:
             mp_task_heap_size = 2 * 1024 * 1024;
+            mp_task_atb_size = mp_task_heap_size / 64;
             break;
         case ESP_SPIRAM_SIZE_32MBITS:
         case ESP_SPIRAM_SIZE_64MBITS:
             mp_task_heap_size = 4 * 1024 * 1024;
+            mp_task_atb_size = mp_task_heap_size / 64;
             break;
         default:
             // No SPIRAM, fallback to normal allocation
@@ -97,13 +101,17 @@ void mp_task(void *pvParameter) {
     // Allocate the uPy heap using malloc and get the largest available region
     size_t mp_task_heap_size = heap_caps_get_largest_free_block(MALLOC_CAP_8BIT);
     void *mp_task_heap = malloc(mp_task_heap_size);
+    void *mp_task_atb = NULL;
     #endif
+    if (mp_task_atb_size) {
+        mp_task_atb = heap_caps_malloc(mp_task_atb_size, MALLOC_CAP_INTERNAL);
+    }
 
 soft_reset:
     // initialise the stack pointer for the main thread
     mp_stack_set_top((void *)sp);
     mp_stack_set_limit(MP_TASK_STACK_SIZE - 1024);
-    gc_init(mp_task_heap, mp_task_heap + mp_task_heap_size);
+    gc_init(mp_task_heap, mp_task_heap + mp_task_heap_size, mp_task_atb, mp_task_atb + mp_task_atb_size);
     mp_init();
     mp_obj_list_init(mp_sys_path, 0);
     mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR_));

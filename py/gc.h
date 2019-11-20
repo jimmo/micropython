@@ -32,6 +32,7 @@
 #include "py/misc.h"
 
 void gc_init(void *start, void *end);
+void gc_init_ext(void *start, void *end, void *atb_start, void *atb_end);
 
 // These lock/unlock functions can be nested.
 // They can be used to prevent the GC from allocating/freeing.

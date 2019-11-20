@@ -69,6 +69,7 @@
 #define ATB_MASK_2 (0x30)
 #define ATB_MASK_3 (0xc0)
 
+#define ATB_IS_FREE(a) (a == 0)
 #define ATB_0_IS_FREE(a) (((a) & ATB_MASK_0) == 0)
 #define ATB_1_IS_FREE(a) (((a) & ATB_MASK_1) == 0)
 #define ATB_2_IS_FREE(a) (((a) & ATB_MASK_2) == 0)
@@ -107,6 +108,9 @@
 
 // TODO waste less memory; currently requires that all entries in alloc_table have a corresponding block in pool
 void gc_init(void *start, void *end) {
+    gc_init_ext(start, end, NULL, NULL);
+}
+void gc_init_ext(void *start, void *end, void *atb_start, void *atb_end) {
     // align end pointer on block boundary
     end = (void*)((uintptr_t)end & (~(BYTES_PER_BLOCK - 1)));
     DEBUG_printf("Initializing GC heap: %p..%p = " UINT_FMT " bytes\n", start, end, (byte*)end - (byte*)start);
@@ -133,6 +137,18 @@ void gc_init(void *start, void *end) {
     size_t gc_pool_block_len = MP_STATE_MEM(gc_alloc_table_byte_len) * BLOCKS_PER_ATB;
     MP_STATE_MEM(gc_pool_start) = (byte*)end - gc_pool_block_len * BYTES_PER_BLOCK;
     MP_STATE_MEM(gc_pool_end) = end;
+
+    if (atb_start && atb_end) {
+        // TODO: the above calculation for total_byte_len will be incorrect because it's accounting
+        // for an A and F that it doesn't need to.
+        size_t total_atb_alloc_len = (byte*)atb_end - (byte*)atb_start;
+        if (total_atb_alloc_len < MP_STATE_MEM(gc_alloc_table_byte_len)) {
+            printf("alloc too small for split ATB %d %d\n", total_atb_alloc_len, MP_STATE_MEM(gc_alloc_table_byte_len));
+        } else {
+            printf("using split atb %p --> %p\n", MP_STATE_MEM(gc_alloc_table_start), atb_start);
+            MP_STATE_MEM(gc_alloc_table_start) = atb_start;
+        }
+    }
 
 #if MICROPY_ENABLE_FINALISER
     assert(MP_STATE_MEM(gc_pool_start) >= MP_STATE_MEM(gc_finaliser_table_start) + gc_finaliser_table_byte_len);
@@ -262,59 +278,78 @@ STATIC void gc_deal_with_stack_overflow(void) {
     }
 }
 
+#include "py/mphal.h"
+
 STATIC void gc_sweep(void) {
+    //mp_int_t t_s = mp_hal_ticks_us();
     #if MICROPY_PY_GC_COLLECT_RETVAL
     MP_STATE_MEM(gc_collected) = 0;
     #endif
     // free unmarked heads and their tails
     int free_tail = 0;
-    for (size_t block = 0; block < MP_STATE_MEM(gc_alloc_table_byte_len) * BLOCKS_PER_ATB; block++) {
-        switch (ATB_GET_KIND(block)) {
-            case AT_HEAD:
-#if MICROPY_ENABLE_FINALISER
-                if (FTB_GET(block)) {
-                    mp_obj_base_t *obj = (mp_obj_base_t*)PTR_FROM_BLOCK(block);
-                    if (obj->type != NULL) {
-                        // if the object has a type then see if it has a __del__ method
-                        mp_obj_t dest[2];
-                        mp_load_method_maybe(MP_OBJ_FROM_PTR(obj), MP_QSTR___del__, dest);
-                        if (dest[0] != MP_OBJ_NULL) {
-                            // load_method returned a method, execute it in a protected environment
-                            #if MICROPY_ENABLE_SCHEDULER
-                            mp_sched_lock();
-                            #endif
-                            mp_call_function_1_protected(dest[0], dest[1]);
-                            #if MICROPY_ENABLE_SCHEDULER
-                            mp_sched_unlock();
-                            #endif
-                        }
-                    }
-                    // clear finaliser flag
-                    FTB_CLEAR(block);
-                }
-#endif
-                free_tail = 1;
-                DEBUG_printf("gc_sweep(%p)\n", PTR_FROM_BLOCK(block));
-                #if MICROPY_PY_GC_COLLECT_RETVAL
-                MP_STATE_MEM(gc_collected)++;
-                #endif
-                // fall through to free the head
-
-            case AT_TAIL:
-                if (free_tail) {
-                    ATB_ANY_TO_FREE(block);
-                    #if CLEAR_ON_SWEEP
-                    memset((void*)PTR_FROM_BLOCK(block), 0, BYTES_PER_BLOCK);
-                    #endif
-                }
-                break;
-
-            case AT_MARK:
-                ATB_MARK_TO_HEAD(block);
-                free_tail = 0;
-                break;
+    #if 0
+    // Skip over entire ATBs if they're all empty. Avoids a lot of shifting.
+    for (size_t block = 0, atb = 0; atb < MP_STATE_MEM(gc_alloc_table_byte_len); atb++) {
+        if (ATB_IS_FREE(MP_STATE_MEM(gc_alloc_table_start)[atb])) {
+            block += 4;
+            continue;
         }
+        for (int i = 0; i < BLOCKS_PER_ATB; ++i, ++block) {
+    #else
+    for (size_t block = 0; block < MP_STATE_MEM(gc_alloc_table_byte_len) * BLOCKS_PER_ATB; block++) {
+    #endif
+            switch (ATB_GET_KIND(block)) {
+                case AT_HEAD:
+    #if MICROPY_ENABLE_FINALISER
+                    if (FTB_GET(block)) {
+                        mp_obj_base_t *obj = (mp_obj_base_t*)PTR_FROM_BLOCK(block);
+                        if (obj->type != NULL) {
+                            // if the object has a type then see if it has a __del__ method
+                            mp_obj_t dest[2];
+                            mp_load_method_maybe(MP_OBJ_FROM_PTR(obj), MP_QSTR___del__, dest);
+                            if (dest[0] != MP_OBJ_NULL) {
+                                // load_method returned a method, execute it in a protected environment
+                                #if MICROPY_ENABLE_SCHEDULER
+                                mp_sched_lock();
+                                #endif
+                                mp_call_function_1_protected(dest[0], dest[1]);
+                                #if MICROPY_ENABLE_SCHEDULER
+                                mp_sched_unlock();
+                                #endif
+                            }
+                        }
+                        // clear finaliser flag
+                        FTB_CLEAR(block);
+                    }
+    #endif
+                    free_tail = 1;
+                    DEBUG_printf("gc_sweep(%p)\n", PTR_FROM_BLOCK(block));
+                    #if MICROPY_PY_GC_COLLECT_RETVAL
+                    MP_STATE_MEM(gc_collected)++;
+                    #endif
+                    // fall through to free the head
+
+                case AT_TAIL:
+                    if (free_tail) {
+                        ATB_ANY_TO_FREE(block);
+                        #if CLEAR_ON_SWEEP
+                        memset((void*)PTR_FROM_BLOCK(block), 0, BYTES_PER_BLOCK);
+                        #endif
+                    }
+                    break;
+
+                case AT_MARK:
+                    ATB_MARK_TO_HEAD(block);
+                    free_tail = 0;
+                    break;
+            }
+    #if 0
+        }
+    #else
+    #endif
     }
+    //mp_int_t t_e = mp_hal_ticks_us();
+    //printf("sweep took %d\n", t_e - t_s);
 }
 
 void gc_collect_start(void) {

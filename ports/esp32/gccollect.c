@@ -59,8 +59,13 @@ static void gc_collect_inner(int level) {
     #endif
 }
 
+#include "py/mphal.h"
+
 void gc_collect(void) {
+    //mp_int_t t_s = mp_hal_ticks_us();
     gc_collect_start();
     gc_collect_inner(0);
     gc_collect_end();
+    //mp_int_t t_e = mp_hal_ticks_us();
+    //printf("collect took %d\n", t_e - t_s);
 }
