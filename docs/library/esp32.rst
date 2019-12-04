@@ -59,7 +59,7 @@ This class gives access to the partitions in the device's flash memory.
 .. method:: Partition.writeblocks(block_num, buf)
 .. method:: Partition.ioctl(cmd, arg)
 
-    These methods implement the block protocol defined by :class:`uos.AbstractBlockDev`.
+    These methods implement the block protocol defined by :class:`os.AbstractBlockDev`.
 
 .. method:: Partition.set_boot()
 

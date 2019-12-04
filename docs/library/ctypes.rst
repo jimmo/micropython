@@ -1,7 +1,7 @@
-:mod:`uctypes` -- access binary data in a structured way
+:mod:`ctypes` -- access binary data in a structured way
 ========================================================
 
-.. module:: uctypes
+.. module:: ctypes
    :synopsis: access binary data in a structured way
 
 This module implements "foreign data interface" for MicroPython. The idea
@@ -13,51 +13,51 @@ sub-fields.
 
 .. warning::
 
-    ``uctypes`` module allows access to arbitrary memory addresses of the
+    ``ctypes`` module allows access to arbitrary memory addresses of the
     machine (including I/O and control registers). Uncareful usage of it
     may lead to crashes, data loss, and even hardware malfunction.
 
 .. seealso::
 
-    Module :mod:`ustruct`
+    Module :mod:`struct`
         Standard Python way to access binary data structures (doesn't scale
         well to large and complex structures).
 
 Usage examples::
 
-    import uctypes
+    import ctypes
 
     # Example 1: Subset of ELF file header
     # https://wikipedia.org/wiki/Executable_and_Linkable_Format#File_header
     ELF_HEADER = {
-        "EI_MAG": (0x0 | uctypes.ARRAY, 4 | uctypes.UINT8),
-        "EI_DATA": 0x5 | uctypes.UINT8,
-        "e_machine": 0x12 | uctypes.UINT16,
+        "EI_MAG": (0x0 | ctypes.ARRAY, 4 | ctypes.UINT8),
+        "EI_DATA": 0x5 | ctypes.UINT8,
+        "e_machine": 0x12 | ctypes.UINT16,
     }
 
     # "f" is an ELF file opened in binary mode
-    buf = f.read(uctypes.sizeof(ELF_HEADER, uctypes.LITTLE_ENDIAN))
-    header = uctypes.struct(uctypes.addressof(buf), ELF_HEADER, uctypes.LITTLE_ENDIAN)
+    buf = f.read(ctypes.sizeof(ELF_HEADER, ctypes.LITTLE_ENDIAN))
+    header = ctypes.struct(ctypes.addressof(buf), ELF_HEADER, ctypes.LITTLE_ENDIAN)
     assert header.EI_MAG == b"\x7fELF"
-    assert header.EI_DATA == 1, "Oops, wrong endianness. Could retry with uctypes.BIG_ENDIAN."
+    assert header.EI_DATA == 1, "Oops, wrong endianness. Could retry with ctypes.BIG_ENDIAN."
     print("machine:", hex(header.e_machine))
 
 
     # Example 2: In-memory data structure, with pointers
     COORD = {
-        "x": 0 | uctypes.FLOAT32,
-        "y": 4 | uctypes.FLOAT32,
+        "x": 0 | ctypes.FLOAT32,
+        "y": 4 | ctypes.FLOAT32,
     }
 
     STRUCT1 = {
-        "data1": 0 | uctypes.UINT8,
-        "data2": 4 | uctypes.UINT32,
-        "ptr": (8 | uctypes.PTR, COORD),
+        "data1": 0 | ctypes.UINT8,
+        "data2": 4 | ctypes.UINT32,
+        "ptr": (8 | ctypes.PTR, COORD),
     }
 
     # Suppose you have address of a structure of type STRUCT1 in "addr"
-    # uctypes.NATIVE is optional (used by default)
-    struct1 = uctypes.struct(addr, STRUCT1, uctypes.NATIVE)
+    # ctypes.NATIVE is optional (used by default)
+    struct1 = ctypes.struct(addr, STRUCT1, ctypes.NATIVE)
     print("x:", struct1.ptr[0].x)
 
 
@@ -65,17 +65,17 @@ Usage examples::
     WWDG_LAYOUT = {
         "WWDG_CR": (0, {
             # BFUINT32 here means size of the WWDG_CR register
-            "WDGA": 7 << uctypes.BF_POS | 1 << uctypes.BF_LEN | uctypes.BFUINT32,
-            "T": 0 << uctypes.BF_POS | 7 << uctypes.BF_LEN | uctypes.BFUINT32,
+            "WDGA": 7 << ctypes.BF_POS | 1 << ctypes.BF_LEN | ctypes.BFUINT32,
+            "T": 0 << ctypes.BF_POS | 7 << ctypes.BF_LEN | ctypes.BFUINT32,
         }),
         "WWDG_CFR": (4, {
-            "EWI": 9 << uctypes.BF_POS | 1 << uctypes.BF_LEN | uctypes.BFUINT32,
-            "WDGTB": 7 << uctypes.BF_POS | 2 << uctypes.BF_LEN | uctypes.BFUINT32,
-            "W": 0 << uctypes.BF_POS | 7 << uctypes.BF_LEN | uctypes.BFUINT32,
+            "EWI": 9 << ctypes.BF_POS | 1 << ctypes.BF_LEN | ctypes.BFUINT32,
+            "WDGTB": 7 << ctypes.BF_POS | 2 << ctypes.BF_LEN | ctypes.BFUINT32,
+            "W": 0 << ctypes.BF_POS | 7 << ctypes.BF_LEN | ctypes.BFUINT32,
         }),
     }
 
-    WWDG = uctypes.struct(0x40002c00, WWDG_LAYOUT)
+    WWDG = ctypes.struct(0x40002c00, WWDG_LAYOUT)
 
     WWDG.WWDG_CFR.WDGTB = 0b10
     WWDG.WWDG_CR.WDGA = 1
@@ -94,14 +94,14 @@ associated values::
         ...
     }
 
-Currently, ``uctypes`` requires explicit specification of offsets for each
+Currently, ``ctypes`` requires explicit specification of offsets for each
 field. Offset are given in bytes from the structure start.
 
 Following are encoding examples for various field types:
 
 * Scalar types::
 
-    "field_name": offset | uctypes.UINT32
+    "field_name": offset | ctypes.UINT32
 
   in other words, the value is a scalar type identifier ORed with a field offset
   (in bytes) from the start of the structure.
@@ -109,8 +109,8 @@ Following are encoding examples for various field types:
 * Recursive structures::
 
     "sub": (offset, {
-        "b0": 0 | uctypes.UINT8,
-        "b1": 1 | uctypes.UINT8,
+        "b0": 0 | ctypes.UINT8,
+        "b1": 1 | ctypes.UINT8,
     })
 
   i.e. value is a 2-tuple, first element of which is an offset, and second is
@@ -121,7 +121,7 @@ Following are encoding examples for various field types:
 
 * Arrays of primitive types::
 
-      "arr": (offset | uctypes.ARRAY, size | uctypes.UINT8),
+      "arr": (offset | ctypes.ARRAY, size | ctypes.UINT8),
 
   i.e. value is a 2-tuple, first element of which is ARRAY flag ORed
   with offset, and second is scalar element type ORed number of elements
@@ -129,7 +129,7 @@ Following are encoding examples for various field types:
 
 * Arrays of aggregate types::
 
-    "arr2": (offset | uctypes.ARRAY, size, {"b": 0 | uctypes.UINT8}),
+    "arr2": (offset | ctypes.ARRAY, size, {"b": 0 | ctypes.UINT8}),
 
   i.e. value is a 3-tuple, first element of which is ARRAY flag ORed
   with offset, second is a number of elements in the array, and third is
@@ -137,21 +137,21 @@ Following are encoding examples for various field types:
 
 * Pointer to a primitive type::
 
-    "ptr": (offset | uctypes.PTR, uctypes.UINT8),
+    "ptr": (offset | ctypes.PTR, ctypes.UINT8),
 
   i.e. value is a 2-tuple, first element of which is PTR flag ORed
   with offset, and second is a scalar element type.
 
 * Pointer to an aggregate type::
 
-    "ptr2": (offset | uctypes.PTR, {"b": 0 | uctypes.UINT8}),
+    "ptr2": (offset | ctypes.PTR, {"b": 0 | ctypes.UINT8}),
 
   i.e. value is a 2-tuple, first element of which is PTR flag ORed
   with offset, second is a descriptor of type pointed to.
 
 * Bitfields::
 
-    "bitf0": offset | uctypes.BFUINT16 | lsbit << uctypes.BF_POS | bitsize << uctypes.BF_LEN,
+    "bitf0": offset | ctypes.BFUINT16 | lsbit << ctypes.BF_POS | bitsize << ctypes.BF_LEN,
 
   i.e. value is a type of scalar value containing given bitfield (typenames are
   similar to scalar types, but prefixes with ``BF``), ORed with offset for
@@ -174,7 +174,7 @@ Following are encoding examples for various field types:
   in particular, example above will access least-significant byte of UINT16
   in both little- and big-endian structures. But it depends on the least
   significant bit being numbered 0. Some targets may use different
-  numbering in their native ABI, but ``uctypes`` always uses the normalized
+  numbering in their native ABI, but ``ctypes`` always uses the normalized
   numbering described above.
 
 Module contents
@@ -246,7 +246,7 @@ Module contents
 .. data:: VOID
 
    ``VOID`` is an alias for ``UINT8``, and is provided to conviniently define
-   C's void pointers: ``(uctypes.PTR, uctypes.VOID)``.
+   C's void pointers: ``(ctypes.PTR, ctypes.VOID)``.
 
 .. data:: PTR
           ARRAY
@@ -260,14 +260,14 @@ Structure descriptors and instantiating structure objects
 
 Given a structure descriptor dictionary and its layout type, you can
 instantiate a specific structure instance at a given memory address
-using :class:`uctypes.struct()` constructor. Memory address usually comes from
+using :class:`ctypes.struct()` constructor. Memory address usually comes from
 following sources:
 
 * Predefined address, when accessing hardware registers on a baremetal
   system. Lookup these addresses in datasheet for a particular MCU/SoC.
 * As a return value from a call to some FFI (Foreign Function Interface)
   function.
-* From `uctypes.addressof()`, when you want to pass arguments to an FFI
+* From `ctypes.addressof()`, when you want to pass arguments to an FFI
   function, or alternatively, to access some data for I/O (for example,
   data read from a file or network socket).
 
@@ -312,7 +312,7 @@ is disabled (e.g. from an interrupt). The recommendations are:
   an alternative is to cache intermediate values, e.g.
   ``register0 = peripheral_a.register[0]``.
 
-2. Range of offsets supported by the ``uctypes`` module is limited.
+2. Range of offsets supported by the ``ctypes`` module is limited.
 The exact range supported is considered an implementation detail,
 and the general suggestion is to split structure definitions to
 cover from a few kilobytes to a few dozen of kilobytes maximum.

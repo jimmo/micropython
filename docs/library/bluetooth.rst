@@ -1,7 +1,7 @@
-:mod:`ubluetooth` --- low-level Bluetooth
+:mod:`bluetooth` --- low-level Bluetooth
 =========================================
 
-.. module:: ubluetooth
+.. module:: bluetooth
    :synopsis: Low-level Bluetooth radio functionality
 
 This module provides an interface to a Bluetooth controller on a board.
@@ -53,7 +53,7 @@ Event Handling
     your program is interested in. The default is all events.
 
     Note: the ``addr``, ``adv_data`` and ``uuid`` entries in the tuples are
-    references to data managed by the :mod:`ubluetooth` module (i.e. the same
+    references to data managed by the :mod:`bluetooth` module (i.e. the same
     instance will be re-used across multiple calls to the event handler). If
     your program wants to use this data outside of the handler, then it must
     copy them first, e.g. by using ``bytes(addr)`` or ``bluetooth.UUID(uuid)``.
@@ -129,7 +129,7 @@ The event codes are::
     _IRQ_GATTC_INDICATE                  = const(1 << 14)
 
 In order to save space in the firmware, these constants are not included on the
-:mod:`ubluetooth` module. Add the ones that you need from the list above to your
+:mod:`bluetooth` module. Add the ones that you need from the list above to your
 program.
 
 
@@ -209,8 +209,8 @@ writes from a central to a given characteristic, use
     value.
 
     The **flags** are a bitwise-OR combination of the
-    :data:`ubluetooth.FLAG_READ`, :data:`ubluetooth.FLAG_WRITE` and
-    :data:`ubluetooth.FLAG_NOTIFY` values defined below.
+    :data:`bluetooth.FLAG_READ`, :data:`bluetooth.FLAG_WRITE` and
+    :data:`bluetooth.FLAG_NOTIFY` values defined below.
 
     The return value is a list (one element per service) of tuples (each element
     is a value handle). Characteristics and descriptor handles are flattened
@@ -338,6 +338,6 @@ Constructor
 Constants
 ---------
 
-.. data:: ubluetooth.FLAG_READ
-          ubluetooth.FLAG_WRITE
-          ubluetooth.FLAG_NOTIFY
+.. data:: bluetooth.FLAG_READ
+          bluetooth.FLAG_WRITE
+          bluetooth.FLAG_NOTIFY

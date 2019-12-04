@@ -1,12 +1,12 @@
-:mod:`uos` -- basic "operating system" services
+:mod:`os` -- basic "operating system" services
 ===============================================
 
-.. module:: uos
+.. module:: os
    :synopsis: basic "operating system" services
 
 |see_cpython_module| :mod:`python:os`.
 
-The ``uos`` module contains functions for filesystem access and mounting,
+The ``os`` module contains functions for filesystem access and mounting,
 terminal redirection and duplication, and the ``uname`` and ``urandom``
 functions.
 
@@ -116,7 +116,7 @@ Terminal redirection and duplication
 
    Duplicate or switch the MicroPython terminal (the REPL) on the given `stream`-like
    object. The *stream_object* argument must be a native stream object, or derive
-   from ``uio.IOBase`` and implement the ``readinto()`` and
+   from ``io.IOBase`` and implement the ``readinto()`` and
    ``write()`` methods.  The stream should be in non-blocking mode and
    ``readinto()`` should return ``None`` if there is no data available for reading.
 
@@ -271,12 +271,12 @@ its data in RAM using a ``bytearray``::
 
 It can be used as follows::
 
-    import uos
+    import os
 
     bdev = RAMBlockDev(512, 50)
-    uos.VfsFat.mkfs(bdev)
-    vfs = uos.VfsFat(bdev)
-    uos.mount(vfs, '/ramdisk')
+    os.VfsFat.mkfs(bdev)
+    vfs = os.VfsFat(bdev)
+    os.mount(vfs, '/ramdisk')
 
 An example of a block device that supports both signatures and behaviours of
 the :meth:`readblocks` and :meth:`writeblocks` methods is::

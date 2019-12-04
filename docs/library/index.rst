@@ -56,7 +56,7 @@ The following standard Python libraries have been "micro-ified" to fit in with
 the philosophy of MicroPython.  They provide the core functionality of that
 module and are intended to be a drop-in replacement for the standard Python
 library.  Some modules below use a standard Python name, but prefixed with "u",
-e.g. ``ujson`` instead of ``json``. This is to signify that such a module is
+e.g. ``json`` instead of ``json``. This is to signify that such a module is
 micro-library, i.e. implements only a subset of CPython module functionality.
 By naming them differently, a user has a choice to write a Python-level module
 to extend functionality for better compatibility with CPython (indeed, this is
@@ -68,7 +68,7 @@ are available both by their u-name, and also by their non-u-name.  The
 non-u-name can be overridden by a file of that name in your library path (``sys.path``).
 For example, ``import json`` will first search for a file ``json.py`` (or package
 directory ``json``) and load that module if it is found.  If nothing is found,
-it will fallback to loading the built-in ``ujson`` module.
+it will fallback to loading the built-in ``json`` module.
 
 .. toctree::
    :maxdepth: 1
@@ -78,22 +78,22 @@ it will fallback to loading the built-in ``ujson`` module.
    gc.rst
    math.rst
    sys.rst
-   uarray.rst
-   ubinascii.rst
-   ucollections.rst
-   uerrno.rst
-   uhashlib.rst
-   uheapq.rst
-   uio.rst
-   ujson.rst
-   uos.rst
-   ure.rst
-   uselect.rst
-   usocket.rst
-   ussl.rst
-   ustruct.rst
-   utime.rst
-   uzlib.rst
+   array.rst
+   binascii.rst
+   collections.rst
+   errno.rst
+   hashlib.rst
+   heapq.rst
+   io.rst
+   json.rst
+   os.rst
+   re.rst
+   select.rst
+   socket.rst
+   ssl.rst
+   struct.rst
+   time.rst
+   zlib.rst
    _thread.rst
 
 
@@ -111,9 +111,9 @@ the following libraries.
    machine.rst
    micropython.rst
    network.rst
-   ubluetooth.rst
-   ucryptolib.rst
-   uctypes.rst
+   bluetooth.rst
+   cryptolib.rst
+   ctypes.rst
 
 
 Port-specific libraries

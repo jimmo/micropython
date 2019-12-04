@@ -107,13 +107,13 @@ Assembler functions have no means of determining the length of an array:
 this will need to be passed to the function.
 
 This use of arrays can be extended to enable more than three arrays to be used. 
-This is done using indirection: the ``uctypes`` module supports ``addressof()`` 
+This is done using indirection: the ``ctypes`` module supports ``addressof()`` 
 which will return the address of an array passed as its argument. Thus you can
 populate an integer array with the addresses of other arrays:
 
 ::
 
-    from uctypes import addressof
+    from ctypes import addressof
     @micropython.asm_thumb
     def getindirect(r0):
         ldr(r0, [r0, 0]) # Address of array loaded from passed array
@@ -151,7 +151,7 @@ their squares.
     square(a, len(a))
     print(a)
 
-The uctypes module supports the use of data structures beyond simple
+The ctypes module supports the use of data structures beyond simple
 arrays. It enables a Python data structure to be mapped onto a bytearray
 instance which may then be passed to the assembler function.
 

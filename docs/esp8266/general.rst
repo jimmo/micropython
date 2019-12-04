@@ -117,7 +117,7 @@ Real-time clock
 
 RTC in ESP8266 has very bad accuracy, drift may be seconds per minute. As
 a workaround, to measure short enough intervals you can use
-``utime.time()``, etc. functions, and for wall clock time, synchronize from
+``time.time()``, etc. functions, and for wall clock time, synchronize from
 the net using included ``ntptime.py`` module.
 
 Due to limitations of the ESP8266 chip the internal real-time clock (RTC)
@@ -189,7 +189,7 @@ limitation with usage of TLS on the low-memory devices:
    it, and it's not possible to stream large amounts of data.
 
 There are also some not implemented features specifically in MicroPython's
-``ussl`` module based on axTLS:
+``ssl`` module based on axTLS:
 
 6. Certificates are not validated (this may make connections susceptible
    to man-in-the-middle attacks).
