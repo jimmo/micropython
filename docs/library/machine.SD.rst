@@ -1,13 +1,12 @@
 .. currentmodule:: machine
 .. _machine.SD:
 
-class SD -- secure digital memory card (cc3200 port only)
-=========================================================
+class SD -- secure digital memory card (WiPy / CC3200 port only)
+================================================================
 
 .. warning::
 
-   This is a non-standard class and is only available on the cc3200 port.
-
+   This is a non-standard class and is only available on the WiPy / CC3200 port.
 
 The SD card class allows to configure and enable the memory card
 module of the WiPy and automatically mount it as ``/sd`` as part
@@ -27,12 +26,15 @@ Example usage::
     os.mount(sd, '/sd')
     # do normal file operations
 
+|availability_cc3200|
+
 Constructors
 ------------
 
 .. class:: SD(id,... )
 
-   Create a SD card object. See ``init()`` for parameters if initialization. 
+   Create a SD card object. See ``init()`` for additional arguments that may be
+   specified.
 
 Methods
 -------

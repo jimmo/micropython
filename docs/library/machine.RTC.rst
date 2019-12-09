@@ -21,6 +21,8 @@ Constructors
 
    Create an RTC object. See init for parameters of initialization.
 
+   |machine_ids|
+
 Methods
 -------
 

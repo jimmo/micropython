@@ -23,6 +23,11 @@ arguments that might need to be set in order to use either a non-standard slot
 or a non-standard pin assignment. The exact subset of arguments supported will
 vary from platform to platform.
 
+|availability_esp32_stm32| See `SD` for CC3200.
+
+Constructors
+------------
+
 .. class:: SDCard(slot=1, width=1, cd=None, wp=None, sck=None, miso=None, mosi=None, cs=None)
 
     This class provides access to SD or MMC storage cards using either
@@ -57,13 +62,19 @@ Implementation-specific details
 Different implementations of the ``SDCard`` class on different hardware support
 varying subsets of the options above.
 
-PyBoard
-```````
+pyboard
+~~~~~~~
 
-The standard PyBoard has just one slot. No arguments are necessary or supported.
+The standard pyboard has just one slot. No arguments are necessary or supported.
+
+STM32
+~~~~~
+
+Boards that enable ``MICROPY_HW_ENABLE_SDCARD`` will have SDCard support, and
+like the pyboard, no arguments are required.
 
 ESP32
-`````
+~~~~~
 
 The ESP32 provides two channels of SD/MMC hardware and also supports
 access to SD Cards through either of the two SPI ports that are
@@ -112,11 +123,11 @@ The default (and preferred) pin assignment are as follows:
     D7       18
     ====== ====== ====== ====== ======
 
-cc3200
-``````
+CC3200 / WiPy
+~~~~~~~~~~~~~
 
 You can set the pins used for SPI access by passing a tuple as the
 *pins* argument.
 
-*Note:* The current cc3200 SD card implementation names the this class
+*Note:* The current CC3200 SD card implementation names the this class
 :class:`machine.SD` rather than :class:`machine.SDCard` .

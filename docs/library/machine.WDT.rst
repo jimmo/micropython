@@ -15,7 +15,14 @@ Example usage::
     wdt = WDT(timeout=2000)  # enable it with a timeout of 2s
     wdt.feed()
 
-Availability of this class: pyboard, WiPy.
+On most ports, code can detect a reset due to the WDT by inspecting
+`reset_cause` on startup.
+
+|availability_portable|
+
+Note for ESP32/ESP8266: The WDT is per-thread, so you must feed the WDT from the
+same thread that created it. There is currently no way to feed a WDT from a
+different thread.
 
 Constructors
 ------------
@@ -26,6 +33,8 @@ Constructors
    the minimum value that is accepted is 1 second. Once it is running the timeout
    cannot be changed and the WDT cannot be stopped either.
 
+   |machine_ids|
+
 Methods
 -------
 
@@ -34,3 +43,5 @@ Methods
    Feed the WDT to prevent it from resetting the system. The application
    should place this call in a sensible place ensuring that the WDT is
    only fed after verifying that everything is functioning correctly.
+
+   |availability_portable|

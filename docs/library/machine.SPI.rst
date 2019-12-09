@@ -9,7 +9,18 @@ physical level, a bus consists of 3 lines: SCK, MOSI, MISO. Multiple devices
 can share the same bus. Each device should have a separate, 4th signal,
 SS (Slave Select), to select a particular device on a bus with which
 communication takes place. Management of an SS signal should happen in
-user code (via machine.Pin class).
+user code (via the `Pin` class).
+
+Most MicroPython ports support a hardware SPI peripheral, but all ports are
+required to support at least a software ("bitbanging") implementation. Typically
+the software implementation will work on any selection of MISO/MOSI/SCK pins,
+whereas the hardware implementation will only work on a subset of pins which
+will usually be predetermined by the hardware (and do not need to be specified).
+
+In most cases, to use the hardware implementation, specify an *id* only, and only
+specifyq the pins if your hardware supports it (e.g. ESP32). To use the
+software implementation, don't specify an id, and instead provide the
+MISO/MOSI/SCK pins. |machine_ids|
 
 Constructors
 ------------
@@ -20,6 +31,8 @@ Constructors
    on a particular port and its hardware. Values 0, 1, etc. are commonly used
    to select hardware SPI block #0, #1, etc. Value -1 can be used for
    bitbanging (software) implementation of SPI (if supported by a port).
+
+  |machine_ids|
 
    With no additional parameters, the SPI object is created but not
    initialised (it has the settings from the last initialisation of
@@ -48,7 +61,7 @@ Methods
        specify them as a tuple of ``pins`` parameter.
 
    In the case of hardware SPI the actual clock frequency may be lower than the
-   requested baudrate. This is dependant on the platform hardware. The actual
+   requested baudrate. This is dependent on the platform hardware. The actual
    rate may be determined by printing the SPI object.
 
 .. method:: SPI.deinit()

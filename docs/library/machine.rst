@@ -11,13 +11,21 @@ and unrestricted access to and control of hardware blocks on a system
 malfunction, lockups, crashes of your board, and in extreme cases, hardware
 damage.
 
+The functions and classes provided by this module are intended to provide a
+common abstraction, such that code (and especially drivers) written using this
+module will be portable between different MicroPython ports. See
+:ref:`portable_apis` for more information. Any function or class marked as
+**Portable** must be provided by all major ports (currently STM32, ESP32,
+ESP8266).
+
 .. _machine_callbacks:
 
-A note of callbacks used by functions and class methods of :mod:`machine` module:
-all these callbacks should be considered as executing in an interrupt context.
-This is true for both physical devices with IDs >= 0 and "virtual" devices
-with negative IDs like -1 (these "virtual" devices are still thin shims on
-top of real hardware and real hardware interrupts). See :ref:`isr_rules`.
+Many of the classes in the ``machine`` module make use of callbacks. These
+callbacks should be considered as executing in an interrupt context. This is
+true for both physical devices with IDs >= 0 and "virtual" devices with negative
+IDs like -1 (these "virtual" devices are still thin shims on top of real
+hardware and real hardware interrupts). See :ref:`isr_rules` for more
+information.
 
 Reset related functions
 -----------------------
@@ -27,9 +35,13 @@ Reset related functions
    Resets the device in a manner similar to pushing the external RESET
    button.
 
+   |availability_portable|
+
 .. function:: reset_cause()
 
    Get the reset cause. See :ref:`constants <machine_constants>` for the possible return values.
+
+   |availability_portable|
 
 Interrupt related functions
 ---------------------------
@@ -41,11 +53,15 @@ Interrupt related functions
    This return value should be passed to the `enable_irq()` function to restore
    interrupts to their original state, before `disable_irq()` was called.
 
+   |availability_portable|
+
 .. function:: enable_irq(state)
 
    Re-enable interrupt requests.
    The *state* parameter should be the value that was returned from the most
    recent call to the `disable_irq()` function.
+
+   |availability_portable|
 
 Power related functions
 -----------------------
@@ -54,6 +70,8 @@ Power related functions
 
     Returns CPU frequency in hertz.
 
+   |availability_portable|
+
 .. function:: idle()
 
    Gates the clock to the CPU, useful to reduce power consumption at any time during
@@ -61,9 +79,11 @@ Power related functions
    as any interrupt is triggered (on many ports this includes system timer
    interrupt occurring at regular intervals on the order of millisecond).
 
+   |availability_portable|
+
 .. function:: sleep()
 
-   .. note:: This function is deprecated, use `lightsleep()` instead with no arguments.
+   |availability_deprecated| Use `lightsleep()` instead with no arguments.
 
 .. function:: lightsleep([time_ms])
               deepsleep([time_ms])
@@ -89,11 +109,13 @@ Power related functions
      return `machine.DEEPSLEEP` and this can be used to distinguish a deepsleep wake
      from other resets.
 
+   |availability_portable|
+
 .. function:: wake_reason()
 
    Get the wake reason. See :ref:`constants <machine_constants>` for the possible return values.
 
-   Availability: ESP32, WiPy.
+   |availability_cc3200_esp32|
 
 Miscellaneous functions
 -----------------------
@@ -101,9 +123,12 @@ Miscellaneous functions
 .. function:: unique_id()
 
    Returns a byte string with a unique identifier of a board/SoC. It will vary
-   from a board/SoC instance to another, if underlying hardware allows. Length
-   varies by hardware (so use substring of a full value if you expect a short
-   ID). In some MicroPython ports, ID corresponds to the network MAC address.
+   from a board/SoC instance to another, if the underlying hardware allows.
+   Length varies by hardware (so use substring of the full value if you expect a
+   short ID). In some MicroPython ports, the ID corresponds to the network MAC
+   address.
+
+   |availability_portable|
 
 .. function:: time_pulse_us(pin, pulse_level, timeout_us=1000000)
 
@@ -121,11 +146,13 @@ Miscellaneous functions
    above. The timeout is the same for both cases and given by *timeout_us* (which
    is in microseconds).
 
+   |availability_portable|
+
 .. function:: rng()
 
    Return a 24-bit software generated random number.
 
-   Availability: WiPy.
+   Availability: STM32, WiPy (CC3200).
 
 .. _machine_constants:
 
@@ -138,6 +165,8 @@ Constants
 
     IRQ wake values.
 
+    |availability_portable|
+
 .. data:: machine.PWRON_RESET
           machine.HARD_RESET
           machine.WDT_RESET
@@ -146,14 +175,36 @@ Constants
 
     Reset causes.
 
-.. data:: machine.WLAN_WAKE
-          machine.PIN_WAKE
-          machine.RTC_WAKE
+    |availability_portable|
+
+.. data:: machine.PIN_WAKE
 
     Wake-up reasons.
 
+    |availability_cc3200_esp32|
+
+.. data:: machine.WLAN_WAKE
+          machine.RTC_WAKE
+
+    Additional wake-up reasons for CC3200.
+
+    |availability_cc3200|
+
+.. data:: machine.EXT0_WAKE
+          machine.EXT1_WAKE
+          machine.TIMER_WAKE
+          machine.TOUCHPAD_WAKE
+          machine.ULP_WAKE
+
+    Additional wake-up reasons for ESP32.
+
+    |availability_ESP32|
+
+
 Classes
 -------
+
+The following classes are part of the portable API (provided by all ports)
 
 .. toctree::
    :maxdepth: 1
@@ -167,5 +218,28 @@ Classes
    machine.RTC.rst
    machine.Timer.rst
    machine.WDT.rst
-   machine.SD.rst
+
+These classes are provided by some, but not all, ports. See their documentation
+for details.
+
+.. toctree::
+   :maxdepth: 1
+
    machine.SDCard.rst
+   machine.SD.rst
+
+Port-specific information
+-------------------------
+
+These guides provide additional information specific to using the machine API on
+the various ports.
+
+.. toctree::
+   :maxdepth: 1
+
+   machine_pyboard.rst
+   machine_stm32.rst
+   machine_esp32.rst
+   machine_esp8266.rst
+   machine_nrf.rst
+   machine_cc3200.rst
