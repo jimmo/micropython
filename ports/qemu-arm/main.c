@@ -27,13 +27,20 @@ void do_str(const char *src, mp_parse_input_kind_t input_kind) {
     }
 }
 
+STATIC uint8_t heap[104000];
+
 int main(int argc, char **argv) {
     mp_stack_ctrl_init();
     mp_stack_set_limit(10240);
-    uint32_t heap[16*1024 / 4];
-    gc_init(heap, (char*)heap + 16 * 1024);
+    //uint32_t heap[16*1024 / 4];
+    memset(heap, 0xaa, sizeof(heap));
+    gc_init(heap, heap + sizeof(heap));
     mp_init();
     do_str("print('hello world!')", MP_PARSE_SINGLE_INPUT);
+    do_str("import micropython", MP_PARSE_SINGLE_INPUT);
+    do_str("micropython.mem_info(1)", MP_PARSE_SINGLE_INPUT);
+    do_str("import gc", MP_PARSE_SINGLE_INPUT);
+    do_str("gc.collect()", MP_PARSE_SINGLE_INPUT);
     mp_deinit();
     return 0;
 }

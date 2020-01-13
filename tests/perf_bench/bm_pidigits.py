@@ -60,3 +60,13 @@ def bm_setup(params):
         return params[0] * params[1], ''.join(str(d) for d in state)
 
     return run, result
+
+# import micropython
+# import gc
+
+# for _ in range(10):
+#     #gc.collect()
+#     #micropython.mem_info(1)
+#     state = None
+#     state = gen_pi_digits(200)
+#     print(state)

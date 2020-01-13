@@ -129,6 +129,8 @@
 #define MICROPY_BYTES_PER_GC_BLOCK (4 * BYTES_PER_WORD)
 #endif
 
+#define GC_AT_ENTRY_TYPE uint32_t
+
 // Number of words allocated (in BSS) to the GC stack (minimum is 1)
 #ifndef MICROPY_ALLOC_GC_STACK_SIZE
 #define MICROPY_ALLOC_GC_STACK_SIZE (64)

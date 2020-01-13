@@ -47,7 +47,7 @@
 
 #define MP_SSIZE_MAX (0x7fffffff)
 
-#define UINT_FMT "%lu"
+#define UINT_FMT "%u"
 #define INT_FMT "%ld"
 
 typedef int32_t mp_int_t; // must be pointer size

@@ -70,11 +70,12 @@ typedef struct _mp_state_mem_t {
     size_t peak_bytes_allocated;
     #endif
 
-    byte *gc_alloc_table_start;
-    size_t gc_alloc_table_byte_len;
+    GC_AT_ENTRY_TYPE *gc_block_alloc_table_start;
+    GC_AT_ENTRY_TYPE *gc_block_status_table_start;
     #if MICROPY_ENABLE_FINALISER
-    byte *gc_finaliser_table_start;
+    GC_AT_ENTRY_TYPE *gc_finaliser_table_start;
     #endif
+    size_t gc_pool_blocks;
     byte *gc_pool_start;
     byte *gc_pool_end;
 
@@ -92,7 +93,10 @@ typedef struct _mp_state_mem_t {
     size_t gc_alloc_threshold;
     #endif
 
-    size_t gc_last_free_atb_index;
+    size_t gc_last_free_block_index;
+    size_t gc_free_remaining;
+    // size_t gc_free_saved_block_index;
+    // size_t gc_free_saved_value;
 
     #if MICROPY_PY_GC_COLLECT_RETVAL
     size_t gc_collected;
