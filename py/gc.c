@@ -147,7 +147,9 @@ void gc_init(void *start, void *end) {
 #endif
 
     // set last free ATB index to start of heap
-    MP_STATE_MEM(gc_last_free_atb_index) = 0;
+    for (size_t i = 0; i < MICROPY_ATB_INDICES; i++) {
+        MP_STATE_MEM(gc_last_free_atb_index)[i] = 0;
+    }
 
     // unlock the GC
     MP_STATE_MEM(gc_lock_depth) = 0;
@@ -358,7 +360,9 @@ void gc_collect_root(void **ptrs, size_t len) {
 void gc_collect_end(void) {
     gc_deal_with_stack_overflow();
     gc_sweep();
-    MP_STATE_MEM(gc_last_free_atb_index) = 0;
+    for (size_t i = 0; i < MICROPY_ATB_INDICES; i++) {
+        MP_STATE_MEM(gc_last_free_atb_index)[i] = 0;
+    }
     MP_STATE_MEM(gc_lock_depth)--;
     GC_EXIT();
 }
@@ -468,10 +472,13 @@ void *gc_alloc(size_t n_bytes, unsigned int alloc_flags) {
     #endif
 
     for (;;) {
+        size_t bucket = MIN(n_blocks, MICROPY_ATB_INDICES) - 1;
+        size_t first_free = MP_STATE_MEM(gc_last_free_atb_index)[bucket];
+        size_t start = first_free;
 
         // look for a run of n_blocks available blocks
         n_free = 0;
-        for (i = MP_STATE_MEM(gc_last_free_atb_index); i < MP_STATE_MEM(gc_alloc_table_byte_len); i++) {
+        for (i = start; i < MP_STATE_MEM(gc_alloc_table_byte_len); i++) {
             byte a = MP_STATE_MEM(gc_alloc_table_start)[i];
             if (ATB_0_IS_FREE(a)) { if (++n_free >= n_blocks) { i = i * BLOCKS_PER_ATB + 0; goto found; } } else { n_free = 0; }
             if (ATB_1_IS_FREE(a)) { if (++n_free >= n_blocks) { i = i * BLOCKS_PER_ATB + 1; goto found; } } else { n_free = 0; }
@@ -496,13 +503,12 @@ found:
     end_block = i;
     start_block = i - n_free + 1;
 
-    // Set last free ATB index to block after last block we found, for start of
-    // next scan.  To reduce fragmentation, we only do this if we were looking
-    // for a single free block, which guarantees that there are no free blocks
-    // before this one.  Also, whenever we free or shink a block we must check
-    // if this index needs adjusting (see gc_realloc and gc_free).
-    if (n_free == 1) {
-        MP_STATE_MEM(gc_last_free_atb_index) = (i + 1) / BLOCKS_PER_ATB;
+    if (n_blocks < MICROPY_ATB_INDICES) {
+        size_t next_free_atb = (i + n_blocks) / BLOCKS_PER_ATB;
+        // Update all atb indices for larger blocks too.
+        for (size_t ii = n_blocks - 1; ii < MICROPY_ATB_INDICES; ii++) {
+            MP_STATE_MEM(gc_last_free_atb_index)[ii] = next_free_atb;
+        }
     }
 
     // mark first block as used head
@@ -591,16 +597,23 @@ void gc_free(void *ptr) {
         FTB_CLEAR(block);
         #endif
 
-        // set the last_free pointer to this block if it's earlier in the heap
-        if (block / BLOCKS_PER_ATB < MP_STATE_MEM(gc_last_free_atb_index)) {
-            MP_STATE_MEM(gc_last_free_atb_index) = block / BLOCKS_PER_ATB;
-        }
+        size_t start = block;
+
 
         // free head and all of its tail blocks
         do {
             ATB_ANY_TO_FREE(block);
             block += 1;
         } while (ATB_GET_KIND(block) == AT_TAIL);
+
+        size_t n_blocks = block - start;
+        size_t bucket = MIN(n_blocks, MICROPY_ATB_INDICES) - 1;
+        size_t new_free_atb = start / BLOCKS_PER_ATB;
+
+        // set the last_free pointer to this block if it's earlier in the heap
+        if (new_free_atb < MP_STATE_MEM(gc_last_free_atb_index)[bucket]) {
+            MP_STATE_MEM(gc_last_free_atb_index)[bucket] = new_free_atb;
+        }
 
         GC_EXIT();
 
@@ -727,9 +740,12 @@ void *gc_realloc(void *ptr_in, size_t n_bytes, bool allow_move) {
             ATB_ANY_TO_FREE(bl);
         }
 
+        size_t new_free_atb = (block + new_blocks) / BLOCKS_PER_ATB;
+        size_t bucket = MIN(n_blocks - new_blocks, MICROPY_ATB_INDICES) - 1;
+
         // set the last_free pointer to end of this block if it's earlier in the heap
-        if ((block + new_blocks) / BLOCKS_PER_ATB < MP_STATE_MEM(gc_last_free_atb_index)) {
-            MP_STATE_MEM(gc_last_free_atb_index) = (block + new_blocks) / BLOCKS_PER_ATB;
+        if (new_free_atb < MP_STATE_MEM(gc_last_free_atb_index)[bucket]) {
+            MP_STATE_MEM(gc_last_free_atb_index)[bucket] = new_free_atb;
         }
 
         GC_EXIT();
