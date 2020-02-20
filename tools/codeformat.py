@@ -9,10 +9,6 @@ FILES = [
 ]
 
 EXCLUSIONS = [
-    'ports/*/qstrdefsport.h',
-    'py/grammar.h',
-    'py/qstrdefs.h',
-    'py/vm.c',
 ]
 
 CFG = './tools/uncrustify.cfg'
