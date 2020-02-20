@@ -283,6 +283,9 @@ mp_obj_t mp_unary_op(mp_unary_op_t op, mp_obj_t arg) {
                 return result;
             }
         }
+        if (op == MP_UNARY_OP_BOOL) {
+            return mp_const_true;
+        }
         // With MP_UNARY_OP_INT, mp_unary_op() becomes a fallback for mp_obj_get_int().
         // In this case provide a more focused error message to not confuse, e.g. chr(1.0)
         if (MICROPY_ERROR_REPORTING == MICROPY_ERROR_REPORTING_TERSE) {
