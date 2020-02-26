@@ -26,8 +26,8 @@
 
 import argparse
 import glob
+import itertools
 import os
-import sys
 
 # Relative to top-level repo dir.
 PATHS = [
@@ -100,17 +100,26 @@ def main():
     def lang_files(exts):
         for file in files:
             if os.path.splitext(file)[1].lower() in exts:
-                yield "'" + file + "'"
+                yield '"' + file + '"'
+
+    # Run tool on N files at a time (to avoid making the command line too long).
+    def batch(cmd, files, N=200):
+        while True:
+            line = " ".join(itertools.islice(files, N))
+            if not line:
+                break
+            os.system(cmd + " " + line)
 
     # Format C files with uncrustify.
-    os.system(
-        "uncrustify -c '{}' -l C --no-backup {}".format(
-            UNCRUSTIFY_CFG, " ".join(lang_files(C_EXTS))
+    if format_c:
+        batch(
+            'uncrustify -c "{}" -l C --no-backup'.format(UNCRUSTIFY_CFG),
+            lang_files(C_EXTS),
         )
-    )
 
     # Format Python files with black.
-    os.system("black -q --fast {}".format(" ".join(lang_files(PY_EXTS))))
+    if format_py:
+        batch("black -q --fast", lang_files(PY_EXTS))
 
 
 if __name__ == "__main__":
