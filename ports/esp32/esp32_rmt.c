@@ -53,7 +53,7 @@ typedef struct _esp32_rmt_obj_t {
     gpio_num_t pin;
     uint8_t clock_div;
     mp_uint_t num_items;
-    rmt_item32_t* items;
+    rmt_item32_t *items;
 } esp32_rmt_obj_t;
 
 // Defined in machine_time.c; simply added the error message
@@ -193,12 +193,12 @@ STATIC mp_obj_t esp32_rmt_write_pulses(size_t n_args, const mp_obj_t *pos_args, 
     }
 
     size_t pulses_length = 0;
-    mp_obj_t* pulses_ptr = NULL;
+    mp_obj_t *pulses_ptr = NULL;
     mp_obj_get_array(pulses, &pulses_length, &pulses_ptr);
 
     mp_uint_t num_items = (pulses_length / 2) + (pulses_length % 2);
     if (num_items > self->num_items) {
-        self->items = (rmt_item32_t*)m_realloc(self->items, num_items * sizeof(rmt_item32_t *));
+        self->items = (rmt_item32_t*)m_realloc(self->items, num_items * sizeof(rmt_item32_t*));
         self->num_items = num_items;
     }
 

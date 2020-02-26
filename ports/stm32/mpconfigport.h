@@ -299,7 +299,7 @@ struct _mp_bluetooth_nimble_root_pointers_t;
     mp_obj_list_t mod_network_nic_list; \
     \
     MICROPY_PORT_ROOT_POINTER_MBEDTLS \
-    MICROPY_PORT_ROOT_POINTER_BLUETOOTH_NIMBLE \
+        MICROPY_PORT_ROOT_POINTER_BLUETOOTH_NIMBLE \
 
 // type definitions for the specific machine
 

@@ -93,7 +93,7 @@ mp_obj_t machine_hard_i2c_make_new(const mp_obj_type_t *type, size_t n_args, siz
 }
 
 STATIC int machine_hard_i2c_transfer_single(mp_obj_base_t *self_in, uint16_t addr, size_t len, uint8_t *buf, unsigned int flags) {
-    machine_hard_i2c_obj_t *self = (machine_hard_i2c_obj_t *)self_in;
+    machine_hard_i2c_obj_t *self = (machine_hard_i2c_obj_t*)self_in;
     struct i2c_msg msg;
     int ret;
 

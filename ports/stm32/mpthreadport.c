@@ -54,7 +54,7 @@ void mp_thread_gc_others(void) {
     mp_thread_mutex_unlock(&thread_mutex);
 }
 
-void mp_thread_create(void *(*entry)(void*), void *arg, size_t *stack_size) {
+void mp_thread_create(void*(*entry)(void*), void *arg, size_t *stack_size) {
     if (*stack_size == 0) {
         *stack_size = 4096; // default stack size
     } else if (*stack_size < 2048) {

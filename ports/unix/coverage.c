@@ -160,12 +160,14 @@ STATIC void pairheap_test(size_t nops, int *ops) {
         if (mp_pairheap_is_empty(pairheap_lt, heap)) {
             mp_printf(&mp_plat_print, " -");
         } else {
-            mp_printf(&mp_plat_print, " %d", mp_pairheap_peek(pairheap_lt, heap) - &node[0]);;
+            mp_printf(&mp_plat_print, " %d", mp_pairheap_peek(pairheap_lt, heap) - &node[0]);
+            ;
         }
     }
     printf("\npop all:");
     while (!mp_pairheap_is_empty(pairheap_lt, heap)) {
-        mp_printf(&mp_plat_print, " %d", mp_pairheap_peek(pairheap_lt, heap) - &node[0]);;
+        mp_printf(&mp_plat_print, " %d", mp_pairheap_peek(pairheap_lt, heap) - &node[0]);
+        ;
         heap = mp_pairheap_pop(pairheap_lt, heap);
     }
     printf("\n");

@@ -208,15 +208,15 @@ struct _machine_timer_obj_t;
 
 #if MICROPY_BLUETOOTH_NIMBLE
 struct mp_bluetooth_nimble_root_pointers_t;
-#define MICROPY_PORT_ROOT_POINTER_BLUETOOTH_NIMBLE struct _mp_bluetooth_nimble_root_pointers_t *bluetooth_nimble_root_pointers;
+#define MICROPY_PORT_ROOT_POINTER_BLUETOOTH_NIMBLE struct _mp_bluetooth_nimble_root_pointers_t*bluetooth_nimble_root_pointers;
 #else
 #define MICROPY_PORT_ROOT_POINTER_BLUETOOTH_NIMBLE
 #endif
 
 #define MICROPY_PORT_ROOT_POINTERS \
-    const char *readline_hist[8]; \
+    const char*readline_hist[8]; \
     mp_obj_t machine_pin_irq_handler[40]; \
-    struct _machine_timer_obj_t *machine_timer_obj_head; \
+    struct _machine_timer_obj_t*machine_timer_obj_head; \
     MICROPY_PORT_ROOT_POINTER_BLUETOOTH_NIMBLE
 
 // type definitions for the specific machine
@@ -256,7 +256,7 @@ void *esp_native_code_commit(void*, size_t, void*);
         extern void mp_handle_pending(bool); \
         mp_handle_pending(true); \
         MICROPY_PY_USOCKET_EVENTS_HANDLER \
-        asm("waiti 0"); \
+        asm ("waiti 0"); \
     } while (0);
 #endif
 

@@ -62,7 +62,7 @@ STATIC MP_DEFINE_ATTRTUPLE(
     (mp_obj_t)&os_uname_info_release_obj,
     (mp_obj_t)&os_uname_info_version_obj,
     (mp_obj_t)&os_uname_info_machine_obj
-);
+    );
 
 STATIC mp_obj_t os_uname(void) {
     return (mp_obj_t)&os_uname_info_obj;

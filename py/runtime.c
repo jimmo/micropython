@@ -69,9 +69,9 @@ void mp_init(void) {
     MP_STATE_VM(sched_len) = 0;
     #endif
 
-#if MICROPY_ENABLE_EMERGENCY_EXCEPTION_BUF
+    #if MICROPY_ENABLE_EMERGENCY_EXCEPTION_BUF
     mp_init_emergency_exception_buf();
-#endif
+    #endif
 
     #if MICROPY_KBD_EXCEPTION
     // initialise the exception object for raising KeyboardInterrupt
@@ -367,11 +367,17 @@ mp_obj_t mp_binary_op(mp_binary_op_t op, mp_obj_t lhs, mp_obj_t rhs) {
             //      <<      checked explicitly
             switch (op) {
                 case MP_BINARY_OP_OR:
-                case MP_BINARY_OP_INPLACE_OR: lhs_val |= rhs_val; break;
+                case MP_BINARY_OP_INPLACE_OR:
+                    lhs_val |= rhs_val;
+                    break;
                 case MP_BINARY_OP_XOR:
-                case MP_BINARY_OP_INPLACE_XOR: lhs_val ^= rhs_val; break;
+                case MP_BINARY_OP_INPLACE_XOR:
+                    lhs_val ^= rhs_val;
+                    break;
                 case MP_BINARY_OP_AND:
-                case MP_BINARY_OP_INPLACE_AND: lhs_val &= rhs_val; break;
+                case MP_BINARY_OP_INPLACE_AND:
+                    lhs_val &= rhs_val;
+                    break;
                 case MP_BINARY_OP_LSHIFT:
                 case MP_BINARY_OP_INPLACE_LSHIFT: {
                     if (rhs_val < 0) {
@@ -403,9 +409,13 @@ mp_obj_t mp_binary_op(mp_binary_op_t op, mp_obj_t lhs, mp_obj_t rhs) {
                     }
                     break;
                 case MP_BINARY_OP_ADD:
-                case MP_BINARY_OP_INPLACE_ADD: lhs_val += rhs_val; break;
+                case MP_BINARY_OP_INPLACE_ADD:
+                    lhs_val += rhs_val;
+                    break;
                 case MP_BINARY_OP_SUBTRACT:
-                case MP_BINARY_OP_INPLACE_SUBTRACT: lhs_val -= rhs_val; break;
+                case MP_BINARY_OP_INPLACE_SUBTRACT:
+                    lhs_val -= rhs_val;
+                    break;
                 case MP_BINARY_OP_MULTIPLY:
                 case MP_BINARY_OP_INPLACE_MULTIPLY: {
 
@@ -441,14 +451,14 @@ mp_obj_t mp_binary_op(mp_binary_op_t op, mp_obj_t lhs, mp_obj_t rhs) {
                     lhs_val = mp_small_int_floor_divide(lhs_val, rhs_val);
                     break;
 
-                #if MICROPY_PY_BUILTINS_FLOAT
+                    #if MICROPY_PY_BUILTINS_FLOAT
                 case MP_BINARY_OP_TRUE_DIVIDE:
                 case MP_BINARY_OP_INPLACE_TRUE_DIVIDE:
                     if (rhs_val == 0) {
                         goto zero_division;
                     }
                     return mp_obj_new_float((mp_float_t)lhs_val / (mp_float_t)rhs_val);
-                #endif
+                    #endif
 
                 case MP_BINARY_OP_MODULO:
                 case MP_BINARY_OP_INPLACE_MODULO: {
@@ -505,10 +515,14 @@ mp_obj_t mp_binary_op(mp_binary_op_t op, mp_obj_t lhs, mp_obj_t rhs) {
                     return MP_OBJ_FROM_PTR(tuple);
                 }
 
-                case MP_BINARY_OP_LESS: return mp_obj_new_bool(lhs_val < rhs_val);
-                case MP_BINARY_OP_MORE: return mp_obj_new_bool(lhs_val > rhs_val);
-                case MP_BINARY_OP_LESS_EQUAL: return mp_obj_new_bool(lhs_val <= rhs_val);
-                case MP_BINARY_OP_MORE_EQUAL: return mp_obj_new_bool(lhs_val >= rhs_val);
+                case MP_BINARY_OP_LESS:
+                    return mp_obj_new_bool(lhs_val < rhs_val);
+                case MP_BINARY_OP_MORE:
+                    return mp_obj_new_bool(lhs_val > rhs_val);
+                case MP_BINARY_OP_LESS_EQUAL:
+                    return mp_obj_new_bool(lhs_val <= rhs_val);
+                case MP_BINARY_OP_MORE_EQUAL:
+                    return mp_obj_new_bool(lhs_val >= rhs_val);
 
                 default:
                     goto unsupported_op;
@@ -519,7 +533,7 @@ mp_obj_t mp_binary_op(mp_binary_op_t op, mp_obj_t lhs, mp_obj_t rhs) {
             } else {
                 return mp_obj_new_int_from_ll(lhs_val);
             }
-#if MICROPY_PY_BUILTINS_FLOAT
+            #if MICROPY_PY_BUILTINS_FLOAT
         } else if (mp_obj_is_float(rhs)) {
             mp_obj_t res = mp_obj_float_binary_op(op, lhs_val, rhs);
             if (res == MP_OBJ_NULL) {
@@ -527,7 +541,7 @@ mp_obj_t mp_binary_op(mp_binary_op_t op, mp_obj_t lhs, mp_obj_t rhs) {
             } else {
                 return res;
             }
-#if MICROPY_PY_BUILTINS_COMPLEX
+            #if MICROPY_PY_BUILTINS_COMPLEX
         } else if (mp_obj_is_type(rhs, &mp_type_complex)) {
             mp_obj_t res = mp_obj_complex_binary_op(op, lhs_val, 0, rhs);
             if (res == MP_OBJ_NULL) {
@@ -535,8 +549,8 @@ mp_obj_t mp_binary_op(mp_binary_op_t op, mp_obj_t lhs, mp_obj_t rhs) {
             } else {
                 return res;
             }
-#endif
-#endif
+            #endif
+            #endif
         }
     }
 
@@ -559,7 +573,7 @@ generic_binary_op:
         }
     }
 
-#if MICROPY_PY_REVERSE_SPECIAL_METHODS
+    #if MICROPY_PY_REVERSE_SPECIAL_METHODS
     if (op >= MP_BINARY_OP_OR && op <= MP_BINARY_OP_POWER) {
         mp_obj_t t = rhs;
         rhs = lhs;
@@ -573,7 +587,7 @@ generic_binary_op:
         lhs = t;
         op -= MP_BINARY_OP_REVERSE_OR - MP_BINARY_OP_OR;
     }
-#endif
+    #endif
 
     if (op == MP_BINARY_OP_CONTAINS) {
         // If type didn't support containment then explicitly walk the iterator.
@@ -1014,9 +1028,9 @@ void mp_convert_member_lookup(mp_obj_t self, const mp_obj_type_t *type, mp_obj_t
         // Don't try to bind types (even though they're callable)
         dest[0] = member;
     } else if (mp_obj_is_fun(member)
-        || (mp_obj_is_obj(member)
-            && (((mp_obj_base_t*)MP_OBJ_TO_PTR(member))->type->name == MP_QSTR_closure
-                || ((mp_obj_base_t*)MP_OBJ_TO_PTR(member))->type->name == MP_QSTR_generator))) {
+               || (mp_obj_is_obj(member)
+                   && (((mp_obj_base_t*)MP_OBJ_TO_PTR(member))->type->name == MP_QSTR_closure
+                       || ((mp_obj_base_t*)MP_OBJ_TO_PTR(member))->type->name == MP_QSTR_generator))) {
         // only functions, closures and generators objects can be bound to self
         #if MICROPY_BUILTIN_METHOD_CHECK_SELF_ARG
         const mp_obj_type_t *m_type = ((mp_obj_base_t*)MP_OBJ_TO_PTR(member))->type;
@@ -1376,7 +1390,7 @@ mp_obj_t mp_import_from(mp_obj_t module, qstr name) {
 
     if (dest[1] != MP_OBJ_NULL) {
         // Hopefully we can't import bound method from an object
-import_error:
+    import_error:
         mp_raise_msg_varg(&mp_type_ImportError, "cannot import name %q", name);
     }
 
@@ -1437,8 +1451,8 @@ void mp_import_all(mp_obj_t module) {
 
 mp_obj_t mp_parse_compile_execute(mp_lexer_t *lex, mp_parse_input_kind_t parse_input_kind, mp_obj_dict_t *globals, mp_obj_dict_t *locals) {
     // save context
-    mp_obj_dict_t *volatile old_globals = mp_globals_get();
-    mp_obj_dict_t *volatile old_locals = mp_locals_get();
+    mp_obj_dict_t* volatile old_globals = mp_globals_get();
+    mp_obj_dict_t* volatile old_locals = mp_locals_get();
 
     // set new context
     mp_globals_set(globals);

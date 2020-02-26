@@ -231,31 +231,31 @@ MP_DEFINE_EXCEPTION(KeyboardInterrupt, BaseException)
 MP_DEFINE_EXCEPTION(GeneratorExit, BaseException)
 MP_DEFINE_EXCEPTION(Exception, BaseException)
   #if MICROPY_PY_ASYNC_AWAIT
-  MP_DEFINE_EXCEPTION(StopAsyncIteration, Exception)
+MP_DEFINE_EXCEPTION(StopAsyncIteration, Exception)
   #endif
-  MP_DEFINE_EXCEPTION(StopIteration, Exception)
-  MP_DEFINE_EXCEPTION(ArithmeticError, Exception)
-    //MP_DEFINE_EXCEPTION(FloatingPointError, ArithmeticError)
-    MP_DEFINE_EXCEPTION(OverflowError, ArithmeticError)
-    MP_DEFINE_EXCEPTION(ZeroDivisionError, ArithmeticError)
-  MP_DEFINE_EXCEPTION(AssertionError, Exception)
-  MP_DEFINE_EXCEPTION(AttributeError, Exception)
-  //MP_DEFINE_EXCEPTION(BufferError, Exception)
-  MP_DEFINE_EXCEPTION(EOFError, Exception)
-  MP_DEFINE_EXCEPTION(ImportError, Exception)
-  MP_DEFINE_EXCEPTION(LookupError, Exception)
-    MP_DEFINE_EXCEPTION(IndexError, LookupError)
-    MP_DEFINE_EXCEPTION(KeyError, LookupError)
-  MP_DEFINE_EXCEPTION(MemoryError, Exception)
-  MP_DEFINE_EXCEPTION(NameError, Exception)
-    /*
+MP_DEFINE_EXCEPTION(StopIteration, Exception)
+MP_DEFINE_EXCEPTION(ArithmeticError, Exception)
+//MP_DEFINE_EXCEPTION(FloatingPointError, ArithmeticError)
+MP_DEFINE_EXCEPTION(OverflowError, ArithmeticError)
+MP_DEFINE_EXCEPTION(ZeroDivisionError, ArithmeticError)
+MP_DEFINE_EXCEPTION(AssertionError, Exception)
+MP_DEFINE_EXCEPTION(AttributeError, Exception)
+//MP_DEFINE_EXCEPTION(BufferError, Exception)
+MP_DEFINE_EXCEPTION(EOFError, Exception)
+MP_DEFINE_EXCEPTION(ImportError, Exception)
+MP_DEFINE_EXCEPTION(LookupError, Exception)
+MP_DEFINE_EXCEPTION(IndexError, LookupError)
+MP_DEFINE_EXCEPTION(KeyError, LookupError)
+MP_DEFINE_EXCEPTION(MemoryError, Exception)
+MP_DEFINE_EXCEPTION(NameError, Exception)
+/*
     MP_DEFINE_EXCEPTION(UnboundLocalError, NameError)
     */
-  MP_DEFINE_EXCEPTION(OSError, Exception)
+MP_DEFINE_EXCEPTION(OSError, Exception)
 #if MICROPY_PY_BUILTINS_TIMEOUTERROR
-    MP_DEFINE_EXCEPTION(TimeoutError, OSError)
+MP_DEFINE_EXCEPTION(TimeoutError, OSError)
 #endif
-    /*
+/*
     MP_DEFINE_EXCEPTION(BlockingIOError, OSError)
     MP_DEFINE_EXCEPTION(ChildProcessError, OSError)
     MP_DEFINE_EXCEPTION(ConnectionError, OSError)
@@ -272,24 +272,24 @@ MP_DEFINE_EXCEPTION(Exception, BaseException)
     MP_DEFINE_EXCEPTION(FileNotFoundError, OSError)
     MP_DEFINE_EXCEPTION(ReferenceError, Exception)
     */
-  MP_DEFINE_EXCEPTION(RuntimeError, Exception)
-    MP_DEFINE_EXCEPTION(NotImplementedError, RuntimeError)
-  MP_DEFINE_EXCEPTION(SyntaxError, Exception)
-    MP_DEFINE_EXCEPTION(IndentationError, SyntaxError)
-    /*
+MP_DEFINE_EXCEPTION(RuntimeError, Exception)
+MP_DEFINE_EXCEPTION(NotImplementedError, RuntimeError)
+MP_DEFINE_EXCEPTION(SyntaxError, Exception)
+MP_DEFINE_EXCEPTION(IndentationError, SyntaxError)
+/*
       MP_DEFINE_EXCEPTION(TabError, IndentationError)
       */
-  //MP_DEFINE_EXCEPTION(SystemError, Exception)
-  MP_DEFINE_EXCEPTION(TypeError, Exception)
+//MP_DEFINE_EXCEPTION(SystemError, Exception)
+MP_DEFINE_EXCEPTION(TypeError, Exception)
 #if MICROPY_EMIT_NATIVE
-    MP_DEFINE_EXCEPTION(ViperTypeError, TypeError)
+MP_DEFINE_EXCEPTION(ViperTypeError, TypeError)
 #endif
-  MP_DEFINE_EXCEPTION(ValueError, Exception)
+MP_DEFINE_EXCEPTION(ValueError, Exception)
 #if MICROPY_PY_BUILTINS_STR_UNICODE
-    MP_DEFINE_EXCEPTION(UnicodeError, ValueError)
-    //TODO: Implement more UnicodeError subclasses which take arguments
+MP_DEFINE_EXCEPTION(UnicodeError, ValueError)
+//TODO: Implement more UnicodeError subclasses which take arguments
 #endif
-  /*
+/*
   MP_DEFINE_EXCEPTION(Warning, Exception)
     MP_DEFINE_EXCEPTION(DeprecationWarning, Warning)
     MP_DEFINE_EXCEPTION(PendingDeprecationWarning, Warning)

@@ -41,15 +41,14 @@ STATIC uint32_t yasmarang_pad = 0xeda4baba, yasmarang_n = 69, yasmarang_d = 233;
 STATIC uint8_t yasmarang_dat = 0;
 #endif
 
-STATIC uint32_t yasmarang(void)
-{
-   yasmarang_pad += yasmarang_dat + yasmarang_d * yasmarang_n;
-   yasmarang_pad = (yasmarang_pad<<3) + (yasmarang_pad>>29);
-   yasmarang_n = yasmarang_pad | 2;
-   yasmarang_d ^= (yasmarang_pad<<31) + (yasmarang_pad>>1);
-   yasmarang_dat ^= (char) yasmarang_pad ^ (yasmarang_d>>8) ^ 1;
+STATIC uint32_t yasmarang(void){
+    yasmarang_pad += yasmarang_dat + yasmarang_d * yasmarang_n;
+    yasmarang_pad = (yasmarang_pad << 3) + (yasmarang_pad >> 29);
+    yasmarang_n = yasmarang_pad | 2;
+    yasmarang_d ^= (yasmarang_pad << 31) + (yasmarang_pad >> 1);
+    yasmarang_dat ^= (char) yasmarang_pad ^ (yasmarang_d >> 8) ^ 1;
 
-   return (yasmarang_pad^(yasmarang_d<<5)^(yasmarang_pad>>18)^(yasmarang_dat<<1));
+    return yasmarang_pad ^ (yasmarang_d << 5) ^ (yasmarang_pad >> 18) ^ (yasmarang_dat << 1);
 }  /* yasmarang */
 
 // End of Yasmarang

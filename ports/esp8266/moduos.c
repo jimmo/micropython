@@ -55,7 +55,7 @@ STATIC mp_obj_tuple_t os_uname_info_obj = {
         NULL,
         (mp_obj_t)&os_uname_info_version_obj,
         (mp_obj_t)&os_uname_info_machine_obj,
-        (void *)os_uname_info_fields,
+        (void*)os_uname_info_fields,
     }
 };
 

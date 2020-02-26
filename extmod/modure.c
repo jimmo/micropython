@@ -296,7 +296,7 @@ STATIC mp_obj_t re_sub_helper(mp_obj_t self_in, size_t n_args, const mp_obj_t *a
         vstr_add_strn(&vstr_return, subj.begin, match->caps[0] - subj.begin);
 
         // Get replacement string
-        const char* repl = mp_obj_str_get_str((mp_obj_is_callable(replace) ? mp_call_function_1(replace, MP_OBJ_FROM_PTR(match)) : replace));
+        const char *repl = mp_obj_str_get_str((mp_obj_is_callable(replace) ? mp_call_function_1(replace, MP_OBJ_FROM_PTR(match)) : replace));
 
         // Append replacement string to result, substituting any regex groups
         while (*repl != '\0') {
@@ -402,7 +402,7 @@ STATIC mp_obj_t mod_re_compile(size_t n_args, const mp_obj_t *args) {
     #endif
     int error = re1_5_compilecode(&o->re, re_str);
     if (error != 0) {
-error:
+    error:
         mp_raise_ValueError("Error in regex");
     }
     #if MICROPY_PY_URE_DEBUG

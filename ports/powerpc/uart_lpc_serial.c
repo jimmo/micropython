@@ -74,7 +74,7 @@ static void lpc_uart_reg_write(uint64_t offset, uint8_t val) {
 
     addr = lpc_uart_base + offset;
 
-    *(volatile uint8_t *)addr = val;
+    *(volatile uint8_t*)addr = val;
 }
 
 static uint8_t lpc_uart_reg_read(uint64_t offset) {
@@ -83,7 +83,7 @@ static uint8_t lpc_uart_reg_read(uint64_t offset) {
 
     addr = lpc_uart_base + offset;
 
-    val = *(volatile uint8_t *)addr;
+    val = *(volatile uint8_t*)addr;
 
     return val;
 }
@@ -101,11 +101,13 @@ void lpc_uart_init(void) {
 }
 
 char lpc_uart_read(void) {
-    while (lpc_uart_rx_empty()) ;
+    while (lpc_uart_rx_empty()) {;
+    }
     return lpc_uart_reg_read(REG_THR);
 }
 
 void lpc_uart_write(char c) {
-    while (lpc_uart_tx_full());
+    while (lpc_uart_tx_full()) {;
+    }
     lpc_uart_reg_write(REG_RBR, c);
 }

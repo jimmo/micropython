@@ -163,7 +163,7 @@ STATIC uint8_t *USBD_StrDescriptor(USBD_HandleTypeDef *pdev, uint8_t idx, uint16
             //
             // See: https://my.st.com/52d187b7 for the algorithim used.
 
-            uint8_t *id = (uint8_t *)MP_HAL_UNIQUE_ID_ADDRESS;
+            uint8_t *id = (uint8_t*)MP_HAL_UNIQUE_ID_ADDRESS;
             snprintf(str_buf, sizeof(str_buf),
                 "%02X%02X%02X%02X%02X%02X",
                 id[11], id[10] + id[2], id[9], id[8] + id[0], id[7], id[6]);

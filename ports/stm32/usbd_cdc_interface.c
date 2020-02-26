@@ -95,7 +95,7 @@ void usbd_cdc_deinit(usbd_cdc_state_t *cdc_in) {
 // pbuf: buffer containing command data (request parameters)
 // length: number of data to be sent (in bytes)
 // Returns USBD_OK if all operations are OK else USBD_FAIL
-int8_t usbd_cdc_control(usbd_cdc_state_t *cdc_in, uint8_t cmd, uint8_t* pbuf, uint16_t length) {
+int8_t usbd_cdc_control(usbd_cdc_state_t *cdc_in, uint8_t cmd, uint8_t *pbuf, uint16_t length) {
     usbd_cdc_itf_t *cdc = (usbd_cdc_itf_t*)cdc_in;
 
     switch (cmd) {
@@ -121,8 +121,8 @@ int8_t usbd_cdc_control(usbd_cdc_state_t *cdc_in, uint8_t cmd, uint8_t* pbuf, ui
 
         case CDC_SET_LINE_CODING:
             #if 0
-            LineCoding.bitrate    = (uint32_t)(pbuf[0] | (pbuf[1] << 8) |\
-                                    (pbuf[2] << 16) | (pbuf[3] << 24));
+            LineCoding.bitrate    = (uint32_t)(pbuf[0] | (pbuf[1] << 8) | \
+                (pbuf[2] << 16) | (pbuf[3] << 24));
             LineCoding.format     = pbuf[4];
             LineCoding.paritytype = pbuf[5];
             LineCoding.datatype   = pbuf[6];
@@ -318,7 +318,7 @@ int usbd_cdc_tx(usbd_cdc_itf_t *cdc, const uint8_t *buf, uint32_t len, uint32_t 
         // Wait until the device is connected and the buffer has space, with a given timeout
         uint32_t start = HAL_GetTick();
         while (cdc->connect_state == USBD_CDC_CONNECT_STATE_DISCONNECTED
-            || ((cdc->tx_buf_ptr_in + 1) & (USBD_CDC_TX_DATA_SIZE - 1)) == cdc->tx_buf_ptr_out) {
+               || ((cdc->tx_buf_ptr_in + 1) & (USBD_CDC_TX_DATA_SIZE - 1)) == cdc->tx_buf_ptr_out) {
             usbd_cdc_try_tx(cdc);
             // Wraparound of tick is taken care of by 2's complement arithmetic.
             if (HAL_GetTick() - start >= timeout) {

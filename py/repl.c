@@ -50,7 +50,7 @@ bool mp_repl_continue_with_input(const char *input) {
 
     // check if input starts with a certain keyword
     bool starts_with_compound_keyword =
-           input[0] == '@'
+        input[0] == '@'
         || str_startswith_word(input, "if")
         || str_startswith_word(input, "while")
         || str_startswith_word(input, "for")
@@ -61,7 +61,7 @@ bool mp_repl_continue_with_input(const char *input) {
         #if MICROPY_PY_ASYNC_AWAIT
         || str_startswith_word(input, "async")
         #endif
-        ;
+    ;
 
     // check for unmatched open bracket, quote or escape quote
     #define Q_NONE (0)
@@ -95,13 +95,26 @@ bool mp_repl_continue_with_input(const char *input) {
             }
         } else if (in_quote == Q_NONE) {
             switch (*i) {
-                case '(': n_paren += 1; break;
-                case ')': n_paren -= 1; break;
-                case '[': n_brack += 1; break;
-                case ']': n_brack -= 1; break;
-                case '{': n_brace += 1; break;
-                case '}': n_brace -= 1; break;
-                default: break;
+                case '(':
+                    n_paren += 1;
+                    break;
+                case ')':
+                    n_paren -= 1;
+                    break;
+                case '[':
+                    n_brack += 1;
+                    break;
+                case ']':
+                    n_brack -= 1;
+                    break;
+                case '{':
+                    n_brace += 1;
+                    break;
+                case '}':
+                    n_brace -= 1;
+                    break;
+                default:
+                    break;
             }
         }
     }

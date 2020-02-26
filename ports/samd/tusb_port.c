@@ -74,7 +74,7 @@ static const uint8_t usbd_desc_cfg[USBD_DESC_LEN] = {
         USBD_CDC_CMD_MAX_SIZE, USBD_CDC_EP_OUT, USBD_CDC_EP_IN, CFG_TUD_CDC_RX_BUFSIZE),
 };
 
-static const char *const usbd_desc_str[] = {
+static const char* const usbd_desc_str[] = {
     [USBD_STR_MANUF] = "MicroPython",
     [USBD_STR_PRODUCT] = "Board in FS mode",
     [USBD_STR_SERIAL] = "000000000000", // TODO
@@ -102,7 +102,7 @@ const uint16_t *tud_descriptor_string_cb(uint8_t index) {
         if (index >= sizeof(usbd_desc_str) / sizeof(usbd_desc_str[0])) {
             return NULL;
         }
-        const char* str = usbd_desc_str[index];
+        const char *str = usbd_desc_str[index];
         for (len = 0; len < DESC_STR_MAX - 1 && str[len]; ++len) {
             desc_str[1 + len] = str[len];
         }

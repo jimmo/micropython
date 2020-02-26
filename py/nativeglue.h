@@ -91,7 +91,7 @@ typedef struct _mp_fun_table_t {
     mp_const_obj_t const_true;
     mp_uint_t (*native_from_obj)(mp_obj_t obj, mp_uint_t type);
     mp_obj_t (*native_to_obj)(mp_uint_t val, mp_uint_t type);
-    mp_obj_dict_t *(*swap_globals)(mp_obj_dict_t *new_globals);
+    mp_obj_dict_t*(*swap_globals)(mp_obj_dict_t * new_globals);
     mp_obj_t (*load_name)(qstr qst);
     mp_obj_t (*load_global)(qstr qst);
     mp_obj_t (*load_build_class)(void);
@@ -118,7 +118,7 @@ typedef struct _mp_fun_table_t {
     mp_obj_t (*call_method_n_kw_var)(bool have_self, size_t n_args_n_kw, const mp_obj_t *args);
     mp_obj_t (*getiter)(mp_obj_t obj, mp_obj_iter_buf_t *iter);
     mp_obj_t (*iternext)(mp_obj_iter_buf_t *iter);
-    unsigned int (*nlr_push)(nlr_buf_t *);
+    unsigned int (*nlr_push)(nlr_buf_t*);
     void (*nlr_pop)(void);
     void (*raise)(mp_obj_t o);
     mp_obj_t (*import_name)(qstr name, mp_obj_t fromlist, mp_obj_t level);
@@ -137,25 +137,25 @@ typedef struct _mp_fun_table_t {
     bool (*yield_from)(mp_obj_t gen, mp_obj_t send_value, mp_obj_t *ret_value);
     void *setjmp;
     // Additional entries for dynamic runtime, starts at index 50
-    void *(*memset_)(void *s, int c, size_t n);
-    void *(*memmove_)(void *dest, const void *src, size_t n);
-    void *(*realloc_)(void *ptr, size_t n_bytes, bool allow_move);
+    void*(*memset_)(void *s, int c, size_t n);
+    void*(*memmove_)(void *dest, const void *src, size_t n);
+    void*(*realloc_)(void *ptr, size_t n_bytes, bool allow_move);
     int (*printf_)(const mp_print_t *print, const char *fmt, ...);
     int (*vprintf_)(const mp_print_t *print, const char *fmt, va_list args);
     #if defined(__GNUC__)
     NORETURN // Only certain compilers support no-return attributes in function pointer declarations
     #endif
     void (*raise_msg)(const mp_obj_type_t *exc_type, const char *msg);
-    const mp_obj_type_t *(*obj_get_type)(mp_const_obj_t o_in);
-    mp_obj_t (*obj_new_str)(const char* data, size_t len);
-    mp_obj_t (*obj_new_bytes)(const byte* data, size_t len);
+    const mp_obj_type_t*(*obj_get_type)(mp_const_obj_t o_in);
+    mp_obj_t (*obj_new_str)(const char *data, size_t len);
+    mp_obj_t (*obj_new_bytes)(const byte *data, size_t len);
     mp_obj_t (*obj_new_bytearray_by_ref)(size_t n, void *items);
     mp_obj_t (*obj_new_float_from_f)(float f);
     mp_obj_t (*obj_new_float_from_d)(double d);
     float (*obj_get_float_to_f)(mp_obj_t o);
     double (*obj_get_float_to_d)(mp_obj_t o);
     void (*get_buffer_raise)(mp_obj_t obj, mp_buffer_info_t *bufinfo, mp_uint_t flags);
-    const mp_stream_p_t *(*get_stream_raise)(mp_obj_t self_in, int flags);
+    const mp_stream_p_t*(*get_stream_raise)(mp_obj_t self_in, int flags);
     const mp_print_t *plat_print;
     const mp_obj_type_t *type_type;
     const mp_obj_type_t *type_str;

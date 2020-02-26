@@ -74,7 +74,7 @@ const mp_obj_type_t mp_type_socket;
 
 // Helper functions
 static inline mp_obj_t mp_obj_from_sockaddr(const struct sockaddr *addr, socklen_t len) {
-    return mp_obj_new_bytes((const byte *)addr, len);
+    return mp_obj_new_bytes((const byte*)addr, len);
 }
 
 STATIC mp_obj_socket_t *socket_new(int fd) {
@@ -167,7 +167,7 @@ STATIC mp_obj_t socket_connect(mp_obj_t self_in, mp_obj_t addr_in) {
     mp_buffer_info_t bufinfo;
     mp_get_buffer_raise(addr_in, &bufinfo, MP_BUFFER_READ);
     MP_THREAD_GIL_EXIT();
-    int r = connect(self->fd, (const struct sockaddr *)bufinfo.buf, bufinfo.len);
+    int r = connect(self->fd, (const struct sockaddr*)bufinfo.buf, bufinfo.len);
     MP_THREAD_GIL_ENTER();
     int err = errno;
     if (r == -1 && self->blocking && err == EINPROGRESS) {
@@ -184,7 +184,7 @@ STATIC mp_obj_t socket_bind(mp_obj_t self_in, mp_obj_t addr_in) {
     mp_buffer_info_t bufinfo;
     mp_get_buffer_raise(addr_in, &bufinfo, MP_BUFFER_READ);
     MP_THREAD_GIL_EXIT();
-    int r = bind(self->fd, (const struct sockaddr *)bufinfo.buf, bufinfo.len);
+    int r = bind(self->fd, (const struct sockaddr*)bufinfo.buf, bufinfo.len);
     MP_THREAD_GIL_ENTER();
     RAISE_ERRNO(r, errno);
     return mp_const_none;
@@ -315,7 +315,7 @@ STATIC mp_obj_t socket_sendto(size_t n_args, const mp_obj_t *args) {
     mp_get_buffer_raise(dst_addr, &addr_bi, MP_BUFFER_READ);
     MP_THREAD_GIL_EXIT();
     int out_sz = sendto(self->fd, bufinfo.buf, bufinfo.len, flags,
-                        (struct sockaddr *)addr_bi.buf, addr_bi.len);
+        (struct sockaddr*)addr_bi.buf, addr_bi.len);
     MP_THREAD_GIL_ENTER();
     RAISE_ERRNO(out_sz, errno);
 
@@ -548,8 +548,8 @@ STATIC mp_obj_t mod_socket_getaddrinfo(size_t n_args, const mp_obj_t *args) {
         snprintf(buf, sizeof(buf), "%u", port);
         serv = buf;
         hints.ai_flags = AI_NUMERICSERV;
-#ifdef __UCLIBC_MAJOR__
-#if __UCLIBC_MAJOR__ == 0 && (__UCLIBC_MINOR__ < 9 || (__UCLIBC_MINOR__ == 9 && __UCLIBC_SUBLEVEL__ <= 32))
+        #ifdef __UCLIBC_MAJOR__
+        #if __UCLIBC_MAJOR__ == 0 && (__UCLIBC_MINOR__ < 9 || (__UCLIBC_MINOR__ == 9 && __UCLIBC_SUBLEVEL__ <= 32))
 // "warning" requires -Wno-cpp which is a relatively new gcc option, so we choose not to use it.
 //#warning Working around uClibc bug with numeric service name
         // Older versions og uClibc have bugs when numeric ports in service
@@ -560,8 +560,8 @@ STATIC mp_obj_t mod_socket_getaddrinfo(size_t n_args, const mp_obj_t *args) {
         // Note that this is crude workaround, precluding UDP socket addresses
         // to be returned. TODO: set only if not set by Python args.
         hints.ai_socktype = SOCK_STREAM;
-#endif
-#endif
+        #endif
+        #endif
     } else {
         serv = mp_obj_str_get_str(args[1]);
     }
@@ -647,7 +647,7 @@ STATIC const mp_rom_map_elem_t mp_module_socket_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR_inet_ntop), MP_ROM_PTR(&mod_socket_inet_ntop_obj) },
     { MP_ROM_QSTR(MP_QSTR_sockaddr), MP_ROM_PTR(&mod_socket_sockaddr_obj) },
 
-#define C(name) { MP_ROM_QSTR(MP_QSTR_ ## name), MP_ROM_INT(name) }
+#define C(name) { MP_ROM_QSTR(MP_QSTR_##name), MP_ROM_INT(name) }
     C(AF_UNIX),
     C(AF_INET),
     C(AF_INET6),

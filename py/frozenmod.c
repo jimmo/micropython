@@ -80,7 +80,7 @@ STATIC mp_lexer_t *mp_lexer_frozen_str(const char *str, size_t len) {
 #include "py/emitglue.h"
 
 extern const char mp_frozen_mpy_names[];
-extern const mp_raw_code_t *const mp_frozen_mpy_content[];
+extern const mp_raw_code_t* const mp_frozen_mpy_content[];
 
 STATIC const mp_raw_code_t *mp_find_frozen_mpy(const char *str, size_t len) {
     const char *name = mp_frozen_mpy_names;

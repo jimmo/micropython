@@ -50,7 +50,7 @@
 #ifdef FMC_SDRAM_BANK
 
 static void sdram_init_seq(SDRAM_HandleTypeDef
-        *hsdram, FMC_SDRAM_CommandTypeDef *command);
+                           *hsdram, FMC_SDRAM_CommandTypeDef *command);
 extern void __fatal_error(const char *msg);
 
 bool sdram_init(void) {
@@ -149,7 +149,7 @@ bool sdram_init(void) {
     /* TRCD */
     SDRAM_Timing.RCDDelay             = MICROPY_HW_SDRAM_TIMING_TRCD;
 
-    #define _FMC_INIT(x, n) x ## _ ## n
+    #define _FMC_INIT(x, n) x##_##n
     #define FMC_INIT(x, n) _FMC_INIT(x,  n)
 
     hsdram.Init.SDBank             = FMC_SDRAM_BANK;
@@ -181,10 +181,9 @@ void *sdram_end(void) {
 }
 
 static void sdram_init_seq(SDRAM_HandleTypeDef
-        *hsdram, FMC_SDRAM_CommandTypeDef *command)
-{
+    *hsdram, FMC_SDRAM_CommandTypeDef *command){
     /* Program the SDRAM external device */
-    __IO uint32_t tmpmrd =0;
+    __IO uint32_t tmpmrd = 0;
 
     /* Step 3:  Configure a clock configuration enable command */
     command->CommandMode           = FMC_SDRAM_CMD_CLK_ENABLE;
@@ -258,7 +257,7 @@ static void sdram_init_seq(SDRAM_HandleTypeDef
 bool sdram_test(bool fast) {
     uint8_t const pattern = 0xaa;
     uint8_t const antipattern = 0x55;
-    uint8_t *const mem_base = (uint8_t*)sdram_start();
+    uint8_t* const mem_base = (uint8_t*)sdram_start();
 
     /* test data bus */
     for (uint8_t i = 1; i; i <<= 1) {

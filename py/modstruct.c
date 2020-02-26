@@ -235,7 +235,7 @@ STATIC mp_obj_t struct_pack_into(size_t n_args, const mp_obj_t *args) {
             mp_raise_ValueError("buffer too small");
         }
     }
-    byte *p = (byte *)bufinfo.buf;
+    byte *p = (byte*)bufinfo.buf;
     byte *end_p = &p[bufinfo.len];
     p += offset;
 

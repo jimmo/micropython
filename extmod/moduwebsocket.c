@@ -71,7 +71,7 @@ STATIC mp_obj_t websocket_make_new(const mp_obj_type_t *type, size_t n_args, siz
     if (n_args > 1 && args[1] == mp_const_true) {
         o->opts |= BLOCKING_WRITE;
     }
-    return  MP_OBJ_FROM_PTR(o);
+    return MP_OBJ_FROM_PTR(o);
 }
 
 STATIC mp_uint_t websocket_read(mp_obj_t self_in, void *buf, mp_uint_t size, int *errcode) {
@@ -183,7 +183,7 @@ STATIC mp_uint_t websocket_read(mp_obj_t self_in, void *buf, mp_uint_t size, int
                 self->msg_sz -= out_sz;
                 if (self->msg_sz == 0) {
                     byte last_state;
-no_payload:
+                no_payload:
                     last_state = self->state;
                     self->state = FRAME_HEADER;
                     self->to_recv = 2;

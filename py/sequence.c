@@ -140,7 +140,7 @@ bool mp_seq_cmp_objs(mp_uint_t op, const mp_obj_t *items1, size_t len1, const mp
 
     // Let's deal only with > & >=
     if (op == MP_BINARY_OP_LESS || op == MP_BINARY_OP_LESS_EQUAL) {
-        SWAP(const mp_obj_t *, items1, items2);
+        SWAP(const mp_obj_t*, items1, items2);
         SWAP(size_t, len1, len2);
         if (op == MP_BINARY_OP_LESS) {
             op = MP_BINARY_OP_MORE;
@@ -163,7 +163,7 @@ bool mp_seq_cmp_objs(mp_uint_t op, const mp_obj_t *items1, size_t len1, const mp
         }
 
         // Otherwise, application of relation op gives the answer
-        return (mp_binary_op(op, items1[i], items2[i]) == mp_const_true);
+        return mp_binary_op(op, items1[i], items2[i]) == mp_const_true;
     }
 
     // If we had tie in the last element...
@@ -208,9 +208,9 @@ mp_obj_t mp_seq_index_obj(const mp_obj_t *items, size_t len, size_t n_args, cons
 mp_obj_t mp_seq_count_obj(const mp_obj_t *items, size_t len, mp_obj_t value) {
     size_t count = 0;
     for (size_t i = 0; i < len; i++) {
-         if (mp_obj_equal(items[i], value)) {
-              count++;
-         }
+        if (mp_obj_equal(items[i], value)) {
+            count++;
+        }
     }
 
     // Common sense says this cannot overflow small int

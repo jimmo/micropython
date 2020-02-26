@@ -71,7 +71,7 @@ STATIC void network_cyw43_print(const mp_print_t *print, mp_obj_t self_in, mp_pr
         netif->ip_addr.addr >> 8 & 0xff,
         netif->ip_addr.addr >> 16 & 0xff,
         netif->ip_addr.addr >> 24
-    );
+        );
 }
 
 STATIC mp_obj_t network_cyw43_make_new(const mp_obj_type_t *type, size_t n_args, size_t n_kw, const mp_obj_t *args) {

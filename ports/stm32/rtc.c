@@ -125,7 +125,7 @@ void rtc_init_start(bool force_init) {
             rtc_info |= 0x40000 | (RCC->BDCR & 7) | (RCC->CSR & 3) << 8;
             return;
         } else if ((bdcr & (RCC_BDCR_RTCEN | RCC_BDCR_RTCSEL))
-            == (RCC_BDCR_RTCEN | RCC_BDCR_RTCSEL_1)) {
+                   == (RCC_BDCR_RTCEN | RCC_BDCR_RTCSEL_1)) {
             // LSI configured as the RTC clock source --> no need to (re-)init RTC
             // remove Backup Domain write protection
             HAL_PWR_EnableBkUpAccess();
@@ -189,7 +189,7 @@ void rtc_init_finalise() {
     if(__HAL_RCC_GET_FLAG(RCC_FLAG_BORRST) != RESET) {
     #else
     if(__HAL_RCC_GET_FLAG(RCC_FLAG_PORRST) != RESET) {
-    #endif
+        #endif
         // power on reset occurred
         rtc_info |= 0x10000;
     }
@@ -295,7 +295,7 @@ STATIC HAL_StatusTypeDef PYB_RTC_Init(RTC_HandleTypeDef *hrtc) {
         return HAL_ERROR;
     } else {
         // Clear RTC_CR FMT, OSEL and POL Bits
-        hrtc->Instance->CR &= ((uint32_t)~(RTC_CR_FMT | RTC_CR_OSEL | RTC_CR_POL));
+        hrtc->Instance->CR &= ((uint32_t) ~(RTC_CR_FMT | RTC_CR_OSEL | RTC_CR_POL));
         // Set RTC_CR register
         hrtc->Instance->CR |= (uint32_t)(hrtc->Init.HourFormat | hrtc->Init.OutPut | hrtc->Init.OutPutPolarity);
 
@@ -304,16 +304,16 @@ STATIC HAL_StatusTypeDef PYB_RTC_Init(RTC_HandleTypeDef *hrtc) {
         hrtc->Instance->PRER |= (uint32_t)(hrtc->Init.AsynchPrediv << 16);
 
         // Exit Initialization mode
-        hrtc->Instance->ISR &= (uint32_t)~RTC_ISR_INIT;
+        hrtc->Instance->ISR &= (uint32_t) ~RTC_ISR_INIT;
 
         #if defined(STM32L0) || defined(STM32L4) || defined(STM32H7) || defined(STM32WB)
-        hrtc->Instance->OR &= (uint32_t)~RTC_OR_ALARMOUTTYPE;
+        hrtc->Instance->OR &= (uint32_t) ~RTC_OR_ALARMOUTTYPE;
         hrtc->Instance->OR |= (uint32_t)(hrtc->Init.OutPutType);
         #elif defined(STM32F7)
-        hrtc->Instance->OR &= (uint32_t)~RTC_OR_ALARMTYPE;
+        hrtc->Instance->OR &= (uint32_t) ~RTC_OR_ALARMTYPE;
         hrtc->Instance->OR |= (uint32_t)(hrtc->Init.OutPutType);
         #else
-        hrtc->Instance->TAFCR &= (uint32_t)~RTC_TAFCR_ALARMOUTTYPE;
+        hrtc->Instance->TAFCR &= (uint32_t) ~RTC_TAFCR_ALARMOUTTYPE;
         hrtc->Instance->TAFCR |= (uint32_t)(hrtc->Init.OutPutType);
         #endif
 
@@ -714,7 +714,7 @@ mp_obj_t pyb_rtc_calibration(size_t n_args, const mp_obj_t *args) {
         cal = mp_obj_get_int(args[1]);
         mp_uint_t cal_p, cal_m;
         if (cal < -511 || cal > 512) {
-#if defined(MICROPY_HW_RTC_USE_CALOUT) && MICROPY_HW_RTC_USE_CALOUT
+            #if defined(MICROPY_HW_RTC_USE_CALOUT) && MICROPY_HW_RTC_USE_CALOUT
             if ((cal & 0xfffe) == 0x0ffe) {
                 // turn on/off X18 (PC13) 512Hz output
                 // Note:
@@ -728,9 +728,9 @@ mp_obj_t pyb_rtc_calibration(size_t n_args, const mp_obj_t *args) {
             } else {
                 mp_raise_ValueError("calibration value out of range");
             }
-#else
+            #else
             mp_raise_ValueError("calibration value out of range");
-#endif
+            #endif
         }
         if (cal > 0) {
             cal_p = RTC_SMOOTHCALIB_PLUSPULSES_SET;

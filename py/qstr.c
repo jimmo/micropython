@@ -106,11 +106,11 @@ const qstr_pool_t mp_qstr_const_pool = {
     MICROPY_ALLOC_QSTR_ENTRIES_INIT,
     MP_QSTRnumber_of,   // corresponds to number of strings in array just below
     {
-#ifndef NO_QSTR
+        #ifndef NO_QSTR
 #define QDEF(id, str) str,
-#include "genhdr/qstrdefs.generated.h"
+        #include "genhdr/qstrdefs.generated.h"
 #undef QDEF
-#endif
+        #endif
     },
 };
 

@@ -90,7 +90,7 @@ void emit_bc_free(emit_t *emit) {
     m_del_obj(emit_t, emit);
 }
 
-typedef byte *(*emit_allocator_t)(emit_t *emit, int nbytes);
+typedef byte*(*emit_allocator_t)(emit_t *emit, int nbytes);
 
 STATIC void emit_write_uint(emit_t *emit, emit_allocator_t allocator, mp_uint_t val) {
     // We store each 7 bits in a separate byte, and that's how many bytes needed
@@ -121,7 +121,7 @@ STATIC byte *emit_get_cur_to_write_code_info(emit_t *emit, int num_bytes_to_writ
     }
 }
 
-STATIC void emit_write_code_info_byte(emit_t* emit, byte val) {
+STATIC void emit_write_code_info_byte(emit_t *emit, byte val) {
     *emit_get_cur_to_write_code_info(emit, 1) = val;
 }
 
@@ -230,7 +230,7 @@ STATIC void emit_write_bytecode_byte_const(emit_t *emit, int stack_adj, byte b, 
 }
 #endif
 
-STATIC void emit_write_bytecode_byte_qstr(emit_t* emit, int stack_adj, byte b, qstr qst) {
+STATIC void emit_write_bytecode_byte_qstr(emit_t *emit, int stack_adj, byte b, qstr qst) {
     #if MICROPY_PERSISTENT_CODE
     assert((qst >> 16) == 0);
     mp_emit_bc_adjust_stack_size(emit, stack_adj);
@@ -467,7 +467,7 @@ void mp_emit_bc_adjust_stack_size(emit_t *emit, mp_int_t delta) {
 }
 
 void mp_emit_bc_set_source_line(emit_t *emit, mp_uint_t source_line) {
-#if MICROPY_ENABLE_SOURCE_LINE
+    #if MICROPY_ENABLE_SOURCE_LINE
     if (MP_STATE_VM(mp_optimise_value) >= 3) {
         // If we compile with -O3, don't store line numbers.
         return;
@@ -479,10 +479,10 @@ void mp_emit_bc_set_source_line(emit_t *emit, mp_uint_t source_line) {
         emit->last_source_line_offset = emit->bytecode_offset;
         emit->last_source_line = source_line;
     }
-#else
+    #else
     (void)emit;
     (void)source_line;
-#endif
+    #endif
 }
 
 void mp_emit_bc_label_assign(emit_t *emit, mp_uint_t l) {

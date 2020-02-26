@@ -128,7 +128,7 @@ mp_obj_t mod_binascii_a2b_base64(mp_obj_t data) {
 
     vstr_t vstr;
     vstr_init(&vstr, (bufinfo.len / 4) * 3 + 1); // Potentially over-allocate
-    byte *out = (byte *)vstr.buf;
+    byte *out = (byte*)vstr.buf;
 
     uint shift = 0;
     int nbits = 0; // Number of meaningful bits in shift
@@ -186,8 +186,7 @@ mp_obj_t mod_binascii_b2a_base64(mp_obj_t data) {
         if (i == 2) {
             *out++ = (in[0] & 0x03) << 4 | (in[1] & 0xF0) >> 4;
             *out++ = (in[1] & 0x0F) << 2;
-        }
-        else {
+        } else   {
             *out++ = (in[0] & 0x03) << 4;
             *out++ = 64;
         }
@@ -204,7 +203,7 @@ mp_obj_t mod_binascii_b2a_base64(mp_obj_t data) {
         } else if (*out < 62) {
             *out += '0' - 52;
         } else if (*out == 62) {
-            *out ='+';
+            *out = '+';
         } else if (*out == 63) {
             *out = '/';
         } else {

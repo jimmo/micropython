@@ -39,11 +39,11 @@ typedef struct _pyb_thread_t {
     struct _pyb_thread_t *queue_next;
 } pyb_thread_t;
 
-typedef pyb_thread_t *pyb_mutex_t;
+typedef pyb_thread_t*pyb_mutex_t;
 
 extern volatile int pyb_thread_enabled;
-extern pyb_thread_t *volatile pyb_thread_all;
-extern pyb_thread_t *volatile pyb_thread_cur;
+extern pyb_thread_t* volatile pyb_thread_all;
+extern pyb_thread_t* volatile pyb_thread_cur;
 
 void pyb_thread_init(pyb_thread_t *th);
 void pyb_thread_deinit();

@@ -145,8 +145,8 @@ void SDMMC1_IRQHandler(void) {
                 | (sdmmc_dma << SDMMC_DCTRL_DMAEN_Pos)
                 #endif
                 | (!sdmmc_write) << SDMMC_DCTRL_DTDIR_Pos
-                | SDMMC_DCTRL_DTEN
-                ;
+                    | SDMMC_DCTRL_DTEN
+            ;
             if (!sdmmc_dma) {
                 SDMMC1->MASK |= SDMMC_MASK_TXFIFOHEIE;
             }
@@ -336,7 +336,7 @@ int sdio_transfer_cmd53(bool write, uint32_t block_size, uint32_t arg, size_t le
             | write << 6 // DIR mem-to-periph
             | 1 << 5 // PFCTRL periph is flow controller
             | 1 << 0 // EN
-            ;
+        ;
         #else
         SDMMC1->IDMABASE0 = (uint32_t)buf;
         SDMMC1->IDMACTRL = SDMMC_IDMA_IDMAEN;
@@ -360,8 +360,8 @@ int sdio_transfer_cmd53(bool write, uint32_t block_size, uint32_t arg, size_t le
             | (dma << SDMMC_DCTRL_DMAEN_Pos)
             #endif
             | (!write) << SDMMC_DCTRL_DTDIR_Pos
-            | SDMMC_DCTRL_DTEN
-            ;
+                | SDMMC_DCTRL_DTEN
+        ;
     }
 
     SDMMC1->ARG = arg;

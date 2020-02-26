@@ -64,7 +64,7 @@ uint32_t spi_transaction(uint8_t spi_no, uint8_t cmd_bits, uint16_t cmd_data,
 void spi_tx8fast(uint8_t spi_no, uint8_t dout_data);
 
 // Expansion Macros
-#define spi_busy(spi_no) READ_PERI_REG(SPI_CMD(spi_no))&SPI_USR
+#define spi_busy(spi_no) READ_PERI_REG(SPI_CMD(spi_no)) & SPI_USR
 
 #define spi_txd(spi_no, bits, data) spi_transaction(spi_no, 0, 0, 0, 0, bits, (uint32_t) data, 0, 0)
 #define spi_tx8(spi_no, data)       spi_transaction(spi_no, 0, 0, 0, 0, 8,    (uint32_t) data, 0, 0)

@@ -117,7 +117,7 @@ STATIC const mp_rom_map_elem_t mp_module_zsensor_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_zsensor) },
     { MP_ROM_QSTR(MP_QSTR_Sensor), MP_ROM_PTR(&sensor_type) },
 
-#define C(name) { MP_ROM_QSTR(MP_QSTR_ ## name), MP_ROM_INT(SENSOR_CHAN_ ## name) }
+#define C(name) { MP_ROM_QSTR(MP_QSTR_##name), MP_ROM_INT(SENSOR_CHAN_##name) }
     C(ACCEL_X),
     C(ACCEL_Y),
     C(ACCEL_Z),

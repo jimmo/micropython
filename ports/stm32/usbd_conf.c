@@ -230,7 +230,7 @@ void HAL_PCD_MspDeInit(PCD_HandleTypeDef *hpcd) {
   * @retval None
   */
 void HAL_PCD_SetupStageCallback(PCD_HandleTypeDef *hpcd) {
-    USBD_LL_SetupStage(hpcd->pData, (uint8_t *)hpcd->Setup);
+    USBD_LL_SetupStage(hpcd->pData, (uint8_t*)hpcd->Setup);
 }
 
 /**
@@ -631,7 +631,7 @@ USBD_StatusTypeDef USBD_LL_PrepareReceive(USBD_HandleTypeDef *pdev,
   * @param  ep_addr: Endpoint Number
   * @retval Recived Data Size
   */
-uint32_t USBD_LL_GetRxDataSize(USBD_HandleTypeDef *pdev, uint8_t  ep_addr) {
+uint32_t USBD_LL_GetRxDataSize(USBD_HandleTypeDef *pdev, uint8_t ep_addr) {
     return HAL_PCD_EP_GetRxCount(pdev->pData, ep_addr);
 }
 

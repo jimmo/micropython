@@ -129,7 +129,7 @@ STATIC const mp_rom_map_elem_t mp_module_termios_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR_tcsetattr), MP_ROM_PTR(&mod_termios_tcsetattr_obj) },
     { MP_ROM_QSTR(MP_QSTR_setraw), MP_ROM_PTR(&mod_termios_setraw_obj) },
 
-#define C(name) { MP_ROM_QSTR(MP_QSTR_ ## name), MP_ROM_INT(name) }
+#define C(name) { MP_ROM_QSTR(MP_QSTR_##name), MP_ROM_INT(name) }
     C(TCSANOW),
 
     C(B9600),

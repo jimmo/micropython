@@ -34,8 +34,8 @@
 // Combined version as a 32-bit number for convenience
 #define MICROPY_VERSION ( \
     MICROPY_VERSION_MAJOR << 16 \
-    | MICROPY_VERSION_MINOR << 8 \
-    | MICROPY_VERSION_MICRO)
+        | MICROPY_VERSION_MINOR << 8 \
+        | MICROPY_VERSION_MICRO)
 
 // String version
 #define MICROPY_VERSION_STRING \

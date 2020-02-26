@@ -110,7 +110,7 @@
         vm_hook_divisor = MICROPY_VM_HOOK_COUNT; \
         extern void ets_loop_iter(void); \
         ets_loop_iter(); \
-    }
+}
 #define MICROPY_VM_HOOK_LOOP MICROPY_VM_HOOK_POLL
 #define MICROPY_VM_HOOK_RETURN MICROPY_VM_HOOK_POLL
 

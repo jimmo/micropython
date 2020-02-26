@@ -189,7 +189,7 @@ STATIC mp_obj_t pyb_rtc_memory(size_t n_args, const mp_obj_t *args) {
 
         int i = 0;
         for (; i < bufinfo.len; i++) {
-            rtcram[i] = ((uint8_t *)bufinfo.buf)[i];
+            rtcram[i] = ((uint8_t*)bufinfo.buf)[i];
         }
 
         system_rtc_mem_write(MEM_USER_DATA_ADDR, rtcram, (len + 3) & ~3);

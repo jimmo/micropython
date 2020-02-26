@@ -33,15 +33,15 @@ MP_WEAK uintptr_t mp_hal_stdio_poll(uintptr_t poll_flags) {
 
 MP_WEAK int mp_hal_stdin_rx_chr(void) {
     for (;;) {
-#if 0
-#ifdef USE_HOST_MODE
+        #if 0
+        #ifdef USE_HOST_MODE
         pyb_usb_host_process();
         int c = pyb_usb_host_get_keyboard();
         if (c != 0) {
             return c;
         }
-#endif
-#endif
+        #endif
+        #endif
         if (MP_STATE_PORT(pyb_stdio_uart) != NULL && uart_rx_any(MP_STATE_PORT(pyb_stdio_uart))) {
             return uart_rx_char(MP_STATE_PORT(pyb_stdio_uart));
         }
@@ -61,9 +61,9 @@ MP_WEAK void mp_hal_stdout_tx_strn(const char *str, size_t len) {
     if (MP_STATE_PORT(pyb_stdio_uart) != NULL) {
         uart_tx_strn(MP_STATE_PORT(pyb_stdio_uart), str, len);
     }
-#if 0 && defined(USE_HOST_MODE) && MICROPY_HW_HAS_LCD
+    #if 0 && defined(USE_HOST_MODE) && MICROPY_HW_HAS_LCD
     lcd_print_strn(str, len);
-#endif
+    #endif
     mp_uos_dupterm_tx_strn(str, len);
 }
 
@@ -171,7 +171,7 @@ void mp_hal_pin_config_speed(mp_hal_pin_obj_t pin_obj, uint32_t speed) {
 
 // Generate a random locally administered MAC address (LAA)
 void mp_hal_generate_laa_mac(int idx, uint8_t buf[6]) {
-    uint8_t *id = (uint8_t *)MP_HAL_UNIQUE_ID_ADDRESS;
+    uint8_t *id = (uint8_t*)MP_HAL_UNIQUE_ID_ADDRESS;
     buf[0] = 0x02; // LAA range
     buf[1] = (id[11] << 4) | (id[10] & 0xf);
     buf[2] = (id[9] << 4) | (id[8] & 0xf);

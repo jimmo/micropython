@@ -182,7 +182,7 @@ void mp_thread_start(void) {
     pthread_mutex_unlock(&thread_mutex);
 }
 
-void mp_thread_create(void *(*entry)(void*), void *arg, size_t *stack_size) {
+void mp_thread_create(void*(*entry)(void*), void *arg, size_t *stack_size) {
     // default stack size is 8k machine-words
     if (*stack_size == 0) {
         *stack_size = 8192 * BYTES_PER_WORD;

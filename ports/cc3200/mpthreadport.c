@@ -100,7 +100,7 @@ void mp_thread_start(void) {
     mp_thread_mutex_unlock(&thread_mutex);
 }
 
-STATIC void *(*ext_thread_entry)(void*) = NULL;
+STATIC void*(*ext_thread_entry)(void*) = NULL;
 
 STATIC void freertos_entry(void *arg) {
     if (ext_thread_entry) {
@@ -111,7 +111,7 @@ STATIC void freertos_entry(void *arg) {
     }
 }
 
-void mp_thread_create(void *(*entry)(void*), void *arg, size_t *stack_size) {
+void mp_thread_create(void*(*entry)(void*), void *arg, size_t *stack_size) {
     // store thread entry function into a global variable so we can access it
     ext_thread_entry = entry;
 

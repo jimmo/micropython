@@ -74,7 +74,7 @@ int mp_hal_stdin_rx_chr(void) {
         #if 0
         // Idles CPU but need more testing before enabling
         if (!ets_loop_iter()) {
-            asm("waiti 0");
+            asm ("waiti 0");
         }
         #else
         mp_hal_delay_us(1);

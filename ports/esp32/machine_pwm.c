@@ -120,7 +120,7 @@ STATIC void esp32_pwm_print(const mp_print_t *print, mp_obj_t self_in, mp_print_
 }
 
 STATIC void esp32_pwm_init_helper(esp32_pwm_obj_t *self,
-        size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args) {
+    size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args) {
     enum { ARG_freq, ARG_duty };
     static const mp_arg_t allowed_args[] = {
         { MP_QSTR_freq, MP_ARG_INT, {.u_int = -1} },
@@ -181,7 +181,7 @@ STATIC void esp32_pwm_init_helper(esp32_pwm_obj_t *self,
     // Set duty cycle?
     int dval = args[ARG_duty].u_int;
     if (dval != -1) {
-        dval &= ((1 << PWRES)-1);
+        dval &= ((1 << PWRES) - 1);
         dval >>= PWRES - timer_cfg.duty_resolution;
         ledc_set_duty(PWMODE, channel, dval);
         ledc_update_duty(PWMODE, channel);
@@ -189,7 +189,7 @@ STATIC void esp32_pwm_init_helper(esp32_pwm_obj_t *self,
 }
 
 STATIC mp_obj_t esp32_pwm_make_new(const mp_obj_type_t *type,
-        size_t n_args, size_t n_kw, const mp_obj_t *args) {
+    size_t n_args, size_t n_kw, const mp_obj_t *args) {
     mp_arg_check_num(n_args, n_kw, 1, MP_OBJ_FUN_ARGS_MAX, true);
     gpio_num_t pin_id = machine_pin_get_id(args[0]);
 
@@ -215,7 +215,7 @@ STATIC mp_obj_t esp32_pwm_make_new(const mp_obj_type_t *type,
 }
 
 STATIC mp_obj_t esp32_pwm_init(size_t n_args,
-        const mp_obj_t *args, mp_map_t *kw_args) {
+    const mp_obj_t *args, mp_map_t *kw_args) {
     esp32_pwm_init_helper(args[0], n_args - 1, args + 1, kw_args);
     return mp_const_none;
 }
@@ -267,7 +267,7 @@ STATIC mp_obj_t esp32_pwm_duty(size_t n_args, const mp_obj_t *args) {
 
     // set
     duty = mp_obj_get_int(args[1]);
-    duty &= ((1 << PWRES)-1);
+    duty &= ((1 << PWRES) - 1);
     duty >>= PWRES - timer_cfg.duty_resolution;
     ledc_set_duty(PWMODE, self->channel, duty);
     ledc_update_duty(PWMODE, self->channel);
@@ -275,7 +275,7 @@ STATIC mp_obj_t esp32_pwm_duty(size_t n_args, const mp_obj_t *args) {
     return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(esp32_pwm_duty_obj,
-    1, 2, esp32_pwm_duty);
+                                           1, 2, esp32_pwm_duty);
 
 STATIC const mp_rom_map_elem_t esp32_pwm_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_init), MP_ROM_PTR(&esp32_pwm_init_obj) },
@@ -285,7 +285,7 @@ STATIC const mp_rom_map_elem_t esp32_pwm_locals_dict_table[] = {
 };
 
 STATIC MP_DEFINE_CONST_DICT(esp32_pwm_locals_dict,
-    esp32_pwm_locals_dict_table);
+                            esp32_pwm_locals_dict_table);
 
 const mp_obj_type_t machine_pwm_type = {
     { &mp_type_type },

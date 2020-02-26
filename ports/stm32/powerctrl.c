@@ -74,7 +74,7 @@ static __attribute__((naked)) void branch_to_bootloader(uint32_t r0, uint32_t bl
         "msr msp, r2\n"         // get stack pointer
         "ldr r2, [r1, #4]\n"    // get address of destination
         "bx r2\n"               // branch to bootloader
-    );
+        );
 }
 
 void powerctrl_check_enter_bootloader(void) {
@@ -205,51 +205,89 @@ int powerctrl_rcc_clock_config_pll(RCC_ClkInitTypeDef *rcc_init, uint32_t sysclk
 
 STATIC uint32_t calc_ahb_div(uint32_t wanted_div) {
     #if defined(STM32H7)
-    if (wanted_div <= 1) { return RCC_HCLK_DIV1; }
-    else if (wanted_div <= 2) { return RCC_HCLK_DIV2; }
-    else if (wanted_div <= 4) { return RCC_HCLK_DIV4; }
-    else if (wanted_div <= 8) { return RCC_HCLK_DIV8; }
-    else if (wanted_div <= 16) { return RCC_HCLK_DIV16; }
-    else if (wanted_div <= 64) { return RCC_HCLK_DIV64; }
-    else if (wanted_div <= 128) { return RCC_HCLK_DIV128; }
-    else if (wanted_div <= 256) { return RCC_HCLK_DIV256; }
-    else { return RCC_HCLK_DIV512; }
+    if (wanted_div <= 1) {
+        return RCC_HCLK_DIV1;
+    } else if (wanted_div <= 2)                                                {
+        return RCC_HCLK_DIV2;
+    } else if (wanted_div <= 4)                                                                                                    {
+        return RCC_HCLK_DIV4;
+    } else if (wanted_div <= 8)                                                                                                                                                        {
+        return RCC_HCLK_DIV8;
+    } else if (wanted_div <= 16)                                                                                                                                                                                                            {
+        return RCC_HCLK_DIV16;
+    } else if (wanted_div <= 64)                                                                                                                                                                                                                                                                  {
+        return RCC_HCLK_DIV64;
+    } else if (wanted_div <= 128)                                                                                                                                                                                                                                                                                                                        {
+        return RCC_HCLK_DIV128;
+    } else if (wanted_div <= 256)                                                                                                                                                                                                                                                                                                                                                                                {
+        return RCC_HCLK_DIV256;
+    } else                                                                                                                                                                                                                                                                                                                                                                                                                                        {
+        return RCC_HCLK_DIV512;
+    }
     #else
-    if (wanted_div <= 1) { return RCC_SYSCLK_DIV1; }
-    else if (wanted_div <= 2) { return RCC_SYSCLK_DIV2; }
-    else if (wanted_div <= 4) { return RCC_SYSCLK_DIV4; }
-    else if (wanted_div <= 8) { return RCC_SYSCLK_DIV8; }
-    else if (wanted_div <= 16) { return RCC_SYSCLK_DIV16; }
-    else if (wanted_div <= 64) { return RCC_SYSCLK_DIV64; }
-    else if (wanted_div <= 128) { return RCC_SYSCLK_DIV128; }
-    else if (wanted_div <= 256) { return RCC_SYSCLK_DIV256; }
-    else { return RCC_SYSCLK_DIV512; }
+    if (wanted_div <= 1) {
+        return RCC_SYSCLK_DIV1;
+    } else if (wanted_div <= 2)                                                  {
+        return RCC_SYSCLK_DIV2;
+    } else if (wanted_div <= 4)                                                                                                        {
+        return RCC_SYSCLK_DIV4;
+    } else if (wanted_div <= 8)                                                                                                                                                              {
+        return RCC_SYSCLK_DIV8;
+    } else if (wanted_div <= 16)                                                                                                                                                                                                                    {
+        return RCC_SYSCLK_DIV16;
+    } else if (wanted_div <= 64)                                                                                                                                                                                                                                                                            {
+        return RCC_SYSCLK_DIV64;
+    } else if (wanted_div <= 128)                                                                                                                                                                                                                                                                                                                                    {
+        return RCC_SYSCLK_DIV128;
+    } else if (wanted_div <= 256)                                                                                                                                                                                                                                                                                                                                                                                              {
+        return RCC_SYSCLK_DIV256;
+    } else                                                                                                                                                                                                                                                                                                                                                                                                                                                        {
+        return RCC_SYSCLK_DIV512;
+    }
     #endif
 }
 
 STATIC uint32_t calc_apb1_div(uint32_t wanted_div) {
     #if defined(STM32H7)
-    if (wanted_div <= 1) { return RCC_APB1_DIV1; }
-    else if (wanted_div <= 2) { return RCC_APB1_DIV2; }
-    else if (wanted_div <= 4) { return RCC_APB1_DIV4; }
-    else if (wanted_div <= 8) { return RCC_APB1_DIV8; }
-    else { return RCC_APB1_DIV16; }
+    if (wanted_div <= 1) {
+        return RCC_APB1_DIV1;
+    } else if (wanted_div <= 2)                                                {
+        return RCC_APB1_DIV2;
+    } else if (wanted_div <= 4)                                                                                                    {
+        return RCC_APB1_DIV4;
+    } else if (wanted_div <= 8)                                                                                                                                                        {
+        return RCC_APB1_DIV8;
+    } else                                                                                                                                                                                                            {
+        return RCC_APB1_DIV16;
+    }
     #else
-    if (wanted_div <= 1) { return RCC_HCLK_DIV1; }
-    else if (wanted_div <= 2) { return RCC_HCLK_DIV2; }
-    else if (wanted_div <= 4) { return RCC_HCLK_DIV4; }
-    else if (wanted_div <= 8) { return RCC_HCLK_DIV8; }
-    else { return RCC_HCLK_DIV16; }
+    if (wanted_div <= 1) {
+        return RCC_HCLK_DIV1;
+    } else if (wanted_div <= 2)                                                {
+        return RCC_HCLK_DIV2;
+    } else if (wanted_div <= 4)                                                                                                    {
+        return RCC_HCLK_DIV4;
+    } else if (wanted_div <= 8)                                                                                                                                                        {
+        return RCC_HCLK_DIV8;
+    } else                                                                                                                                                                                                            {
+        return RCC_HCLK_DIV16;
+    }
     #endif
 }
 
 STATIC uint32_t calc_apb2_div(uint32_t wanted_div) {
     #if defined(STM32H7)
-    if (wanted_div <= 1) { return RCC_APB2_DIV1; }
-    else if (wanted_div <= 2) { return RCC_APB2_DIV2; }
-    else if (wanted_div <= 4) { return RCC_APB2_DIV4; }
-    else if (wanted_div <= 8) { return RCC_APB2_DIV8; }
-    else { return RCC_APB2_DIV16; }
+    if (wanted_div <= 1) {
+        return RCC_APB2_DIV1;
+    } else if (wanted_div <= 2)                                                {
+        return RCC_APB2_DIV2;
+    } else if (wanted_div <= 4)                                                                                                    {
+        return RCC_APB2_DIV4;
+    } else if (wanted_div <= 8)                                                                                                                                                        {
+        return RCC_APB2_DIV8;
+    } else                                                                                                                                                                                                            {
+        return RCC_APB2_DIV16;
+    }
     #else
     return calc_apb1_div(wanted_div);
     #endif

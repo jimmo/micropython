@@ -84,12 +84,12 @@ void mp_asm_base_label_assign(mp_asm_base_t *as, size_t label) {
 }
 
 // align must be a multiple of 2
-void mp_asm_base_align(mp_asm_base_t* as, unsigned int align) {
+void mp_asm_base_align(mp_asm_base_t *as, unsigned int align) {
     as->code_offset = (as->code_offset + align - 1) & (~(align - 1));
 }
 
 // this function assumes a little endian machine
-void mp_asm_base_data(mp_asm_base_t* as, unsigned int bytesize, uintptr_t val) {
+void mp_asm_base_data(mp_asm_base_t *as, unsigned int bytesize, uintptr_t val) {
     uint8_t *c = mp_asm_base_get_cur_to_write_bytes(as, bytesize);
     if (c != NULL) {
         for (unsigned int i = 0; i < bytesize; i++) {

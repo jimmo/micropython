@@ -82,11 +82,11 @@ struct mbedtls_aes_ctx_with_key {
 typedef struct _mp_obj_aes_t {
     mp_obj_base_t base;
     AES_CTX_IMPL ctx;
-    uint8_t block_mode: 6;
+    uint8_t block_mode : 6;
 #define AES_KEYTYPE_NONE 0
 #define AES_KEYTYPE_ENC  1
 #define AES_KEYTYPE_DEC  2
-    uint8_t key_type: 2;
+    uint8_t key_type : 2;
 } mp_obj_aes_t;
 
 static inline bool is_ctr_mode(int block_mode) {
@@ -144,7 +144,7 @@ STATIC void aes_process_cbc_impl(AES_CTX_IMPL *ctx, const uint8_t *in, uint8_t *
 // axTLS doesn't have CTR support out of the box. This implements the counter part using the ECB primitive.
 STATIC void aes_process_ctr_impl(AES_CTX_IMPL *ctx, const uint8_t *in, uint8_t *out, size_t in_len, struct ctr_params *ctr_params) {
     size_t n = ctr_params->offset;
-    uint8_t *const counter = ctx->iv;
+    uint8_t* const counter = ctx->iv;
 
     while (in_len--) {
         if (n == 0) {
@@ -219,9 +219,9 @@ STATIC mp_obj_t ucryptolib_aes_make_new(const mp_obj_type_t *type, size_t n_args
     switch (block_mode) {
         case UCRYPTOLIB_MODE_ECB:
         case UCRYPTOLIB_MODE_CBC:
-        #if MICROPY_PY_UCRYPTOLIB_CTR
+            #if MICROPY_PY_UCRYPTOLIB_CTR
         case UCRYPTOLIB_MODE_CTR:
-        #endif
+            #endif
             break;
 
         default:
@@ -319,12 +319,12 @@ STATIC mp_obj_t aes_process(size_t n_args, const mp_obj_t *args, bool encrypt) {
             aes_process_cbc_impl(&self->ctx, in_bufinfo.buf, out_buf_ptr, in_bufinfo.len, encrypt);
             break;
 
-        #if MICROPY_PY_UCRYPTOLIB_CTR
+            #if MICROPY_PY_UCRYPTOLIB_CTR
         case UCRYPTOLIB_MODE_CTR:
             aes_process_ctr_impl(&self->ctx, in_bufinfo.buf, out_buf_ptr, in_bufinfo.len,
                 ctr_params_from_aes(self));
             break;
-        #endif
+            #endif
     }
 
     if (out_buf != MP_OBJ_NULL) {
@@ -359,13 +359,13 @@ STATIC const mp_obj_type_t ucryptolib_aes_type = {
 STATIC const mp_rom_map_elem_t mp_module_ucryptolib_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_ucryptolib) },
     { MP_ROM_QSTR(MP_QSTR_aes), MP_ROM_PTR(&ucryptolib_aes_type) },
-#if MICROPY_PY_UCRYPTOLIB_CONSTS
+    #if MICROPY_PY_UCRYPTOLIB_CONSTS
     { MP_ROM_QSTR(MP_QSTR_MODE_ECB), MP_ROM_INT(UCRYPTOLIB_MODE_ECB) },
     { MP_ROM_QSTR(MP_QSTR_MODE_CBC), MP_ROM_INT(UCRYPTOLIB_MODE_CBC) },
     #if MICROPY_PY_UCRYPTOLIB_CTR
     { MP_ROM_QSTR(MP_QSTR_MODE_CTR), MP_ROM_INT(UCRYPTOLIB_MODE_CTR) },
     #endif
-#endif
+    #endif
 };
 
 STATIC MP_DEFINE_CONST_DICT(mp_module_ucryptolib_globals, mp_module_ucryptolib_globals_table);

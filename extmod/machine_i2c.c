@@ -685,8 +685,8 @@ int mp_machine_soft_i2c_write(mp_obj_base_t *self_in, const uint8_t *src, size_t
 }
 
 STATIC const mp_machine_i2c_p_t mp_machine_soft_i2c_p = {
-    .start = (int(*)(mp_obj_base_t*))mp_hal_i2c_start,
-    .stop = (int(*)(mp_obj_base_t*))mp_hal_i2c_stop,
+    .start = (int (*)(mp_obj_base_t*))mp_hal_i2c_start,
+    .stop = (int (*)(mp_obj_base_t*))mp_hal_i2c_stop,
     .read = mp_machine_soft_i2c_read,
     .write = mp_machine_soft_i2c_write,
     .transfer = mp_machine_soft_i2c_transfer,

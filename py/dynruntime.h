@@ -73,7 +73,7 @@ static inline void *m_realloc_dyn(void *ptr, size_t new_num_bytes) {
 /******************************************************************************/
 // Types and objects
 
-#define MP_OBJ_NEW_QSTR(x) MP_OBJ_NEW_QSTR_ ## x
+#define MP_OBJ_NEW_QSTR(x) MP_OBJ_NEW_QSTR_##x
 
 #define mp_type_type                        (*mp_fun_table.type_type)
 #define mp_type_str                         (*mp_fun_table.type_str)
@@ -119,7 +119,7 @@ static inline void *m_realloc_dyn(void *ptr, size_t new_num_bytes) {
 #define mp_obj_subscr(base, index, val)     (mp_fun_table.obj_subscr((base), (index), (val)))
 #define mp_obj_list_append(list, item)      (mp_fun_table.list_append((list), (item)))
 
-static inline mp_obj_t mp_obj_new_str_of_type_dyn(const mp_obj_type_t *type, const byte* data, size_t len) {
+static inline mp_obj_t mp_obj_new_str_of_type_dyn(const mp_obj_type_t *type, const byte *data, size_t len) {
     if (type == &mp_type_str) {
         return mp_obj_new_str((const char*)data, len);
     } else {

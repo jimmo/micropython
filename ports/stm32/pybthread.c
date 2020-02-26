@@ -45,8 +45,8 @@
 extern void __fatal_error(const char*);
 
 volatile int pyb_thread_enabled;
-pyb_thread_t *volatile pyb_thread_all;
-pyb_thread_t *volatile pyb_thread_cur;
+pyb_thread_t* volatile pyb_thread_all;
+pyb_thread_t* volatile pyb_thread_cur;
 
 static inline void pyb_thread_add_to_runable(pyb_thread_t *thread) {
     thread->run_prev = pyb_thread_cur->run_prev;

@@ -55,7 +55,7 @@ static uint64_t potato_uart_reg_read(int offset) {
 
     addr = potato_uart_base + offset;
 
-    val = *(volatile uint64_t *)addr;
+    val = *(volatile uint64_t*)addr;
 
     return val;
 }
@@ -65,7 +65,7 @@ void potato_uart_reg_write(int offset, uint64_t val) {
 
     addr = potato_uart_base + offset;
 
-    *(volatile uint64_t *)addr = val;
+    *(volatile uint64_t*)addr = val;
 }
 
 static int potato_uart_rx_empty(void) {
@@ -105,7 +105,8 @@ void potato_uart_init(void) {
 char potato_uart_read(void) {
     uint64_t val;
 
-    while (potato_uart_rx_empty());
+    while (potato_uart_rx_empty()) {;
+    }
     val = potato_uart_reg_read(POTATO_CONSOLE_RX);
 
     return (char)(val & 0x000000ff);
@@ -116,6 +117,7 @@ void potato_uart_write(char c) {
 
     val = c;
 
-    while (potato_uart_tx_full());
+    while (potato_uart_tx_full()) {;
+    }
     potato_uart_reg_write(POTATO_CONSOLE_TX, val);
 }

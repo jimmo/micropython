@@ -47,7 +47,7 @@ STATIC const mp_obj_type_t mp_type_framebuf;
 
 typedef void (*setpixel_t)(const mp_obj_framebuf_t*, int, int, uint32_t);
 typedef uint32_t (*getpixel_t)(const mp_obj_framebuf_t*, int, int);
-typedef void (*fill_rect_t)(const mp_obj_framebuf_t *, int, int, int, int, uint32_t);
+typedef void (*fill_rect_t)(const mp_obj_framebuf_t*, int, int, int, int, uint32_t);
 
 typedef struct _mp_framebuf_p_t {
     setpixel_t setpixel;
@@ -153,8 +153,8 @@ STATIC uint32_t gs2_hmsb_getpixel(const mp_obj_framebuf_t *fb, int x, int y) {
 }
 
 STATIC void gs2_hmsb_fill_rect(const mp_obj_framebuf_t *fb, int x, int y, int w, int h, uint32_t col) {
-    for (int xx=x; xx < x+w; xx++) {
-        for (int yy=y; yy < y+h; yy++) {
+    for (int xx = x; xx < x + w; xx++) {
+        for (int yy = y; yy < y + h; yy++) {
             gs2_hmsb_setpixel(fb, xx, yy, col);
         }
     }
@@ -397,9 +397,9 @@ STATIC mp_obj_t framebuf_rect(size_t n_args, const mp_obj_t *args) {
     mp_int_t col = mp_obj_get_int(args[5]);
 
     fill_rect(self, x, y, w, 1, col);
-    fill_rect(self, x, y + h- 1, w, 1, col);
+    fill_rect(self, x, y + h - 1, w, 1, col);
     fill_rect(self, x, y, 1, h, col);
-    fill_rect(self, x + w- 1, y, 1, h, col);
+    fill_rect(self, x + w - 1, y, 1, h, col);
 
     return mp_const_none;
 }
@@ -436,9 +436,15 @@ STATIC mp_obj_t framebuf_line(size_t n_args, const mp_obj_t *args) {
     bool steep;
     if (dy > dx) {
         mp_int_t temp;
-        temp = x1; x1 = y1; y1 = temp;
-        temp = dx; dx = dy; dy = temp;
-        temp = sx; sx = sy; sy = temp;
+        temp = x1;
+        x1 = y1;
+        y1 = temp;
+        temp = dx;
+        dx = dy;
+        dy = temp;
+        temp = sx;
+        sx = sy;
+        sy = temp;
         steep = true;
     } else {
         steep = false;
@@ -491,7 +497,7 @@ STATIC mp_obj_t framebuf_blit(size_t n_args, const mp_obj_t *args) {
         (y >= self->height) ||
         (-x >= source->width) ||
         (-y >= source->height)
-    ) {
+        ) {
         // Out of bounds, no-op.
         return mp_const_none;
     }

@@ -43,7 +43,7 @@
 #include "lib/oofatfs/diskio.h"
 #include "extmod/vfs_fat.h"
 
-typedef void *bdev_t;
+typedef void*bdev_t;
 STATIC fs_user_mount_t *disk_get_device(void *bdev) {
     return (fs_user_mount_t*)bdev;
 }
@@ -57,8 +57,7 @@ DRESULT disk_read (
     BYTE *buff,        /* Data buffer to store read data */
     DWORD sector,    /* Sector address (LBA) */
     UINT count        /* Number of sectors to read (1..128) */
-)
-{
+    ){
     fs_user_mount_t *vfs = disk_get_device(pdrv);
     if (vfs == NULL) {
         return RES_PARERR;
@@ -78,8 +77,7 @@ DRESULT disk_write (
     const BYTE *buff,    /* Data to be written */
     DWORD sector,        /* Sector address (LBA) */
     UINT count            /* Number of sectors to write (1..128) */
-)
-{
+    ){
     fs_user_mount_t *vfs = disk_get_device(pdrv);
     if (vfs == NULL) {
         return RES_PARERR;
@@ -104,8 +102,7 @@ DRESULT disk_ioctl (
     bdev_t pdrv,      /* Physical drive nmuber (0..) */
     BYTE cmd,        /* Control code */
     void *buff        /* Buffer to send/receive control data */
-)
-{
+    ){
     fs_user_mount_t *vfs = disk_get_device(pdrv);
     if (vfs == NULL) {
         return RES_PARERR;

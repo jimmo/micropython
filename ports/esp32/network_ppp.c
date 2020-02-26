@@ -60,7 +60,7 @@ typedef struct _ppp_if_obj_t {
 const mp_obj_type_t ppp_if_type;
 
 static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx) {
-    ppp_if_obj_t* self = ctx;
+    ppp_if_obj_t *self = ctx;
     struct netif *pppif = ppp_netif(self->pcb);
 
     switch (err_code) {
@@ -195,8 +195,8 @@ STATIC mp_obj_t ppp_connect_py(size_t n_args, const mp_obj_t *args, mp_map_t *kw
     }
 
     if (parsed_args[ARG_authmode].u_int != PPPAUTHTYPE_NONE) {
-        const char* username_str = mp_obj_str_get_str(parsed_args[ARG_username].u_obj);
-        const char* password_str = mp_obj_str_get_str(parsed_args[ARG_password].u_obj);
+        const char *username_str = mp_obj_str_get_str(parsed_args[ARG_username].u_obj);
+        const char *password_str = mp_obj_str_get_str(parsed_args[ARG_password].u_obj);
         pppapi_set_auth(self->pcb, parsed_args[ARG_authmode].u_int, username_str, password_str);
     }
     if (pppapi_set_default(self->pcb) != ESP_OK) {
@@ -218,7 +218,7 @@ STATIC mp_obj_t ppp_connect_py(size_t n_args, const mp_obj_t *args, mp_map_t *kw
 MP_DEFINE_CONST_FUN_OBJ_KW(ppp_connect_obj, 1, ppp_connect_py);
 
 STATIC mp_obj_t ppp_delete(mp_obj_t self_in) {
-    ppp_if_obj_t* self = MP_OBJ_TO_PTR(self_in);
+    ppp_if_obj_t *self = MP_OBJ_TO_PTR(self_in);
     mp_obj_t args[] = {self, mp_const_false};
     ppp_active(2, args);
     return mp_const_none;

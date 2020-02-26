@@ -52,8 +52,8 @@
 #include "patch_prog.h"
 
 #define MAX_ADDRSTRLEN      (128)
-#define MAX_RX_PACKET       (CC3000_RX_BUFFER_SIZE-CC3000_MINIMAL_RX_SIZE-1)
-#define MAX_TX_PACKET       (CC3000_TX_BUFFER_SIZE-CC3000_MINIMAL_TX_SIZE-1)
+#define MAX_RX_PACKET       (CC3000_RX_BUFFER_SIZE - CC3000_MINIMAL_RX_SIZE - 1)
+#define MAX_TX_PACKET       (CC3000_TX_BUFFER_SIZE - CC3000_MINIMAL_TX_SIZE - 1)
 
 #define MAKE_SOCKADDR(addr, ip, port) \
     sockaddr addr; \
@@ -143,10 +143,18 @@ STATIC int cc3k_socket_socket(mod_network_socket_obj_t *socket, int *_errno) {
 
     mp_uint_t type;
     switch (socket->u_param.type) {
-        case MOD_NETWORK_SOCK_STREAM: type = SOCK_STREAM; break;
-        case MOD_NETWORK_SOCK_DGRAM: type = SOCK_DGRAM; break;
-        case MOD_NETWORK_SOCK_RAW: type = SOCK_RAW; break;
-        default: *_errno = MP_EINVAL; return -1;
+        case MOD_NETWORK_SOCK_STREAM:
+            type = SOCK_STREAM;
+            break;
+        case MOD_NETWORK_SOCK_DGRAM:
+            type = SOCK_DGRAM;
+            break;
+        case MOD_NETWORK_SOCK_RAW:
+            type = SOCK_RAW;
+            break;
+        default:
+            *_errno = MP_EINVAL;
+            return -1;
     }
 
     // open socket
@@ -436,11 +444,11 @@ STATIC mp_obj_t cc3k_make_new(const mp_obj_type_t *type, size_t n_args, size_t n
         pin_find(args[1]),
         pin_find(args[2]),
         pin_find(args[3])
-    );
+        );
 
     // initialize and start the module
     wlan_init(cc3k_callback, NULL, NULL, NULL,
-            ReadWlanInterruptPin, SpiResumeSpi, SpiPauseSpi, WriteWlanPin);
+        ReadWlanInterruptPin, SpiResumeSpi, SpiPauseSpi, WriteWlanPin);
 
     if (wlan_start(0) != 0) {
         mp_raise_msg(&mp_type_OSError, "failed to init CC3000 module");
@@ -450,10 +458,10 @@ STATIC mp_obj_t cc3k_make_new(const mp_obj_type_t *type, size_t n_args, size_t n
     // wlan_ioctl_set_connection_policy(0, 0, 0);
 
     // Mask out all non-required events from the CC3000
-    wlan_set_event_mask(HCI_EVNT_WLAN_KEEPALIVE|
-                        HCI_EVNT_WLAN_UNSOL_INIT|
-                        HCI_EVNT_WLAN_ASYNC_PING_REPORT|
-                        HCI_EVNT_WLAN_ASYNC_SIMPLE_CONFIG_DONE);
+    wlan_set_event_mask(HCI_EVNT_WLAN_KEEPALIVE |
+        HCI_EVNT_WLAN_UNSOL_INIT |
+        HCI_EVNT_WLAN_ASYNC_PING_REPORT |
+        HCI_EVNT_WLAN_ASYNC_SIMPLE_CONFIG_DONE);
 
     // register with network module
     mod_network_register_nic((mp_obj_t)&cc3k_obj);

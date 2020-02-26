@@ -88,7 +88,7 @@ STATIC int ble_hs_err_to_errno(int err) {
 }
 
 // Note: modbluetooth UUIDs store their data in LE.
-STATIC ble_uuid_t* create_nimble_uuid(const mp_obj_bluetooth_uuid_t *uuid) {
+STATIC ble_uuid_t *create_nimble_uuid(const mp_obj_bluetooth_uuid_t *uuid) {
     if (uuid->type == MP_BLUETOOTH_UUID_TYPE_16) {
         ble_uuid16_t *result = m_new(ble_uuid16_t, 1);
         result->u.type = BLE_UUID_TYPE_16;
@@ -139,7 +139,7 @@ STATIC mp_obj_bluetooth_uuid_t create_mp_uuid(const ble_uuid_any_t *uuid) {
 // modbluetooth (and the layers above it) work in BE for addresses, Nimble works in LE.
 STATIC void reverse_addr_byte_order(uint8_t *addr_out, const uint8_t *addr_in) {
     for (int i = 0; i < 6; ++i) {
-        addr_out[i] = addr_in[5-i];
+        addr_out[i] = addr_in[5 - i];
     }
 }
 
@@ -196,7 +196,7 @@ STATIC void sync_cb(void) {
     }
 
     if (MP_BLUETOOTH_MAX_ATTR_SIZE > 20) {
-        rc = ble_att_set_preferred_mtu(MP_BLUETOOTH_MAX_ATTR_SIZE+3);
+        rc = ble_att_set_preferred_mtu(MP_BLUETOOTH_MAX_ATTR_SIZE + 3);
         assert(rc == 0);
     }
 

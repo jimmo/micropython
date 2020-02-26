@@ -67,7 +67,7 @@ static void uart0_init(void) {
         | SERCOM_USART_CTRLA_RXPO(rxpo)
         | SERCOM_USART_CTRLA_TXPO(txpo)
         | SERCOM_USART_CTRLA_MODE(1)
-        ;
+    ;
     USARTx->USART.CTRLB.reg = SERCOM_USART_CTRLB_RXEN | SERCOM_USART_CTRLB_TXEN;
     while (USARTx->USART.SYNCBUSY.bit.CTRLB) { }
     #if CPU_FREQ == 8000000
