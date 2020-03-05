@@ -7,4 +7,4 @@ LD_FILES = boards/stm32f091xc.ld boards/common_basic.ld
 MICROPY_VFS_FAT = 0
 
 # Don't include default frozen modules because MCU is tight on flash space
-FROZEN_MANIFEST ?=
+#FROZEN_MANIFEST ?= ''

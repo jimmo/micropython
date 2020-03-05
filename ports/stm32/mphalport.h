@@ -37,6 +37,14 @@ static inline mp_uint_t mp_hal_ticks_cpu(void) {
     #endif
 }
 
+#if __CORTEX_M >= 3
+#define mp_hal_delay_ticks_start() { uint32_t ticks_start = DWT->CYCCNT;
+#define mp_hal_delay_ticks(ticks) uint32_t ticks_finish = ticks_start + ticks; while (DWT->CYCCNT < ticks_finish); }
+#else
+#define mp_hal_delay_ticks_start()
+#define mp_hal_delay_ticks(ticks) { uint32_t t = ticks; while (--t) { __NOP(); } }
+#endif
+
 // C-level pin HAL
 
 #include "pin.h"

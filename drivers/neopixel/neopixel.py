@@ -10,8 +10,10 @@ except:
 class NeoPixel:
     ORDER = (1, 0, 2, 3)
     WS400 = (500, 2000, 1200, 1300) # 400kHz, UNTESTED!
-    WS2812S = (350, 800, 700, 600)
-    
+    #WS2812B = (742, 1578, 1485, 835)
+    # https://cdn-shop.adafruit.com/datasheets/WS2812B.pdf
+    WS2812B = (400, 800, 850, 450)
+
     def __init__(self, pin, n, bpp=3, timing=1):
         self.pin = pin
         self.n = n
@@ -21,7 +23,7 @@ class NeoPixel:
         if timing == 0:
             self.timing = self.WS400
         elif timing == 1:
-            self.timing = self.WS2812S
+            self.timing = self.WS2812B
         else:
             self.timing = timing # user supplied 4-tuple
 

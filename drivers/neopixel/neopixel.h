@@ -4,7 +4,7 @@
 #include "py/obj.h"
 
 // To be provided by the port
-uint32_t mp_hal_delay_ns_calc_neopixel(uint32_t ns, bool is_low_cycle);
+uint32_t mp_hal_delay_ticks_calc_neopixel(uint32_t ns, bool is_low_cycle);
 
 MP_DECLARE_CONST_FUN_OBJ_3(neopixel_write_obj);
 
