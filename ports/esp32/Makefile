@@ -49,6 +49,7 @@ FLASH_FREQ ?= 40m
 FLASH_SIZE ?= 4MB
 CROSS_COMPILE ?= xtensa-esp32-elf-
 OBJDUMP = $(CROSS_COMPILE)objdump
+NM = $(CROSS_COMPILE)nm
 
 SDKCONFIG_COMBINED = $(BUILD)/sdkconfig.combined
 SDKCONFIG_H = $(BUILD)/sdkconfig.h
@@ -254,7 +255,7 @@ CFLAGS_MOD += -DMICROPY_PY_BLUETOOTH_ENABLE_CENTRAL_MODE=1
 endif
 
 # these flags are common to C and C++ compilation
-CFLAGS_COMMON = -Os -ffunction-sections -fdata-sections -fstrict-volatile-bitfields \
+CFLAGS_COMMON = -Os -g -ffunction-sections -fdata-sections -fstrict-volatile-bitfields \
 	-mlongcalls -nostdlib \
 	-Wall -Werror -Wno-error=unused-function -Wno-error=unused-but-set-variable \
 	-Wno-error=unused-variable -Wno-error=deprecated-declarations \
@@ -290,7 +291,6 @@ LIBSTDCXX_FILE_NAME = $(shell $(CXX) $(CXXFLAGS) -print-file-name=libstdc++.a)
 
 # Debugging/Optimization
 ifeq ($(DEBUG), 1)
-CFLAGS += -g
 COPT = -O0
 else
 #CFLAGS += -fdata-sections -ffunction-sections
@@ -792,6 +792,20 @@ endef
 vpath %.cpp . $(TOP)
 $(BUILD)/%.o: %.cpp
 	$(call compile_cxx)
+
+.PHONY: bloatmap
+bloatmap: $(BUILD)/bloat $(BUILD)/bloat/bloat.json
+
+$(BUILD)/bloat/bloat.json: $(BUILD)/application.elf $(BUILD)/bloat
+	$(ECHO) "GEN $@"
+	$(Q)$(NM) -C -S -l $< >$(BUILD)/nm.out
+	$(Q)python2 $(BUILD)/bloat/bloat.py --nm-output $(BUILD)/nm.out \
+	    --strip-prefix=`cd $(TOP); pwd` syms >$@
+	$(Q)echo "To view bloatmap open $(dir $@)index.html"
+
+$(BUILD)/bloat:
+	$(Q)mkdir -p $@
+	$(Q)cp $(TOP)/lib/bloat/* $@
 
 ################################################################################
 # Declarations to build the bootloader

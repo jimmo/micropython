@@ -54,6 +54,7 @@ SYSTEM_FILE ?= lib/stm32lib/CMSIS/STM32$(MCU_SERIES_UPPER)xx/Source/Templates/sy
 
 # Select the cross compile prefix
 CROSS_COMPILE ?= arm-none-eabi-
+NM ?= $(CROSS_COMPILE)nm
 
 INC += -I.
 INC += -I$(TOP)
@@ -97,6 +98,7 @@ CFLAGS += $(INC) -Wall -Wpointer-arith -Werror -std=gnu99 -nostdlib $(CFLAGS_MOD
 CFLAGS += -D$(CMSIS_MCU)
 CFLAGS += $(CFLAGS_MCU_$(MCU_SERIES))
 CFLAGS += $(COPT)
+CFLAGS += -g
 CFLAGS += -I$(BOARD_DIR)
 CFLAGS += -DSTM32_HAL_H='<stm32$(MCU_SERIES)xx_hal.h>'
 CFLAGS += -DMICROPY_HW_VTOR=$(TEXT0_ADDR)
@@ -131,7 +133,7 @@ LDFLAGS += --gc-sections
 
 # Debugging/Optimization
 ifeq ($(DEBUG), 1)
-CFLAGS += -g -DPENDSV_DEBUG
+CFLAGS += -DPENDSV_DEBUG
 COPT = -O0
 else
 COPT += -Os -DNDEBUG
@@ -595,6 +597,20 @@ $(BUILD)/firmware.dfu: $(BUILD)/firmware.elf
 	$(Q)$(PYTHON) $(DFU) -b $(TEXT0_ADDR):$(BUILD)/firmware0.bin -b $(TEXT1_ADDR):$(BUILD)/firmware1.bin $@
 
 endif
+
+.PHONY: bloatmap
+bloatmap: $(BUILD)/bloat $(BUILD)/bloat/bloat.json
+
+$(BUILD)/bloat/bloat.json: $(BUILD)/firmware.elf $(BUILD)/bloat
+	$(ECHO) "GEN $@"
+	$(Q)$(NM) -C -S -l $< >$(BUILD)/nm.out
+	$(Q)python2 $(TOP)/lib/bloat/bloat.py --nm-output $(BUILD)/nm.out \
+	    --strip-prefix=`cd $(TOP); pwd` syms >$@
+	$(Q)echo "To view bloatmap open $(dir $@)index.html"
+
+$(BUILD)/bloat:
+	$(Q)mkdir -p $@
+	$(Q)cp $(TOP)/lib/bloat/* $@
 
 $(BUILD)/firmware.hex: $(BUILD)/firmware.elf
 	$(ECHO) "GEN $@"
