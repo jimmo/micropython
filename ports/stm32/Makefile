@@ -54,7 +54,6 @@ SYSTEM_FILE ?= lib/stm32lib/CMSIS/STM32$(MCU_SERIES_UPPER)xx/Source/Templates/sy
 
 # Select the cross compile prefix
 CROSS_COMPILE ?= arm-none-eabi-
-NM ?= $(CROSS_COMPILE)nm
 
 INC += -I.
 INC += -I$(TOP)
@@ -604,7 +603,7 @@ bloatmap: $(BUILD)/bloat $(BUILD)/bloat/bloat.json
 $(BUILD)/bloat/bloat.json: $(BUILD)/firmware.elf $(BUILD)/bloat
 	$(ECHO) "GEN $@"
 	$(Q)$(NM) -C -S -l $< >$(BUILD)/nm.out
-	$(Q)python2 $(TOP)/lib/bloat/bloat.py --nm-output $(BUILD)/nm.out \
+	$(Q)$(PYTHON) $(TOP)/lib/bloat/bloat.py --nm-output $(BUILD)/nm.out \
 	    --strip-prefix=`cd $(TOP); pwd` syms >$@
 	$(Q)echo "To view bloatmap open $(dir $@)index.html"
 
