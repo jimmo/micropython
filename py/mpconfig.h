@@ -140,7 +140,7 @@
 // big enough to index all blocks in the heap, which is set by
 // heap-size-in-bytes / MICROPY_BYTES_PER_GC_BLOCK.
 #ifndef MICROPY_GC_STACK_ENTRY_TYPE
-#define MICROPY_GC_STACK_ENTRY_TYPE size_t
+#define MICROPY_GC_STACK_ENTRY_TYPE void*
 #endif
 
 // Be conservative and always clear to zero newly (re)allocated memory in the GC.

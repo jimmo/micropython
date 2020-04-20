@@ -62,6 +62,19 @@ typedef struct _mp_sched_item_t {
     mp_obj_t arg;
 } mp_sched_item_t;
 
+#define BYTES_PER_BLOCK (MICROPY_BYTES_PER_GC_BLOCK)
+#define BLOCKS_PER_ATB (4)
+#define GC_REGION_SIZE_BYTES (128*1024)
+#define GC_REGION_SIZE_BLOCKS (GC_REGION_SIZE_BYTES / BYTES_PER_BLOCK)
+#define GC_REGION_SIZE_ATBS (GC_REGION_SIZE_BLOCKS / BLOCKS_PER_ATB)
+#define GC_REGION_SIZE_MASK ~(128*1024-1)
+
+typedef struct _gc_region_t {
+    uintptr_t addr;
+    struct _gc_region_t *next;
+    byte alloc_table[GC_REGION_SIZE_ATBS];
+} gc_region_t;
+
 // This structure hold information about the memory allocation system.
 typedef struct _mp_state_mem_t {
     #if MICROPY_MEM_STATS
@@ -70,13 +83,17 @@ typedef struct _mp_state_mem_t {
     size_t peak_bytes_allocated;
     #endif
 
-    byte *gc_alloc_table_start;
-    size_t gc_alloc_table_byte_len;
-    #if MICROPY_ENABLE_FINALISER
-    byte *gc_finaliser_table_start;
-    #endif
-    byte *gc_pool_start;
-    byte *gc_pool_end;
+
+    // byte *gc_alloc_table_start;
+    // size_t gc_alloc_table_byte_len;
+    // #if MICROPY_ENABLE_FINALISER
+    // byte *gc_finaliser_table_start;
+    // #endif
+    // byte *gc_pool_start;
+    // byte *gc_pool_end;
+    gc_region_t *gc_region_head;
+    size_t gc_allocated_blocks;
+    size_t gc_allocated_blocks_limit;
 
     int gc_stack_overflow;
     MICROPY_GC_STACK_ENTRY_TYPE gc_stack[MICROPY_ALLOC_GC_STACK_SIZE];

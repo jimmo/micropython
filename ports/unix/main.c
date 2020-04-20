@@ -37,6 +37,7 @@
 #include <sys/types.h>
 #include <errno.h>
 #include <signal.h>
+#include <malloc.h>
 
 #include "py/compile.h"
 #include "py/runtime.h"
@@ -415,6 +416,14 @@ STATIC void set_sys_argv(char *argv[], int argc, int start_arg) {
 #else
 #define PATHLIST_SEP_CHAR ':'
 #endif
+
+
+void* port_memalign(size_t alignment, size_t n) {
+    return memalign(alignment, n);
+}
+void port_memalign_free(void *ptr) {
+    return free(ptr);
+}
 
 MP_NOINLINE int main_(int argc, char **argv);
 
