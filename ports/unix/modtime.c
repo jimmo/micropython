@@ -25,10 +25,19 @@
  * THE SOFTWARE.
  */
 
+#include <bits/types/struct_tm.h>
+#include <stdbool.h>
+#include <sys/select.h>
+
 #include "py/mpconfig.h"
+#include "mphalport.h"
+#include "py/misc.h"
+#include "py/mpthread.h"
+#include "py/obj.h"
+#include "py/objtuple.h"
+#include "py/qstr.h"
 #if MICROPY_PY_UTIME
 
-#include <unistd.h>
 #include <errno.h>
 #include <string.h>
 #include <time.h>
@@ -36,8 +45,6 @@
 #include <math.h>
 
 #include "py/runtime.h"
-#include "py/smallint.h"
-#include "py/mphal.h"
 #include "extmod/utime_mphal.h"
 
 #ifdef _WIN32

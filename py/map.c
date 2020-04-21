@@ -28,10 +28,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "py/mpconfig.h"
 #include "py/misc.h"
 #include "py/runtime.h"
+#include "py/obj.h"
+#include "py/qstr.h"
+#include "py/runtime0.h"
 
 #if MICROPY_DEBUG_VERBOSE // print debugging info
 #define DEBUG_PRINT (1)

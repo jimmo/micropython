@@ -27,13 +27,14 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
 #include "py/objmodule.h"
 #include "py/runtime.h"
 #include "py/builtin.h"
-
 #include "genhdr/moduledefs.h"
+#include "py/misc.h"
+#include "py/mpprint.h"
+#include "py/mpstate.h"
 
 STATIC void module_print(const mp_print_t *print, mp_obj_t self_in, mp_print_kind_t kind) {
     (void)kind;

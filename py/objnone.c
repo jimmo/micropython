@@ -24,9 +24,10 @@
  * THE SOFTWARE.
  */
 
-#include <stdlib.h>
-
 #include "py/obj.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/qstr.h"
 
 #if !MICROPY_OBJ_IMMEDIATE_OBJS
 typedef struct _mp_obj_none_t {

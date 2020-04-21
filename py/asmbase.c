@@ -27,7 +27,8 @@
 #include <assert.h>
 #include <string.h>
 
-#include "py/obj.h"
+#include "py/mpconfig.h"
+
 #include "py/misc.h"
 #include "py/asmbase.h"
 

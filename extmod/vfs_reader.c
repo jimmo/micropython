@@ -24,14 +24,9 @@
  * THE SOFTWARE.
  */
 
-#include <stdio.h>
-#include <string.h>
 
-#include "py/runtime.h"
-#include "py/stream.h"
-#include "py/reader.h"
-#include "extmod/vfs.h"
 
+#include "py/mpconfig.h"
 #if MICROPY_READER_VFS
 
 typedef struct _mp_reader_vfs_t {

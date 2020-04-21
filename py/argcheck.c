@@ -26,8 +26,13 @@
 
 #include <stdlib.h>
 #include <assert.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #include "py/runtime.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/obj.h"
 
 void mp_arg_check_num_sig(size_t n_args, size_t n_kw, uint32_t sig) {
     // TODO maybe take the function name as an argument so we can print nicer error messages

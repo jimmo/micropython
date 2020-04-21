@@ -24,11 +24,21 @@
  * THE SOFTWARE.
  */
 
-#include "py/mphal.h"
+#include <errno.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
 #include "py/mpthread.h"
 #include "py/runtime.h"
 #include "py/stream.h"
 #include "extmod/vfs_posix.h"
+#include "mphalport.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 
 #if MICROPY_VFS_POSIX || MICROPY_VFS_POSIX_FILE
 

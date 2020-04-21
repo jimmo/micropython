@@ -29,11 +29,15 @@
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
+#include <termios.h>
 
 #include "py/mphal.h"
-#include "py/mpthread.h"
-#include "py/runtime.h"
 #include "extmod/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpstate.h"
+#include "py/nlr.h"
+#include "py/obj.h"
+#include "readline.h"
 
 #ifndef _WIN32
 #include <signal.h>

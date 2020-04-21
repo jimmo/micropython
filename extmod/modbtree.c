@@ -25,12 +25,18 @@
  */
 
 #include <stdio.h>
-#include <string.h>
 #include <errno.h> // for declaration of global errno variable
-#include <fcntl.h>
+#include <stdbool.h>
 
 #include "py/runtime.h"
 #include "py/stream.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/obj.h"
+#include "py/objtuple.h"
+#include "py/qstr.h"
+#include "py/runtime0.h"
 
 #if MICROPY_PY_BTREE
 

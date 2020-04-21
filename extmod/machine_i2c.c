@@ -24,14 +24,8 @@
  * THE SOFTWARE.
  */
 
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
-
-#include "py/mperrno.h"
-#include "py/mphal.h"
-#include "py/runtime.h"
 #include "extmod/machine_i2c.h"
+#include "py/mpconfig.h"
 
 #if MICROPY_PY_MACHINE_I2C
 

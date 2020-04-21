@@ -28,9 +28,17 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "py/gc.h"
 #include "py/runtime.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/mpstate.h"
+#include "py/mpthread.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 
 #if MICROPY_ENABLE_GC
 

@@ -26,8 +26,15 @@
 #ifndef MICROPY_INCLUDED_PY_OBJINT_H
 #define MICROPY_INCLUDED_PY_OBJINT_H
 
+#include <stdbool.h>
+#include <stddef.h>
+
 #include "py/mpz.h"
 #include "py/obj.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/runtime0.h"
 
 typedef struct _mp_obj_int_t {
     mp_obj_base_t base;

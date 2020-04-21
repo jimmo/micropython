@@ -24,7 +24,14 @@
  * THE SOFTWARE.
  */
 
+#include <stddef.h>
+
 #include "py/objtuple.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 
 #if MICROPY_PY_ATTRTUPLE || MICROPY_PY_COLLECTIONS
 

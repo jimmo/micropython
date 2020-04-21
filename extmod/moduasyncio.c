@@ -24,11 +24,7 @@
  * THE SOFTWARE.
  */
 
-#include "py/runtime.h"
-#include "py/smallint.h"
-#include "py/pairheap.h"
-#include "py/mphal.h"
-
+#include "py/mpconfig.h"
 #if MICROPY_PY_UASYNCIO
 
 typedef struct _mp_obj_task_t {

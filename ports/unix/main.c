@@ -25,18 +25,15 @@
  * THE SOFTWARE.
  */
 
-#include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdarg.h>
 #include <unistd.h>
-#include <ctype.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <errno.h>
 #include <signal.h>
+#include <limits.h>
 
 #include "py/compile.h"
 #include "py/runtime.h"
@@ -45,12 +42,21 @@
 #include "py/gc.h"
 #include "py/stackctrl.h"
 #include "py/mphal.h"
-#include "py/mpthread.h"
 #include "extmod/misc.h"
-#include "extmod/vfs.h"
 #include "extmod/vfs_posix.h"
 #include "genhdr/mpversion.h"
 #include "input.h"
+#include "py/emitglue.h"
+#include "py/lexer.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/mpstate.h"
+#include "py/nlr.h"
+#include "py/obj.h"
+#include "py/objlist.h"
+#include "py/parse.h"
+#include "py/qstr.h"
 
 // Command line options, with their defaults
 STATIC bool compile_only = false;

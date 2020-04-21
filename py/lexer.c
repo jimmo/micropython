@@ -26,11 +26,11 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 
 #include "py/reader.h"
 #include "py/lexer.h"
 #include "py/runtime.h"
+#include "py/mpstate.h"
 
 #if MICROPY_ENABLE_COMPILER
 

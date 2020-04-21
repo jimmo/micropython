@@ -29,14 +29,21 @@
 #include <stdarg.h>
 #include <assert.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include <stdint.h>
 
-#include "py/objlist.h"
 #include "py/objstr.h"
 #include "py/objtuple.h"
 #include "py/objtype.h"
 #include "py/runtime.h"
-#include "py/gc.h"
 #include "py/mperrno.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/mpstate.h"
+#include "py/obj.h"
+#include "py/objexcept.h"
+#include "py/qstr.h"
 
 #if MICROPY_ROM_TEXT_COMPRESSION && !defined(NO_QSTR)
 // Extract the MP_MAX_UNCOMPRESSED_TEXT_LEN macro from "genhdr/compressed.data.h".
@@ -44,6 +51,7 @@
 #define MP_MATCH_COMPRESSED(...) // Ignore
 #define MP_COMPRESSED_DATA(...) // Ignore
 #include "genhdr/compressed.data.h"
+
 #undef MP_MATCH_COMPRESSED
 #undef MP_COMPRESSED_DATA
 #endif

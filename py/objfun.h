@@ -27,6 +27,9 @@
 #define MICROPY_INCLUDED_PY_OBJFUN_H
 
 #include "py/obj.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/qstr.h"
 
 typedef struct _mp_obj_fun_bc_t {
     mp_obj_base_t base;

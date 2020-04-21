@@ -27,11 +27,16 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #include "py/objstr.h"
 #include "py/objstringio.h"
 #include "py/runtime.h"
 #include "py/stream.h"
+#include "py/mperrno.h"
+#include "py/mpprint.h"
+#include "py/qstr.h"
 
 #if MICROPY_PY_IO
 

@@ -26,8 +26,12 @@
 #ifndef MICROPY_INCLUDED_PY_SCOPE_H
 #define MICROPY_INCLUDED_PY_SCOPE_H
 
+#include <stdint.h>
+
 #include "py/parse.h"
 #include "py/emitglue.h"
+#include "py/mpconfig.h"
+#include "py/qstr.h"
 
 enum {
     ID_INFO_KIND_UNDECIDED,

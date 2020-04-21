@@ -26,15 +26,18 @@
 
 #include <assert.h>
 #include <stdarg.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
-#include "py/mphal.h"
 #include "py/mpprint.h"
 #include "py/obj.h"
 #include "py/objint.h"
 #include "py/runtime.h"
+#include "py/misc.h"
+#include "py/qstr.h"
+
+#include "py/mphal.h"
 
 #if MICROPY_PY_BUILTINS_FLOAT
 #include "py/formatfloat.h"

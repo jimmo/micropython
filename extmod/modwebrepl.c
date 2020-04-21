@@ -24,17 +24,10 @@
  * THE SOFTWARE.
  */
 
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
 
-#include "py/runtime.h"
-#include "py/stream.h"
-#include "py/builtin.h"
 #ifdef MICROPY_PY_WEBREPL_DELAY
 #include "py/mphal.h"
 #endif
-#include "extmod/moduwebsocket.h"
 
 #if MICROPY_PY_WEBREPL
 

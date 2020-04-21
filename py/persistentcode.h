@@ -26,9 +26,14 @@
 #ifndef MICROPY_INCLUDED_PY_PERSISTENTCODE_H
 #define MICROPY_INCLUDED_PY_PERSISTENTCODE_H
 
+#include <stddef.h>
+#include <stdint.h>
+
 #include "py/mpprint.h"
 #include "py/reader.h"
 #include "py/emitglue.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
 
 // The current version of .mpy files
 #define MPY_VERSION 5

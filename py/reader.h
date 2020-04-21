@@ -26,7 +26,12 @@
 #ifndef MICROPY_INCLUDED_PY_READER_H
 #define MICROPY_INCLUDED_PY_READER_H
 
+#include <stdbool.h>
+#include <stddef.h>
+
 #include "py/obj.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
 
 // the readbyte function must return the next byte in the input stream
 // it must return MP_READER_EOF if end of stream

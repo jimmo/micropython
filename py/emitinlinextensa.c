@@ -24,15 +24,9 @@
  * THE SOFTWARE.
  */
 
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
-#include <assert.h>
 
-#include "py/emit.h"
-#include "py/asmxtensa.h"
 
+#include "py/mpconfig.h"
 #if MICROPY_EMIT_INLINE_XTENSA
 
 struct _emit_inline_asm_t {

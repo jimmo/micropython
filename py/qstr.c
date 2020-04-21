@@ -24,14 +24,17 @@
  * THE SOFTWARE.
  */
 
-#include <assert.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "py/mpstate.h"
 #include "py/qstr.h"
 #include "py/gc.h"
 #include "py/runtime.h"
+#include "py/mpprint.h"
+#include "py/mpthread.h"
+#include "py/obj.h"
 
 // NOTE: we are using linear arrays to store and search for qstr's (unique strings, interned strings)
 // ultimately we will replace this with a static hash table of some kind
@@ -109,6 +112,7 @@ const qstr_pool_t mp_qstr_const_pool = {
         #ifndef NO_QSTR
 #define QDEF(id, str) str,
         #include "genhdr/qstrdefs.generated.h"
+
 #undef QDEF
         #endif
     },
@@ -324,6 +328,7 @@ void qstr_dump_data(void) {
 #define MP_COMPRESSED_DATA(x) STATIC const char *compressed_string_data = x;
 #define MP_MATCH_COMPRESSED(a, b)
 #include "genhdr/compressed.data.h"
+
 #undef MP_COMPRESSED_DATA
 #undef MP_MATCH_COMPRESSED
 

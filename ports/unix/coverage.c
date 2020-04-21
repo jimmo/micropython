@@ -1,20 +1,4 @@
-#include <stdio.h>
-#include <string.h>
 
-#include "py/obj.h"
-#include "py/objstr.h"
-#include "py/runtime.h"
-#include "py/gc.h"
-#include "py/repl.h"
-#include "py/mpz.h"
-#include "py/builtin.h"
-#include "py/emit.h"
-#include "py/formatfloat.h"
-#include "py/ringbuf.h"
-#include "py/pairheap.h"
-#include "py/stream.h"
-#include "py/binary.h"
-#include "py/bc.h"
 
 // expected output of this file is found in extra_coverage.py.exp
 

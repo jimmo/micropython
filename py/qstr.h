@@ -26,6 +26,8 @@
 #ifndef MICROPY_INCLUDED_PY_QSTR_H
 #define MICROPY_INCLUDED_PY_QSTR_H
 
+#include <stddef.h>
+
 #include "py/mpconfig.h"
 #include "py/misc.h"
 
@@ -40,6 +42,7 @@ enum {
     #ifndef NO_QSTR
 #define QDEF(id, str) id,
     #include "genhdr/qstrdefs.generated.h"
+
 #undef QDEF
     #endif
     MP_QSTRnumber_of, // no underscore so it can't clash with any of the above

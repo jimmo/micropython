@@ -30,19 +30,24 @@
 #include <string.h>
 #include <assert.h>
 
-#include "py/parsenum.h"
 #include "py/compile.h"
 #include "py/objstr.h"
 #include "py/objtuple.h"
 #include "py/objlist.h"
 #include "py/objtype.h"
-#include "py/objmodule.h"
 #include "py/objgenerator.h"
 #include "py/smallint.h"
 #include "py/runtime.h"
 #include "py/builtin.h"
 #include "py/stackctrl.h"
 #include "py/gc.h"
+#include "py/emitglue.h"
+#include "py/lexer.h"
+#include "py/mpthread.h"
+#include "py/nlr.h"
+#include "py/objexcept.h"
+#include "py/parse.h"
+#include "py/pystack.h"
 
 #if MICROPY_DEBUG_VERBOSE // print debugging info
 #define DEBUG_PRINT (1)

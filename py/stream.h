@@ -27,8 +27,14 @@
 #ifndef MICROPY_INCLUDED_PY_STREAM_H
 #define MICROPY_INCLUDED_PY_STREAM_H
 
+#include <errno.h>
+#include <stddef.h>
+#include <stdint.h>
+
 #include "py/obj.h"
 #include "py/mperrno.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
 
 #define MP_STREAM_ERROR ((mp_uint_t)-1)
 
@@ -118,6 +124,7 @@ void mp_stream_write_adaptor(void *self, const char *buf, size_t len);
 
 #if MICROPY_STREAMS_POSIX_API
 #include <sys/types.h>
+
 // Functions with POSIX-compatible signatures
 // "stream" is assumed to be a pointer to a concrete object with the stream protocol
 ssize_t mp_stream_posix_write(void *stream, const void *buf, size_t len);

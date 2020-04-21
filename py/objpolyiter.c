@@ -24,9 +24,7 @@
  * THE SOFTWARE.
  */
 
-#include <stdlib.h>
 
-#include "py/runtime.h"
 
 // This is universal iterator type which calls "iternext" method stored in
 // particular object instance. (So, each instance of this time can have its
@@ -34,6 +32,10 @@
 // for various internal iterator objects.
 
 // Any instance should have these 2 fields at the beginning
+#include "py/mpconfig.h"
+#include "py/obj.h"
+#include "py/qstr.h"
+
 typedef struct _mp_obj_polymorph_iter_t {
     mp_obj_base_t base;
     mp_fun_1_t iternext;

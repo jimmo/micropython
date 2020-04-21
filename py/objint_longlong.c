@@ -25,17 +25,8 @@
  * THE SOFTWARE.
  */
 
-#include <stdlib.h>
-#include <string.h>
 
-#include "py/smallint.h"
-#include "py/objint.h"
-#include "py/runtime.h"
-
-#if MICROPY_PY_BUILTINS_FLOAT
-#include <math.h>
-#endif
-
+#include "py/mpconfig.h"
 #if MICROPY_LONGINT_IMPL == MICROPY_LONGINT_IMPL_LONGLONG
 
 #if MICROPY_PY_SYS_MAXSIZE

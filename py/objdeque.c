@@ -26,8 +26,14 @@
 
 #include <unistd.h> // for ssize_t
 #include <string.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #include "py/mpconfig.h"
+#include "py/misc.h"
+#include "py/obj.h"
+#include "py/qstr.h"
+#include "py/runtime0.h"
 #if MICROPY_PY_COLLECTIONS_DEQUE
 
 #include "py/runtime.h"

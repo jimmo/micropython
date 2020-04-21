@@ -26,6 +26,9 @@
 #ifndef MICROPY_INCLUDED_PY_MPPRINT_H
 #define MICROPY_INCLUDED_PY_MPPRINT_H
 
+#include <stdarg.h>
+#include <stddef.h>
+
 #include "py/mpconfig.h"
 
 #define PF_FLAG_LEFT_ADJUST       (0x001)

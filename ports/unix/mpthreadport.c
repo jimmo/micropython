@@ -24,19 +24,25 @@
  * THE SOFTWARE.
  */
 
+#include "mpthreadport.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <assert.h>
+#include <bits/local_lim.h>
+#include <bits/types/siginfo_t.h>
+#include <pthread.h>
 
 #include "py/runtime.h"
 #include "py/mpthread.h"
 #include "py/gc.h"
+#include "py/mpconfig.h"
+#include "py/mpstate.h"
 
 #if MICROPY_PY_THREAD
 
-#include <fcntl.h>
 #include <signal.h>
-#include <sched.h>
 #include <semaphore.h>
 
 // Some platforms don't have SIGRTMIN but if we do have it, use it to avoid

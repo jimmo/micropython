@@ -28,6 +28,7 @@
 #define MICROPY_INCLUDED_PY_PROFILING_H
 
 #include "py/emitglue.h"
+#include "py/mpconfig.h"
 
 #if MICROPY_PY_SYS_SETTRACE
 

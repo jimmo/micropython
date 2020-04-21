@@ -24,14 +24,19 @@
  * THE SOFTWARE.
  */
 
-#include <sys/types.h>
 #include <termios.h>
-#include <unistd.h>
 #include <errno.h>
+#include <assert.h>
+#include <termios.h>
+#include <stddef.h>
 
 #include "py/objlist.h"
+#include "mphalport.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 #include "py/runtime.h"
-#include "py/mphal.h"
 
 STATIC mp_obj_t mod_termios_tcgetattr(mp_obj_t fd_in) {
     struct termios term;

@@ -26,9 +26,9 @@
  */
 
 #include <string.h>
-#include <unistd.h>
+#include <stdbool.h>
+#include <stdio.h>
 
-#include "py/objstr.h"
 #include "py/stream.h"
 #include "py/runtime.h"
 

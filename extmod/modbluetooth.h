@@ -29,10 +29,14 @@
 #define MICROPY_INCLUDED_EXTMOD_MODBLUETOOTH_H
 
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #include "py/obj.h"
 #include "py/objlist.h"
 #include "py/ringbuf.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
 
 // Port specific configuration.
 #ifndef MICROPY_PY_BLUETOOTH_RINGBUF_SIZE

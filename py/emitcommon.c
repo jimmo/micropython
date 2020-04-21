@@ -27,6 +27,9 @@
 #include <assert.h>
 
 #include "py/emit.h"
+#include "py/mpconfig.h"
+#include "py/qstr.h"
+#include "py/scope.h"
 
 #if MICROPY_ENABLE_COMPILER
 

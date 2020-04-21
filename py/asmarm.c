@@ -25,10 +25,6 @@
  * THE SOFTWARE.
  */
 
-#include <stdio.h>
-#include <assert.h>
-#include <string.h>
-
 #include "py/mpconfig.h"
 
 // wrapper around everything in this file

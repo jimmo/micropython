@@ -27,6 +27,8 @@
 #ifndef MICROPY_INCLUDED_PY_FROZENMOD_H
 #define MICROPY_INCLUDED_PY_FROZENMOD_H
 
+#include <stddef.h>
+
 #include "py/lexer.h"
 
 enum {

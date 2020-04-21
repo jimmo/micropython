@@ -24,16 +24,18 @@
  * THE SOFTWARE.
  */
 
-#include <assert.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "py/runtime.h"
 #include "py/builtin.h"
 #include "py/stream.h"
 #include "py/binary.h"
 #include "py/objarray.h"
-#include "py/objstringio.h"
-#include "py/frozenmod.h"
+#include "py/mpconfig.h"
+#include "py/mperrno.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 
 #if MICROPY_PY_IO
 

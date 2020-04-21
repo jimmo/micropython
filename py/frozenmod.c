@@ -30,6 +30,8 @@
 
 #include "py/lexer.h"
 #include "py/frozenmod.h"
+#include "py/mpconfig.h"
+#include "py/qstr.h"
 
 #if MICROPY_MODULE_FROZEN_STR
 

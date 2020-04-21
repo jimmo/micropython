@@ -26,6 +26,9 @@
 #ifndef MICROPY_INCLUDED_PY_PARSENUM_H
 #define MICROPY_INCLUDED_PY_PARSENUM_H
 
+#include <stdbool.h>
+#include <stddef.h>
+
 #include "py/mpconfig.h"
 #include "py/lexer.h"
 #include "py/obj.h"

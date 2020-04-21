@@ -27,10 +27,13 @@
 #define MICROPY_INCLUDED_PY_LEXER_H
 
 #include <stdint.h>
+#include <stdbool.h>
+#include <stddef.h>
 
 #include "py/mpconfig.h"
 #include "py/qstr.h"
 #include "py/reader.h"
+#include "py/misc.h"
 
 /* lexer.h -- simple tokeniser for MicroPython
  *

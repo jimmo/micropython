@@ -24,8 +24,6 @@
  * THE SOFTWARE.
  */
 
-#include "py/mpstate.h"
-
 #if MICROPY_NLR_SETJMP
 
 void nlr_jump(void *val) {

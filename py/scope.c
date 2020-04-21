@@ -25,8 +25,10 @@
  */
 
 #include <assert.h>
+#include <stddef.h>
 
 #include "py/scope.h"
+#include "py/misc.h"
 
 #if MICROPY_ENABLE_COMPILER
 

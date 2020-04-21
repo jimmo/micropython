@@ -28,13 +28,18 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
+#include <sys/types.h>
 
 #include "py/reader.h"
 #include "py/nativeglue.h"
 #include "py/persistentcode.h"
 #include "py/bc0.h"
-#include "py/objstr.h"
-#include "py/mpthread.h"
+#include "py/bc.h"
+#include "py/obj.h"
+#include "py/qstr.h"
+#include "py/runtime.h"
+#include "py/runtime0.h"
 
 #if MICROPY_PERSISTENT_CODE_LOAD || MICROPY_PERSISTENT_CODE_SAVE
 

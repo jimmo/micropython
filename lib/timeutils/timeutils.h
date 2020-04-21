@@ -27,6 +27,11 @@
 #ifndef MICROPY_INCLUDED_LIB_TIMEUTILS_TIMEUTILS_H
 #define MICROPY_INCLUDED_LIB_TIMEUTILS_TIMEUTILS_H
 
+#include <stdbool.h>
+#include <stdint.h>
+
+#include "py/mpconfig.h"
+
 typedef struct _timeutils_struct_time_t {
     uint16_t tm_year;       // i.e. 2014
     uint8_t tm_mon;         // 1..12

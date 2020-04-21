@@ -26,14 +26,12 @@
  */
 
 #include "py/mpconfig.h"
-#if MICROPY_PY_UTIME_MP_HAL
 
-#include <string.h>
+#if MICROPY_PY_UTIME_MP_HAL
 
 #include "py/obj.h"
 #include "py/mphal.h"
 #include "py/smallint.h"
-#include "py/runtime.h"
 #include "extmod/utime_mphal.h"
 
 STATIC mp_obj_t time_sleep(mp_obj_t seconds_o) {

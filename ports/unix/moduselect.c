@@ -25,12 +25,18 @@
  * THE SOFTWARE.
  */
 
+#include <assert.h>
+#include <stdbool.h>
+
 #include "py/mpconfig.h"
+#include "mphalport.h"
+#include "py/misc.h"
+#include "py/mperrno.h"
+#include "py/qstr.h"
 
 #if MICROPY_PY_USELECT_POSIX
 
 #include <stdio.h>
-#include <errno.h>
 #include <poll.h>
 
 #include "py/runtime.h"
@@ -38,8 +44,6 @@
 #include "py/obj.h"
 #include "py/objlist.h"
 #include "py/objtuple.h"
-#include "py/mphal.h"
-#include "py/mpthread.h"
 
 #define DEBUG 0
 

@@ -25,8 +25,14 @@
  */
 
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "py/runtime.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/obj.h"
+#include "py/qstr.h"
+#include "py/runtime0.h"
 
 #if MICROPY_OBJ_IMMEDIATE_OBJS
 

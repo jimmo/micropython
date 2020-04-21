@@ -27,10 +27,17 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <assert.h>
+#include <stdbool.h>
 
 #include "py/runtime.h"
 #include "py/stream.h"
 #include "extmod/moduwebsocket.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mperrno.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 
 #if MICROPY_PY_UWEBSOCKET
 

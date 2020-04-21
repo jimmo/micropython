@@ -26,9 +26,18 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #include "py/runtime.h"
 #include "py/stream.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mperrno.h"
+#include "py/mpprint.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 
 #if MICROPY_PY_USSL && MICROPY_SSL_AXTLS
 

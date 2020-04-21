@@ -25,8 +25,14 @@
  */
 
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "py/runtime.h"
+#include "py/mpconfig.h"
+#include "py/mpstate.h"
+#include "py/nlr.h"
+#include "py/obj.h"
+#include "py/objexcept.h"
 
 #if MICROPY_KBD_EXCEPTION
 // This function may be called asynchronously at any time so only do the bare minimum.

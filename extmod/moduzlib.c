@@ -26,14 +26,21 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
+#include <stddef.h>
 
 #include "py/runtime.h"
 #include "py/stream.h"
 #include "py/mperrno.h"
+#include "extmod/uzlib/tinf_compat.h"
+#include "extmod/uzlib/uzlib.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/nlr.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 
 #if MICROPY_PY_UZLIB
-
-#include "uzlib/tinf.h"
 
 #if 0 // print debugging info
 #define DEBUG_printf DEBUG_printf

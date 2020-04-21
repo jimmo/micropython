@@ -24,12 +24,9 @@
  * THE SOFTWARE.
  */
 
-#include <stdio.h>
-#include <string.h>
 
-#include "py/builtin.h"
-#include "py/objmodule.h"
 
+#include "py/mpconfig.h"
 #if MICROPY_PY_BUILTINS_HELP
 
 const char mp_help_default_text[] =

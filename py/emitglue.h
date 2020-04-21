@@ -26,8 +26,13 @@
 #ifndef MICROPY_INCLUDED_PY_EMITGLUE_H
 #define MICROPY_INCLUDED_PY_EMITGLUE_H
 
+#include <stddef.h>
+#include <stdint.h>
+
 #include "py/obj.h"
 #include "py/bc.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
 
 // These variables and functions glue the code emitters to the runtime.
 

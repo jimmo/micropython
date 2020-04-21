@@ -25,7 +25,13 @@
  * THE SOFTWARE.
  */
 
+#include <stdbool.h>
+#include <stdint.h>
+
 #include "py/mpconfig.h"
+#include "py/misc.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 
 #if MICROPY_PY_UCRYPTOLIB
 

@@ -31,6 +31,9 @@
 #include "py/runtime.h"
 #include "py/objstr.h"
 #include "py/objnamedtuple.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
 
 #if MICROPY_PY_COLLECTIONS
 

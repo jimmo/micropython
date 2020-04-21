@@ -25,7 +25,6 @@
  * THE SOFTWARE.
  */
 
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <errno.h>
@@ -37,13 +36,13 @@
 #include <direct.h> // For mkdir
 #endif
 #include "py/mpconfig.h"
-
 #include "py/runtime.h"
 #include "py/objtuple.h"
-#include "py/mphal.h"
 #include "py/mpthread.h"
-#include "extmod/vfs.h"
-#include "extmod/misc.h"
+#include "mphalport.h"
+#include "py/misc.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 
 #ifdef __ANDROID__
 #define USE_STATFS 1
@@ -75,6 +74,7 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_1(mod_os_stat_obj, mod_os_stat);
 
 #if USE_STATFS
 #include <sys/vfs.h>
+
 #define STRUCT_STATVFS struct statfs
 #define STATVFS statfs
 #define F_FAVAIL sb.f_ffree
@@ -82,6 +82,7 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_1(mod_os_stat_obj, mod_os_stat);
 #define F_FLAG sb.f_flags
 #else
 #include <sys/statvfs.h>
+
 #define STRUCT_STATVFS struct statvfs
 #define STATVFS statvfs
 #define F_FAVAIL sb.f_favail

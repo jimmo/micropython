@@ -24,9 +24,13 @@
  * THE SOFTWARE.
  */
 
-#include <stdlib.h>
+#include <assert.h>
 
 #include "py/runtime.h"
+#include "py/mpconfig.h"
+#include "py/nlr.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 
 // this is a wrapper object that turns something that has a __getitem__ method into an iterator
 

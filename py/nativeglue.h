@@ -27,9 +27,21 @@
 #define MICROPY_INCLUDED_PY_NATIVEGLUE_H
 
 #include <stdarg.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
 #include "py/obj.h"
 #include "py/persistentcode.h"
 #include "py/stream.h"
+#include "py/bc.h"
+#include "py/emitglue.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/nlr.h"
+#include "py/qstr.h"
+#include "py/runtime0.h"
 
 typedef enum {
     MP_F_CONST_NONE_OBJ = 0,

@@ -26,9 +26,17 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <stdint.h>
 
 #include "py/bc0.h"
 #include "py/bc.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/obj.h"
+#include "py/qstr.h"
+#include "py/runtime.h"
+#include "py/runtime0.h"
 
 #if MICROPY_DEBUG_PRINTERS
 

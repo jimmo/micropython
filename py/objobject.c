@@ -25,9 +25,14 @@
  */
 
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "py/objtype.h"
 #include "py/runtime.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 
 typedef struct _mp_obj_object_t {
     mp_obj_base_t base;

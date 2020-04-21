@@ -1,5 +1,9 @@
 #include <py/runtime.h>
 
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/obj.h"
+
 NORETURN void abort_(void);
 
 NORETURN void abort_(void) {

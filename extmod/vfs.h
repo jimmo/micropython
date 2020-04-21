@@ -26,6 +26,9 @@
 #ifndef MICROPY_INCLUDED_EXTMOD_VFS_H
 #define MICROPY_INCLUDED_EXTMOD_VFS_H
 
+#include <stddef.h>
+#include <stdint.h>
+
 #include "py/lexer.h"
 #include "py/obj.h"
 

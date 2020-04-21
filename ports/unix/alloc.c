@@ -25,13 +25,12 @@
  */
 
 #include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/mman.h>
 
 #include "py/mpstate.h"
 #include "py/gc.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
 
 #if MICROPY_EMIT_NATIVE || (MICROPY_PY_FFI && MICROPY_FORCE_PLAT_ALLOC_EXEC)
 

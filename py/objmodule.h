@@ -27,6 +27,8 @@
 #define MICROPY_INCLUDED_PY_OBJMODULE_H
 
 #include "py/obj.h"
+#include "py/mpconfig.h"
+#include "py/qstr.h"
 
 extern const mp_map_t mp_builtin_module_map;
 

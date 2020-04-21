@@ -27,11 +27,19 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <stdbool.h>
+#include <sys/types.h>
 
 #include "py/runtime.h"
-#include "py/binary.h"
 #include "py/objstr.h"
 #include "py/stackctrl.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/nlr.h"
+#include "py/obj.h"
+#include "py/pystack.h"
+#include "py/qstr.h"
 
 #if MICROPY_PY_URE
 

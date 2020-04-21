@@ -24,10 +24,10 @@
  * THE SOFTWARE.
  */
 
-#include <stdlib.h>
-#include <assert.h>
-
 #include "py/obj.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/qstr.h"
 
 /******************************************************************************/
 /* singleton objects defined by Python                                        */

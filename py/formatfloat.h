@@ -26,6 +26,8 @@
 #ifndef MICROPY_INCLUDED_PY_FORMATFLOAT_H
 #define MICROPY_INCLUDED_PY_FORMATFLOAT_H
 
+#include <stddef.h>
+
 #include "py/mpconfig.h"
 
 #if MICROPY_PY_BUILTINS_FLOAT

@@ -24,11 +24,9 @@
  * THE SOFTWARE.
  */
 
-#include <stdio.h>
-#include <string.h>
 
-#include "py/runtime.h"
 
+#include "py/mpconfig.h"
 #if MICROPY_PY_FRAMEBUF
 
 #include "ports/stm32/font_petme128_8x8.h"

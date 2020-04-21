@@ -25,7 +25,6 @@
  * THE SOFTWARE.
  */
 
-#include "py/mpconfig.h"
 #if MICROPY_VFS_FAT
 
 #if !MICROPY_VFS
@@ -33,6 +32,7 @@
 #endif
 
 #include <string.h>
+
 #include "py/runtime.h"
 #include "py/mperrno.h"
 #include "lib/oofatfs/ff.h"

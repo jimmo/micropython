@@ -26,14 +26,20 @@
  */
 
 #include <stdlib.h>
-#include <assert.h>
+#include <stdint.h>
 
 #include "py/runtime.h"
 #include "py/bc.h"
-#include "py/objstr.h"
 #include "py/objgenerator.h"
 #include "py/objfun.h"
 #include "py/stackctrl.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/nlr.h"
+#include "py/objexcept.h"
+#include "py/objtuple.h"
+#include "py/qstr.h"
 
 // Instance of GeneratorExit exception - needed by generator.close()
 const mp_obj_exception_t mp_const_GeneratorExit_obj = {{&mp_type_GeneratorExit}, 0, 0, NULL, (mp_obj_tuple_t *)&mp_const_empty_tuple_obj};

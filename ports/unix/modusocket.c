@@ -30,7 +30,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -38,14 +37,25 @@
 #include <netdb.h>
 #include <errno.h>
 #include <math.h>
+#include <alloca.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <sys/time.h>
 
 #include "py/objtuple.h"
 #include "py/objstr.h"
 #include "py/runtime.h"
 #include "py/stream.h"
 #include "py/builtin.h"
-#include "py/mphal.h"
 #include "py/mpthread.h"
+#include "mphalport.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mperrno.h"
+#include "py/mpprint.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 
 /*
   The idea of this module is to implement reasonable minimum of

@@ -25,10 +25,9 @@
  */
 
 #include <stdio.h>
-#include <assert.h>
+#include <errno.h>
 
 #include "py/runtime.h"
-#include "py/mperrno.h"
 #include "py/mpthread.h"
 #include "py/reader.h"
 
@@ -69,7 +68,6 @@ void mp_reader_new_mem(mp_reader_t *reader, const byte *buf, size_t len, size_t 
 
 #if MICROPY_READER_POSIX
 
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 

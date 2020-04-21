@@ -24,12 +24,18 @@
  * THE SOFTWARE.
  */
 
-#include <stdint.h>
+#include <stddef.h>
 
 #include "py/objfun.h"
 #include "py/compile.h"
 #include "py/runtime.h"
-#include "py/builtin.h"
+#include "py/lexer.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/nlr.h"
+#include "py/obj.h"
+#include "py/parse.h"
+#include "py/qstr.h"
 
 #if MICROPY_PY_BUILTINS_COMPILE
 

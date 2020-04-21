@@ -27,9 +27,17 @@
 #include <stdbool.h>
 #include <string.h>
 #include <assert.h>
+#include <stdint.h>
 
 #include "py/runtime.h"
 #include "py/builtin.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/nlr.h"
+#include "py/obj.h"
+#include "py/qstr.h"
+#include "py/runtime0.h"
 
 #if MICROPY_PY_BUILTINS_SET
 

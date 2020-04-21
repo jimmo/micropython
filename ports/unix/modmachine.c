@@ -30,16 +30,19 @@
 
 #include "py/runtime.h"
 #include "py/obj.h"
-
 #include "extmod/machine_mem.h"
 #include "extmod/machine_pinbase.h"
 #include "extmod/machine_signal.h"
 #include "extmod/machine_pulse.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/qstr.h"
 
 #if MICROPY_PLAT_DEV_MEM
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/mman.h>
+
 #define MICROPY_PAGE_SIZE 4096
 #define MICROPY_PAGE_MASK (MICROPY_PAGE_SIZE - 1)
 #endif

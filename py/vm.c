@@ -26,15 +26,22 @@
  */
 
 #include <stdio.h>
-#include <string.h>
 #include <assert.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #include "py/emitglue.h"
 #include "py/objtype.h"
 #include "py/runtime.h"
 #include "py/bc0.h"
 #include "py/bc.h"
-#include "py/profile.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpstate.h"
+#include "py/nlr.h"
+#include "py/obj.h"
+#include "py/objfun.h"
+#include "py/qstr.h"
 
 // *FORMAT-OFF*
 
@@ -209,6 +216,7 @@ mp_vm_return_kind_t mp_execute_bytecode(mp_code_state_t *code_state, volatile mp
 #endif
 #if MICROPY_OPT_COMPUTED_GOTO
     #include "py/vmentrytable.h"
+
     #define DISPATCH() do { \
         TRACE(ip); \
         MARK_EXC_IP_GLOBAL(); \

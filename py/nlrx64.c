@@ -25,6 +25,7 @@
  */
 
 #include "py/mpstate.h"
+#include "py/mpconfig.h"
 
 #if MICROPY_NLR_X64
 

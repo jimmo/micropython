@@ -25,10 +25,14 @@
  */
 
 #include <string.h>
+
 #include "py/obj.h"
 #include "py/runtime.h"
 #include "py/builtin.h"
 #include "py/repl.h"
+#include "py/misc.h"
+#include "py/mpstate.h"
+#include "py/qstr.h"
 
 #if MICROPY_HELPER_REPL
 

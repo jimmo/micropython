@@ -27,12 +27,20 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <string.h>
 #include <assert.h>
 
 #include "py/mpstate.h"
 #include "py/emit.h"
 #include "py/bc0.h"
+#include "py/bc.h"
+#include "py/emitglue.h"
+#include "py/lexer.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/obj.h"
+#include "py/qstr.h"
+#include "py/runtime0.h"
+#include "py/scope.h"
 
 #if MICROPY_ENABLE_COMPILER
 

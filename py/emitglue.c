@@ -26,15 +26,12 @@
 
 // This code glues the code emitters to the runtime.
 
-#include <stdint.h>
 #include <stdio.h>
-#include <string.h>
 #include <assert.h>
 
 #include "py/emitglue.h"
 #include "py/runtime0.h"
 #include "py/bc.h"
-#include "py/profile.h"
 
 #if MICROPY_DEBUG_VERBOSE // print debugging info
 #define DEBUG_PRINT (1)

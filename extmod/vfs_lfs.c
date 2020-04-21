@@ -24,9 +24,8 @@
  * THE SOFTWARE.
  */
 
-#include "py/runtime.h"
-#include "extmod/vfs.h"
 #include "extmod/vfs_lfs.h"
+#include "py/mpconfig.h"
 
 #if MICROPY_VFS && (MICROPY_VFS_LFS1 || MICROPY_VFS_LFS2)
 

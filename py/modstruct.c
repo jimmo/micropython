@@ -25,14 +25,16 @@
  * THE SOFTWARE.
  */
 
-#include <assert.h>
 #include <string.h>
 
 #include "py/runtime.h"
-#include "py/builtin.h"
 #include "py/objtuple.h"
 #include "py/binary.h"
 #include "py/parsenum.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 
 #if MICROPY_PY_STRUCT
 

@@ -24,10 +24,9 @@
  * THE SOFTWARE.
  */
 
-#include <stdio.h>
 
-#include "py/runtime.h"
 
+#include "py/mpconfig.h"
 #if MICROPY_ENABLE_PYSTACK
 
 void mp_pystack_init(void *start, void *end) {

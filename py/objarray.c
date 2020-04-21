@@ -28,11 +28,17 @@
 #include <string.h>
 #include <assert.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "py/runtime.h"
 #include "py/binary.h"
 #include "py/objstr.h"
 #include "py/objarray.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/qstr.h"
+#include "py/runtime0.h"
 
 #if MICROPY_PY_ARRAY || MICROPY_PY_BUILTINS_BYTEARRAY || MICROPY_PY_BUILTINS_MEMORYVIEW
 

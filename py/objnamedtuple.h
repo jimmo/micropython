@@ -26,7 +26,11 @@
 #ifndef MICROPY_INCLUDED_PY_OBJNAMEDTUPLE_H
 #define MICROPY_INCLUDED_PY_OBJNAMEDTUPLE_H
 
+#include <stddef.h>
+
 #include "py/objtuple.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 
 typedef struct _mp_obj_namedtuple_type_t {
     mp_obj_type_t base;

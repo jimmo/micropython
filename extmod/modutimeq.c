@@ -26,10 +26,15 @@
  */
 
 #include <string.h>
+#include <stdbool.h>
 
 #include "py/objlist.h"
 #include "py/runtime.h"
 #include "py/smallint.h"
+#include "py/misc.h"
+#include "py/obj.h"
+#include "py/qstr.h"
+#include "py/runtime0.h"
 
 #if MICROPY_PY_UTIMEQ
 

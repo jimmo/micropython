@@ -26,6 +26,9 @@
 #ifndef MICROPY_INCLUDED_PY_UNICODE_H
 #define MICROPY_INCLUDED_PY_UNICODE_H
 
+#include <stdbool.h>
+#include <stddef.h>
+
 #include "py/mpconfig.h"
 #include "py/misc.h"
 

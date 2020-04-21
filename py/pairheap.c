@@ -26,6 +26,8 @@
 
 #include "py/pairheap.h"
 
+#include <stdint.h>
+
 // The mp_pairheap_t.next pointer can take one of the following values:
 //   - NULL: the node is the top of the heap
 //   - LSB set: the node is the last of the children and points to its parent node

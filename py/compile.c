@@ -34,8 +34,12 @@
 #include "py/emit.h"
 #include "py/compile.h"
 #include "py/runtime.h"
-#include "py/asmbase.h"
-#include "py/persistentcode.h"
+#include "py/emitglue.h"
+#include "py/misc.h"
+#include "py/mpstate.h"
+#include "py/nlr.h"
+#include "py/pystack.h"
+#include "py/runtime0.h"
 
 #if MICROPY_ENABLE_COMPILER
 
@@ -48,6 +52,7 @@ typedef enum {
 #define DEF_RULE(rule, comp, kind, ...) PN_##rule,
 #define DEF_RULE_NC(rule, kind, ...)
     #include "py/grammar.h"
+
 #undef DEF_RULE
 #undef DEF_RULE_NC
     PN_const_object, // special node for a constant, generic Python object
@@ -55,6 +60,7 @@ typedef enum {
 #define DEF_RULE(rule, comp, kind, ...)
 #define DEF_RULE_NC(rule, kind, ...) PN_##rule,
     #include "py/grammar.h"
+
 #undef DEF_RULE
 #undef DEF_RULE_NC
 } pn_kind_t;
@@ -2743,6 +2749,7 @@ STATIC const compile_function_t compile_function[] = {
 #define DEF_RULE(rule, comp, kind, ...) comp,
 #define DEF_RULE_NC(rule, kind, ...)
     #include "py/grammar.h"
+
 #undef c
 #undef DEF_RULE
 #undef DEF_RULE_NC

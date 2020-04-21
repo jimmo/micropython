@@ -27,9 +27,9 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <assert.h>
-#include <string.h>
 
 #include "py/mpconfig.h"
+#include "py/misc.h"
 
 // wrapper around everything in this file
 #if MICROPY_EMIT_X64

@@ -35,6 +35,11 @@
 #include "py/runtime.h"
 #include "py/binary.h"
 #include "py/mperrno.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 
 /*
  * modffi uses character codes to encode a value type, based on "struct"

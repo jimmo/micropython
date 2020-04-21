@@ -24,12 +24,7 @@
  * THE SOFTWARE.
  */
 
-#include "py/runtime.h"
-#include "py/binary.h"
-#include "py/objarray.h"
-#include "py/mperrno.h"
-#include "extmod/vfs.h"
-
+#include "py/mpconfig.h"
 #if MICROPY_VFS
 
 void mp_vfs_blockdev_init(mp_vfs_blockdev_t *self, mp_obj_t bdev) {

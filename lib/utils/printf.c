@@ -24,18 +24,14 @@
  * THE SOFTWARE.
  */
 
-#include "py/mpconfig.h"
-
-#include <stdint.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdio.h>
 
-#include "py/obj.h"
+#include "py/mpconfig.h"
 #include "py/mphal.h"
-
-#if MICROPY_PY_BUILTINS_FLOAT
-#include "py/formatfloat.h"
-#endif
+#include "py/misc.h"
+#include "py/mpprint.h"
 
 #if MICROPY_DEBUG_PRINTERS
 int DEBUG_printf(const char *fmt, ...) {

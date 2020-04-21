@@ -27,11 +27,18 @@
 
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "py/runtime.h"
 #include "py/builtin.h"
-#include "py/objtype.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/nlr.h"
+#include "py/obj.h"
 #include "py/objstr.h"
+#include "py/qstr.h"
+#include "py/runtime0.h"
 
 #define mp_obj_is_dict_type(o) (mp_obj_is_obj(o) && ((mp_obj_base_t *)MP_OBJ_TO_PTR(o))->type->make_new == dict_make_new)
 

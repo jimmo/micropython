@@ -26,8 +26,13 @@
  */
 
 #include <string.h>
+#include <stdbool.h>
 
 #include "py/runtime.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/obj.h"
+#include "py/runtime0.h"
 
 // Helpers for sequence types
 

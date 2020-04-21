@@ -25,11 +25,15 @@
  */
 
 #include <stdio.h>
-#include <assert.h>
-#include <string.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #include "py/runtime.h"
-#include "py/binary.h"
+#include "extmod/uzlib/uzlib.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 
 #if MICROPY_PY_UBINASCII
 
@@ -218,7 +222,6 @@ STATIC mp_obj_t mod_binascii_b2a_base64(mp_obj_t data) {
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(mod_binascii_b2a_base64_obj, mod_binascii_b2a_base64);
 
 #if MICROPY_PY_UBINASCII_CRC32
-#include "uzlib/tinf.h"
 
 STATIC mp_obj_t mod_binascii_crc32(size_t n_args, const mp_obj_t *args) {
     mp_buffer_info_t bufinfo;

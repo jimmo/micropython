@@ -26,7 +26,12 @@
 #ifndef MICROPY_INCLUDED_EXTMOD_MACHINE_I2C_H
 #define MICROPY_INCLUDED_EXTMOD_MACHINE_I2C_H
 
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
 #include "py/obj.h"
+#include "py/mphal.h"
 
 #define MP_MACHINE_I2C_FLAG_READ (0x01) // if not set then it's a write
 #define MP_MACHINE_I2C_FLAG_STOP (0x02)

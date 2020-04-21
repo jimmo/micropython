@@ -25,16 +25,19 @@
  * THE SOFTWARE.
  */
 
-#include "py/builtin.h"
-#include "py/objlist.h"
+#include <stddef.h>
+
 #include "py/objtuple.h"
 #include "py/objstr.h"
 #include "py/objint.h"
-#include "py/objtype.h"
 #include "py/stream.h"
-#include "py/smallint.h"
-#include "py/runtime.h"
 #include "py/persistentcode.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/mpstate.h"
+#include "py/nlr.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 
 #if MICROPY_PY_SYS_SETTRACE
 #include "py/objmodule.h"

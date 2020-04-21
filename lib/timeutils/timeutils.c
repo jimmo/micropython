@@ -25,8 +25,6 @@
  * THE SOFTWARE.
  */
 
-#include "py/obj.h"
-
 #include "lib/timeutils/timeutils.h"
 
 // LEAPOCH corresponds to 2000-03-01, which is a mod-400 year, immediately

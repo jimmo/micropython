@@ -26,11 +26,17 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <limits.h>
 
 #include "py/runtime.h"
 #include "py/parsenumbase.h"
 #include "py/parsenum.h"
 #include "py/smallint.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/nlr.h"
+#include "py/qstr.h"
 
 #if MICROPY_PY_BUILTINS_FLOAT
 #include <math.h>

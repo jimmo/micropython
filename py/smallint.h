@@ -26,6 +26,8 @@
 #ifndef MICROPY_INCLUDED_PY_SMALLINT_H
 #define MICROPY_INCLUDED_PY_SMALLINT_H
 
+#include <stdbool.h>
+
 #include "py/mpconfig.h"
 #include "py/misc.h"
 

@@ -28,9 +28,14 @@
 
 #include "py/builtin.h"
 #include "py/stackctrl.h"
-#include "py/runtime.h"
 #include "py/gc.h"
-#include "py/mphal.h"
+#include "mphalport.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/mpstate.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 
 // Various builtins specific to MicroPython runtime,
 // living in micropython module

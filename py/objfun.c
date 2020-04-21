@@ -27,12 +27,17 @@
 
 #include <string.h>
 #include <assert.h>
+#include <alloca.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #include "py/objtuple.h"
 #include "py/objfun.h"
 #include "py/runtime.h"
 #include "py/bc.h"
 #include "py/stackctrl.h"
+#include "py/mpprint.h"
+#include "py/nlr.h"
 
 #if MICROPY_DEBUG_VERBOSE // print debugging info
 #define DEBUG_PRINT (1)

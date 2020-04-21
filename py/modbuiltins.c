@@ -26,14 +26,22 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <stdbool.h>
+#include <stdint.h>
 
-#include "py/smallint.h"
 #include "py/objint.h"
 #include "py/objstr.h"
-#include "py/objtype.h"
 #include "py/runtime.h"
 #include "py/builtin.h"
 #include "py/stream.h"
+#include "mphalport.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/mpstate.h"
+#include "py/obj.h"
+#include "py/qstr.h"
+#include "py/runtime0.h"
 
 #if MICROPY_PY_BUILTINS_FLOAT
 #include <math.h>
@@ -229,7 +237,6 @@ MP_DEFINE_CONST_FUN_OBJ_1(mp_builtin_hex_obj, mp_builtin_hex);
 
 #if MICROPY_PY_BUILTINS_INPUT
 
-#include "py/mphal.h"
 #include "lib/mp-readline/readline.h"
 
 // A port can define mp_hal_readline if they want to use a custom function here

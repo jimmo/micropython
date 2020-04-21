@@ -26,7 +26,11 @@
 #ifndef MICROPY_INCLUDED_PY_OBJTYPE_H
 #define MICROPY_INCLUDED_PY_OBJTYPE_H
 
+#include <stdbool.h>
+#include <stddef.h>
+
 #include "py/obj.h"
+#include "py/mpconfig.h"
 
 // instance object
 // creating an instance of a class makes one of these objects

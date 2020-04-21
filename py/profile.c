@@ -25,8 +25,6 @@
  */
 
 #include "py/profile.h"
-#include "py/bc0.h"
-#include "py/gc.h"
 
 #if MICROPY_PY_SYS_SETTRACE
 

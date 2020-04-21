@@ -24,8 +24,9 @@
  * THE SOFTWARE.
  */
 
-#include "py/builtin.h"
-
+#include "py/mpconfig.h"
+#include "py/obj.h"
+#include "py/qstr.h"
 #if MICROPY_PY_ARRAY
 
 STATIC const mp_rom_map_elem_t mp_module_array_globals_table[] = {

@@ -26,10 +26,16 @@
 
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "py/objlist.h"
 #include "py/runtime.h"
 #include "py/stackctrl.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/qstr.h"
+#include "py/runtime0.h"
 
 STATIC mp_obj_t mp_obj_new_list_iterator(mp_obj_t list, size_t cur, mp_obj_iter_buf_t *iter_buf);
 STATIC mp_obj_list_t *list_new(size_t n);

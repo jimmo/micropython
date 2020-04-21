@@ -30,6 +30,8 @@
 
 #include "py/emit.h"
 #include "py/runtime.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
 
 #if MICROPY_WARNINGS
 

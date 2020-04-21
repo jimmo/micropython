@@ -26,11 +26,18 @@
 #ifndef MICROPY_INCLUDED_PY_OBJ_H
 #define MICROPY_INCLUDED_PY_OBJ_H
 
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
 #include "py/mpconfig.h"
 #include "py/misc.h"
 #include "py/qstr.h"
 #include "py/mpprint.h"
 #include "py/runtime0.h"
+
+struct _mp_obj_type_t;
 
 // This is the definition of the opaque MicroPython object type.
 // All concrete objects have an encoding within this type and the

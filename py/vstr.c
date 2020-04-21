@@ -29,10 +29,13 @@
 #include <stdarg.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "py/mpconfig.h"
 #include "py/runtime.h"
 #include "py/mpprint.h"
+#include "py/misc.h"
+#include "py/obj.h"
 
 // returned value is always at least 1 greater than argument
 #define ROUND_ALLOC(a) (((a) & ((~0U) - 7)) + 8)

@@ -24,10 +24,12 @@
  * THE SOFTWARE.
  */
 
-#include <stdio.h>
+#include <stdint.h>
 
 #include "py/mpstate.h"
 #include "py/gc.h"
+#include "mpthreadport.h"
+#include "py/mpconfig.h"
 
 #if MICROPY_ENABLE_GC
 

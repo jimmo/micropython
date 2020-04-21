@@ -27,10 +27,16 @@
 
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "py/objstr.h"
-#include "py/objlist.h"
 #include "py/runtime.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/obj.h"
+#include "py/qstr.h"
+#include "py/runtime0.h"
 
 #if MICROPY_PY_BUILTINS_STR_UNICODE
 

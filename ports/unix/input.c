@@ -24,15 +24,18 @@
  * THE SOFTWARE.
  */
 
+#include "input.h"
+
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include "py/mpstate.h"
-#include "py/mphal.h"
-#include "input.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
 
 #if MICROPY_USE_READLINE == 1
 #include "lib/mp-readline/readline.h"

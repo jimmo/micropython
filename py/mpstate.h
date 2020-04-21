@@ -27,6 +27,7 @@
 #define MICROPY_INCLUDED_PY_MPSTATE_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 #include "py/mpconfig.h"
 #include "py/mpthread.h"
@@ -35,6 +36,8 @@
 #include "py/obj.h"
 #include "py/objlist.h"
 #include "py/objexcept.h"
+#include "mpthreadport.h"
+#include "py/qstr.h"
 
 // This file contains structures defining the state of the MicroPython
 // memory system, runtime and virtual machine.  The state is a global

@@ -26,8 +26,18 @@
 #ifndef MICROPY_INCLUDED_PY_RUNTIME_H
 #define MICROPY_INCLUDED_PY_RUNTIME_H
 
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
 #include "py/mpstate.h"
 #include "py/pystack.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpprint.h"
+#include "py/obj.h"
+#include "py/qstr.h"
+#include "py/runtime0.h"
 
 typedef enum {
     MP_VM_RETURN_NORMAL,

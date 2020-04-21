@@ -25,7 +25,6 @@
  * THE SOFTWARE.
  */
 
-#include "py/mpconfig.h"
 #if MICROPY_PY_USSL && MICROPY_SSL_MBEDTLS
 
 #include <stdio.h>
@@ -34,7 +33,6 @@
 
 #include "py/runtime.h"
 #include "py/stream.h"
-
 // mbedtls_time_t
 #include "mbedtls/platform.h"
 #include "mbedtls/ssl.h"

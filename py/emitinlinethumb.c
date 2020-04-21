@@ -24,15 +24,9 @@
  * THE SOFTWARE.
  */
 
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
-#include <assert.h>
 
-#include "py/emit.h"
-#include "py/asmthumb.h"
 
+#include "py/mpconfig.h"
 #if MICROPY_EMIT_INLINE_THUMB
 
 typedef enum {
@@ -40,6 +34,7 @@ typedef enum {
 #define DEF_RULE(rule, comp, kind, ...) PN_##rule,
 #define DEF_RULE_NC(rule, kind, ...)
     #include "py/grammar.h"
+
 #undef DEF_RULE
 #undef DEF_RULE_NC
     PN_const_object, // special node for a constant, generic Python object
@@ -47,6 +42,7 @@ typedef enum {
 #define DEF_RULE(rule, comp, kind, ...)
 #define DEF_RULE_NC(rule, kind, ...) PN_##rule,
     #include "py/grammar.h"
+
 #undef DEF_RULE
 #undef DEF_RULE_NC
 } pn_kind_t;

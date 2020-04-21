@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "py/parsenum.h"
 #include "py/smallint.h"
@@ -34,10 +35,7 @@
 #include "py/objstr.h"
 #include "py/runtime.h"
 #include "py/binary.h"
-
-#if MICROPY_PY_BUILTINS_FLOAT
-#include <math.h>
-#endif
+#include "py/qstr.h"
 
 // This dispatcher function is expected to be independent of the implementation of long int
 STATIC mp_obj_t mp_obj_int_make_new(const mp_obj_type_t *type_in, size_t n_args, size_t n_kw, const mp_obj_t *args) {

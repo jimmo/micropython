@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "py/compile.h"
 #include "py/objmodule.h"
@@ -35,6 +36,16 @@
 #include "py/runtime.h"
 #include "py/builtin.h"
 #include "py/frozenmod.h"
+#include "py/emitglue.h"
+#include "py/lexer.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/mpstate.h"
+#include "py/nlr.h"
+#include "py/obj.h"
+#include "py/parse.h"
+#include "py/pystack.h"
+#include "py/qstr.h"
 
 #if MICROPY_DEBUG_VERBOSE // print debugging info
 #define DEBUG_PRINT (1)

@@ -24,14 +24,9 @@
  * THE SOFTWARE.
  */
 
-#include <stdint.h>
-#include <string.h>
 
-#include "extmod/vfs.h"
-#include "extmod/vfs_posix.h"
-#include "extmod/vfs_fat.h"
-#include "extmod/vfs_lfs.h"
 
+#include "py/mpconfig.h"
 #if MICROPY_VFS
 
 // These are defined in modos.c

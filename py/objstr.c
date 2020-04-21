@@ -33,6 +33,7 @@
 #include "py/objlist.h"
 #include "py/runtime.h"
 #include "py/stackctrl.h"
+#include "py/nlr.h"
 
 #if MICROPY_PY_BUILTINS_STR_OP_MODULO
 STATIC mp_obj_t str_modulo_format(mp_obj_t pattern, size_t n_args, const mp_obj_t *args, mp_obj_t dict);

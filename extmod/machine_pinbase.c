@@ -24,7 +24,11 @@
  * THE SOFTWARE.
  */
 
+#include <stddef.h>
+#include <stdint.h>
+
 #include "py/mpconfig.h"
+#include "py/qstr.h"
 #if MICROPY_PY_MACHINE
 
 #include "py/obj.h"

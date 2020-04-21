@@ -27,8 +27,17 @@
 #ifndef MICROPY_INCLUDED_PY_BC_H
 #define MICROPY_INCLUDED_PY_BC_H
 
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
 #include "py/runtime.h"
 #include "py/objfun.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
+#include "py/obj.h"
+#include "py/qstr.h"
+#include "py/runtime0.h"
 
 // bytecode layout:
 //

@@ -25,17 +25,7 @@
  * THE SOFTWARE.
  */
 
-#include "py/binary.h"
-#include "py/misc.h"
-#include "py/mperrno.h"
-#include "py/obj.h"
-#include "py/objstr.h"
-#include "py/objarray.h"
-#include "py/qstr.h"
-#include "py/runtime.h"
-#include "py/mphal.h"
 #include "extmod/modbluetooth.h"
-#include <string.h>
 
 #if MICROPY_PY_BLUETOOTH
 

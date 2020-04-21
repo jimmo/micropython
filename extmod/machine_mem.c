@@ -24,8 +24,9 @@
  * THE SOFTWARE.
  */
 
-#include "py/runtime.h"
 #include "extmod/machine_mem.h"
+#include "py/mpprint.h"
+#include "py/qstr.h"
 
 #if MICROPY_PY_MACHINE
 

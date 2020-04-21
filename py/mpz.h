@@ -27,6 +27,8 @@
 #define MICROPY_INCLUDED_PY_MPZ_H
 
 #include <stdint.h>
+#include <stdbool.h>
+#include <stddef.h>
 
 #include "py/mpconfig.h"
 #include "py/misc.h"

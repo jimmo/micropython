@@ -27,6 +27,8 @@
 #define MICROPY_INCLUDED_PY_OBJSTRINGIO_H
 
 #include "py/obj.h"
+#include "py/misc.h"
+#include "py/mpconfig.h"
 
 typedef struct _mp_obj_stringio_t {
     mp_obj_base_t base;

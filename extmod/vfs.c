@@ -24,13 +24,8 @@
  * THE SOFTWARE.
  */
 
-#include <stdint.h>
-#include <string.h>
-
-#include "py/runtime.h"
-#include "py/objstr.h"
-#include "py/mperrno.h"
 #include "extmod/vfs.h"
+#include "py/mpconfig.h"
 
 #if MICROPY_VFS
 

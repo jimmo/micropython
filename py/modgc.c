@@ -24,9 +24,13 @@
  * THE SOFTWARE.
  */
 
+#include <stddef.h>
+
 #include "py/mpstate.h"
 #include "py/obj.h"
 #include "py/gc.h"
+#include "py/mpconfig.h"
+#include "py/qstr.h"
 
 #if MICROPY_PY_GC && MICROPY_ENABLE_GC
 

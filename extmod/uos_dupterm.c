@@ -25,15 +25,7 @@
  * THE SOFTWARE.
  */
 
-#include <string.h>
-#include "py/mpconfig.h"
 
-#include "py/runtime.h"
-#include "py/objtuple.h"
-#include "py/objarray.h"
-#include "py/stream.h"
-#include "extmod/misc.h"
-#include "lib/utils/interrupt_char.h"
 
 #if MICROPY_PY_OS_DUPTERM
 

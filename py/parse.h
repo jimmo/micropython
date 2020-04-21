@@ -28,8 +28,10 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "py/obj.h"
+#include "py/mpconfig.h"
 
 struct _mp_lexer_t;
 

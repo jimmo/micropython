@@ -26,7 +26,6 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include <stdarg.h>
 #include <assert.h>
 
 #include "py/obj.h"
@@ -35,7 +34,6 @@
 #include "py/objstr.h"
 #include "py/runtime.h"
 #include "py/stackctrl.h"
-#include "py/stream.h" // for mp_obj_print
 
 const mp_obj_type_t *mp_obj_get_type(mp_const_obj_t o_in) {
     #if MICROPY_OBJ_IMMEDIATE_OBJS && MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_A

@@ -25,13 +25,18 @@
  * THE SOFTWARE.
  */
 
-#include <stdio.h>
 #include <stddef.h>
 #include <string.h>
 #include <assert.h>
+#include <stdint.h>
 
 #include "py/objtype.h"
 #include "py/runtime.h"
+#include "py/misc.h"
+#include "py/mpprint.h"
+#include "py/objtuple.h"
+#include "py/qstr.h"
+#include "py/runtime0.h"
 
 #if MICROPY_DEBUG_VERBOSE // print debugging info
 #define DEBUG_PRINT (1)
