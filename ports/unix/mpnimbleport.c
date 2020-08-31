@@ -56,7 +56,7 @@ bool mp_bluetooth_hci_poll(void) {
 
         // Run pending background operations and events, but only after HCI sync.
         mp_bluetooth_nimble_os_callout_process();
-        mp_bluetooth_nimble_os_eventq_run_all();
+        mp_bluetooth_nimble_os_eventq_schedule();
 
         MICROPY_END_ATOMIC_SECTION(atomic_state);
     }
