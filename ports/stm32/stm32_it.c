@@ -82,6 +82,7 @@
 #include "dma.h"
 #include "i2c.h"
 #include "usb.h"
+#include "rfcore.h"
 
 extern void __fatal_error(const char *);
 #if defined(MICROPY_HW_USB_FS)
@@ -770,7 +771,7 @@ void USART4_5_IRQHandler(void) {
     IRQ_EXIT(USART4_5_IRQn);
 }
 
-#else
+#else // not F0 or L0
 
 void USART3_IRQHandler(void) {
     IRQ_ENTER(USART3_IRQn);
@@ -828,7 +829,23 @@ void UART10_IRQHandler(void) {
 }
 #endif
 
-#endif
+#endif // USART for other families (non-FO/L0)
+
+// IPCC IRQ Handlers
+
+#if defined(STM32WB)
+void IPCC_C1_TX_IRQHandler(void) {
+    IRQ_ENTER(IPCC_C1_TX_IRQn);
+    rfcore_c1_tx_irq_handler();
+    IRQ_EXIT(IPCC_C1_TX_IRQn);
+}
+
+void IPCC_C1_RX_IRQHandler(void) {
+    IRQ_ENTER(IPCC_C1_RX_IRQn);
+    rfcore_c1_rx_irq_handler();
+    IRQ_EXIT(IPCC_C1_RX_IRQn);
+}
+#endif // defined(STM32WB)
 
 #if MICROPY_PY_PYB_LEGACY
 
