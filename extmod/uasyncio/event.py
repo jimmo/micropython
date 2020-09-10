@@ -3,6 +3,8 @@
 
 from . import core
 
+import io
+
 # Event class for primitive events that can be waited on, set, and cleared
 class Event:
     def __init__(self):
@@ -29,3 +31,23 @@ class Event:
             core.cur_task.data = self.waiting
             yield
         return True
+
+
+_MP_STREAM_POLL = const(3)
+
+# Event class that can be used from IRQs.
+class PollingEvent(io.IOBase):
+    def __init__(self):
+        self._flag = 0
+
+    def ioctl(self, req, flags):
+        if req == _MP_STREAM_POLL:
+            return self._flag * flags
+        return None
+
+    def set(self):
+        self._flag = 1
+
+    async def wait(self):
+        yield core._io_queue.queue_read(self)
+        self._flag = 0

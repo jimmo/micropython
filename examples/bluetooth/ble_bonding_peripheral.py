@@ -67,7 +67,7 @@ class BLETemperature:
         self._ble.config(mitm=True)
         self._ble.config(io=_IO_CAPABILITY_DISPLAY_YESNO)
         self._ble.active(True)
-        self._ble.config(addr_mode=2)
+        self._ble.config(addr_mode=0)
         ((self._handle,),) = self._ble.gatts_register_services((_ENV_SENSE_SERVICE,))
         self._connections = set()
         self._payload = advertising_payload(
@@ -149,7 +149,7 @@ class BLETemperature:
                     self._ble.gatts_indicate(conn_handle, self._handle)
 
     def _advertise(self, interval_us=500000):
-        self._ble.config(addr_mode=2)
+        #self._ble.config(addr_mode=0)
         self._ble.gap_advertise(interval_us, adv_data=self._payload)
 
     def _load_secrets(self):

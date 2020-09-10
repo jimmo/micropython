@@ -1,0 +1,15 @@
+freeze(
+    "..",
+    (
+        "aioble/__init__.py",
+        "aioble/central.py",
+        "aioble/client.py",
+        "aioble/core.py",
+        "aioble/device.py",
+        "aioble/l2cap.py",
+        "aioble/peripheral.py",
+        "aioble/security.py",
+        "aioble/server.py",
+    ),
+    opt=0,
+)
