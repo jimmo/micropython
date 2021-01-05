@@ -350,7 +350,7 @@ struct _mp_bluetooth_nimble_malloc_t;
 // This macro is not provided by glibc but we need it so ports that don't have
 // dirent->d_ino can disable the use of this field.
 #ifndef _DIRENT_HAVE_D_INO
-#define _DIRENT_HAVE_D_INO (1)
+// #define _DIRENT_HAVE_D_INO (1)
 #endif
 
 #ifndef __APPLE__
@@ -370,7 +370,7 @@ struct _mp_bluetooth_nimble_malloc_t;
         mp_hal_delay_us(500); \
     } while (0);
 
-#include <sched.h>
-#define MICROPY_UNIX_MACHINE_IDLE sched_yield();
+//#include <sched.h>
+//#define MICROPY_UNIX_MACHINE_IDLE sched_yield();
 
 #endif // MICROPY_UNIX_MINIMAL

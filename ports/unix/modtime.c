@@ -91,6 +91,8 @@ STATIC mp_obj_t mod_time_clock(void) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_0(mod_time_clock_obj, mod_time_clock);
 
+typedef uint64_t suseconds_t;
+
 STATIC mp_obj_t mod_time_sleep(mp_obj_t arg) {
     #if MICROPY_PY_BUILTINS_FLOAT
     struct timeval tv;
@@ -200,7 +202,7 @@ STATIC mp_obj_t mod_time_mktime(mp_obj_t tuple) {
         time.tm_isdst = -1; // auto-detect
     }
     time_t ret = mktime(&time);
-    if (ret == -1) {
+    if (ret == (time_t)-1) {
         mp_raise_msg(&mp_type_OverflowError, MP_ERROR_TEXT("invalid mktime usage"));
     }
     return mp_obj_new_int(ret);

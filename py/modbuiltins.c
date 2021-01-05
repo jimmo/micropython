@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <math.h>
 
 #include "py/smallint.h"
 #include "py/objint.h"
@@ -470,6 +471,10 @@ STATIC mp_obj_t mp_builtin_repr(mp_obj_t o_in) {
     return mp_obj_new_str_from_vstr(&mp_type_str, &vstr);
 }
 MP_DEFINE_CONST_FUN_OBJ_1(mp_builtin_repr_obj, mp_builtin_repr);
+
+mp_float_t nearbyint(mp_float_t x) {
+    return round(x);
+}
 
 STATIC mp_obj_t mp_builtin_round(size_t n_args, const mp_obj_t *args) {
     mp_obj_t o_in = args[0];

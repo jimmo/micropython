@@ -24,14 +24,14 @@
  * THE SOFTWARE.
  */
 
-#include <pthread.h>
-#include <unistd.h>
-
 #include "py/runtime.h"
 #include "py/mperrno.h"
 #include "py/mphal.h"
 
 #if MICROPY_PY_BLUETOOTH && MICROPY_BLUETOOTH_BTSTACK && MICROPY_BLUETOOTH_BTSTACK_USB
+
+#include <pthread.h>
+#include <unistd.h>
 
 #include "lib/btstack/src/btstack.h"
 #include "lib/btstack/platform/embedded/btstack_run_loop_embedded.h"

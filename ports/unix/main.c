@@ -592,7 +592,7 @@ MP_NOINLINE int main_(int argc, char **argv) {
 
                 mp_obj_t mod;
                 nlr_buf_t nlr;
-                bool subpkg_tried = false;
+                //bool subpkg_tried = false;
 
             reimport:
                 if (nlr_push(&nlr) == 0) {
@@ -603,8 +603,8 @@ MP_NOINLINE int main_(int argc, char **argv) {
                     return handle_uncaught_exception(nlr.ret_val) & 0xff;
                 }
 
-                if (mp_obj_is_package(mod) && !subpkg_tried) {
-                    subpkg_tried = true;
+                if (mp_obj_is_package(mod)) {
+                    // subpkg_tried = true;
                     vstr_t vstr;
                     int len = strlen(argv[a + 1]);
                     vstr_init(&vstr, len + sizeof(".__main__"));
