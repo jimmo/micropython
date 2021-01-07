@@ -43,7 +43,7 @@
 
 #define DEBUG 0
 
-#if MICROPY_PY_SOCKET
+#if MICROPY_PY_USOCKET
 extern const mp_obj_type_t mp_type_socket;
 #endif
 

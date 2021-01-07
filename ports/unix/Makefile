@@ -9,8 +9,10 @@ ifeq ($(wildcard $(VARIANT_DIR)/.),)
 $(error Invalid VARIANT specified: $(VARIANT_DIR))
 endif
 
+# OS name, for simple autoconfig
+UNAME_S := $(shell uname -s)
+
 include ../../py/mkenv.mk
--include mpconfigport.mk
 include $(VARIANT_DIR)/mpconfigvariant.mk
 
 # use FROZEN_MANIFEST for new projects, others are legacy
@@ -25,13 +27,8 @@ PROG ?= micropython
 QSTR_DEFS = qstrdefsport.h
 QSTR_GLOBAL_DEPENDENCIES = $(VARIANT_DIR)/mpconfigvariant.h
 
-# OS name, for simple autoconfig
-UNAME_S := $(shell uname -s)
-
 # include py core make definitions
 include $(TOP)/py/py.mk
-
-GIT_SUBMODULES += lib/axtls lib/berkeley-db-1.xx lib/libffi
 
 INC +=  -I.
 INC +=  -I$(TOP)
@@ -121,101 +118,15 @@ INC +=  -I$(TOP)/lib/mp-readline
 CFLAGS_MOD += -DMICROPY_USE_READLINE=1
 LIB_SRC_C_EXTRA += mp-readline/readline.c
 endif
-ifeq ($(MICROPY_PY_TERMIOS),1)
-CFLAGS_MOD += -DMICROPY_PY_TERMIOS=1
-SRC_MOD += modtermios.c
+
+ifeq ($(MICROPY_PY_USOCKET),1)
+CFLAGS_MOD += -DMICROPY_PY_USOCKET=1
+SRC_MOD += variants/standard/modusocket.c
 endif
-ifeq ($(MICROPY_PY_SOCKET),1)
-CFLAGS_MOD += -DMICROPY_PY_SOCKET=1
-SRC_MOD += modusocket.c
-endif
+
 ifeq ($(MICROPY_PY_THREAD),1)
 CFLAGS_MOD += -DMICROPY_PY_THREAD=1 -DMICROPY_PY_THREAD_GIL=0
 LDFLAGS_MOD += $(LIBPTHREAD)
-endif
-
-# If the variant enables it, enable modbluetooth.
-ifeq ($(MICROPY_PY_BLUETOOTH),1)
-
-HAVE_LIBUSB := $(shell (which pkg-config > /dev/null && pkg-config --exists libusb-1.0) 2>/dev/null && echo '1')
-
-# Only one stack can be enabled.
-ifeq ($(MICROPY_BLUETOOTH_NIMBLE),1)
-ifeq ($(MICROPY_BLUETOOTH_BTSTACK),1)
-$(error Cannot enable both NimBLE and BTstack at the same time)
-endif
-endif
-
-# Default to btstack, but a variant (or make command line) can set NimBLE
-# explicitly (which is always via H4 UART).
-ifneq ($(MICROPY_BLUETOOTH_NIMBLE),1)
-ifneq ($(MICROPY_BLUETOOTH_BTSTACK),1)
-MICROPY_BLUETOOTH_BTSTACK ?= 1
-endif
-endif
-
-CFLAGS_MOD += -DMICROPY_PY_BLUETOOTH=1
-CFLAGS_MOD += -DMICROPY_PY_BLUETOOTH_ENABLE_CENTRAL_MODE=1
-
-ifeq ($(MICROPY_BLUETOOTH_BTSTACK),1)
-
-# Figure out which BTstack transport to use.
-ifeq ($(MICROPY_BLUETOOTH_BTSTACK_H4),1)
-ifeq ($(MICROPY_BLUETOOTH_BTSTACK_USB),1)
-$(error Cannot enable BTstack support for USB and H4 UART at the same time)
-endif
-else
-ifeq ($(HAVE_LIBUSB),1)
-# Default to btstack-over-usb.
-MICROPY_BLUETOOTH_BTSTACK_USB ?= 1
-else
-# Fallback to HCI controller via a H4 UART (e.g. Zephyr on nRF) over a /dev/tty serial port.
-MICROPY_BLUETOOTH_BTSTACK_H4 ?= 1
-endif
-endif
-
-# BTstack is enabled.
-GIT_SUBMODULES += lib/btstack
-include $(TOP)/extmod/btstack/btstack.mk
-
-else
-
-# NimBLE is enabled.
-GIT_SUBMODULES += lib/mynewt-nimble
-CFLAGS_MOD += -DMICROPY_PY_BLUETOOTH_ENABLE_L2CAP_CHANNELS=1
-include $(TOP)/extmod/nimble/nimble.mk
-
-endif
-
-endif
-
-ifeq ($(MICROPY_PY_FFI),1)
-
-ifeq ($(MICROPY_STANDALONE),1)
-LIBFFI_CFLAGS_MOD := -I$(shell ls -1d $(BUILD)/lib/libffi/out/lib/libffi-*/include)
- ifeq ($(MICROPY_FORCE_32BIT),1)
-  LIBFFI_LDFLAGS_MOD = $(BUILD)/lib/libffi/out/lib32/libffi.a
- else
-  LIBFFI_LDFLAGS_MOD = $(BUILD)/lib/libffi/out/lib/libffi.a
- endif
-else
-LIBFFI_CFLAGS_MOD := $(shell pkg-config --cflags libffi)
-LIBFFI_LDFLAGS_MOD := $(shell pkg-config --libs libffi)
-endif
-
-ifeq ($(UNAME_S),Linux)
-LIBFFI_LDFLAGS_MOD += -ldl
-endif
-
-CFLAGS_MOD += $(LIBFFI_CFLAGS_MOD) -DMICROPY_PY_FFI=1
-LDFLAGS_MOD += $(LIBFFI_LDFLAGS_MOD)
-SRC_MOD += modffi.c
-endif
-
-ifeq ($(MICROPY_PY_JNI),1)
-# Path for 64-bit OpenJDK, should be adjusted for other JDKs
-CFLAGS_MOD += -I/usr/lib/jvm/java-7-openjdk-amd64/include -DMICROPY_PY_JNI=1
-SRC_MOD += modjni.c
 endif
 
 # source files
@@ -230,15 +141,9 @@ SRC_C += \
 	moduos_vfs.c \
 	modtime.c \
 	moduselect.c \
+	modusocket.c \
 	alloc.c \
-	fatfs_port.c \
-	mpbthciport.c \
-	mpbtstackport_common.c \
-	mpbtstackport_h4.c \
-	mpbtstackport_usb.c \
-	mpnimbleport.c \
-	$(SRC_MOD) \
-	$(wildcard $(VARIANT_DIR)/*.c)
+	$(SRC_MOD)
 
 LIB_SRC_C += $(addprefix lib/,\
 	$(LIB_SRC_C_EXTRA) \
@@ -316,26 +221,6 @@ CROSS_COMPILE_HOST = --host=$(patsubst %-,%,$(CROSS_COMPILE))
 else
 CROSS_COMPILE_HOST =
 endif
-
-deplibs: libffi axtls
-
-libffi: $(BUILD)/lib/libffi/include/ffi.h
-
-$(TOP)/lib/libffi/configure: $(TOP)/lib/libffi/autogen.sh
-	cd $(TOP)/lib/libffi; ./autogen.sh
-
-# install-exec-recursive & install-data-am targets are used to avoid building
-# docs and depending on makeinfo
-$(BUILD)/lib/libffi/include/ffi.h: $(TOP)/lib/libffi/configure
-	mkdir -p $(BUILD)/lib/libffi; cd $(BUILD)/lib/libffi; \
-	$(abspath $(TOP))/lib/libffi/configure $(CROSS_COMPILE_HOST) --prefix=$$PWD/out --disable-structs CC="$(CC)" CXX="$(CXX)" LD="$(LD)" CFLAGS="-Os -fomit-frame-pointer -fstrict-aliasing -ffast-math -fno-exceptions"; \
-	$(MAKE) install-exec-recursive; $(MAKE) -C include install-data-am
-
-axtls: $(TOP)/lib/axtls/README
-
-$(TOP)/lib/axtls/README:
-	@echo "You cloned without --recursive, fetching submodules for you."
-	(cd $(TOP); git submodule update --init --recursive)
 
 PREFIX = /usr/local
 BINDIR = $(DESTDIR)$(PREFIX)/bin

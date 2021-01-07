@@ -15,10 +15,7 @@ LDFLAGS += -fprofile-arcs -ftest-coverage
 FROZEN_MANIFEST ?= $(VARIANT_DIR)/manifest.py
 USER_C_MODULES = $(TOP)/examples/usercmodule
 
-MICROPY_ROM_TEXT_COMPRESSION = 1
-MICROPY_VFS_FAT = 1
-MICROPY_VFS_LFS1 = 1
-MICROPY_VFS_LFS2 = 1
+SRC_C += variants/coverage/coverage.c
+SRC_CXX += variants/coverage/coveragecpp.cpp
 
-SRC_C += coverage.c
-SRC_CXX += coveragecpp.cpp
+include variants/standard/mpconfigvariant.mk

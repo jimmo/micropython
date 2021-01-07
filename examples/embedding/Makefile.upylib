@@ -97,9 +97,9 @@ ifeq ($(MICROPY_PY_TERMIOS),1)
 CFLAGS_MOD += -DMICROPY_PY_TERMIOS=1
 SRC_MOD += modtermios.c
 endif
-ifeq ($(MICROPY_PY_SOCKET),1)
-CFLAGS_MOD += -DMICROPY_PY_SOCKET=1
-SRC_MOD += modsocket.c
+ifeq ($(MICROPY_PY_USOCKET),1)
+CFLAGS_MOD += -DMICROPY_PY_USOCKET=1
+SRC_MOD += modusocket.c
 endif
 
 ifeq ($(MICROPY_PY_FFI),1)

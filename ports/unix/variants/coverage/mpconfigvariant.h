@@ -27,6 +27,9 @@
 // This config enables almost all possible features such that it can be used
 // for coverage testing.
 
+// Extend from the standard variant.
+#include "variants/standard/mpconfigvariant.h"
+
 #define MICROPY_VFS                    (1)
 #define MICROPY_PY_UOS_VFS             (1)
 
@@ -63,8 +66,3 @@
 #define MICROPY_PY_UCRYPTOLIB          (1)
 #define MICROPY_PY_UCRYPTOLIB_CTR      (1)
 #define MICROPY_PY_MICROPYTHON_HEAP_LOCKED (1)
-
-// use vfs's functions for import stat and builtin open
-#define mp_import_stat mp_vfs_import_stat
-#define mp_builtin_open mp_vfs_open
-#define mp_builtin_open_obj mp_vfs_open_obj

@@ -3,7 +3,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2019 Damien P. George
+ * Copyright (c) 2021 Jim Mussared
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,22 +24,14 @@
  * THE SOFTWARE.
  */
 
-#define MICROPY_READER_VFS                      (1)
-#define MICROPY_REPL_EMACS_WORDS_MOVE           (1)
-#define MICROPY_REPL_EMACS_EXTRA_WORDS_MOVE     (1)
-#define MICROPY_ENABLE_SCHEDULER                (1)
-#define MICROPY_VFS                             (1)
-#define MICROPY_VFS_POSIX                       (1)
-
-#define MICROPY_PY_SYS_SETTRACE                 (1)
-#define MICROPY_PY_UOS_VFS                      (1)
-#define MICROPY_PY_URANDOM_EXTRA_FUNCS          (1)
-
-#ifndef MICROPY_PY_UASYNCIO
-#define MICROPY_PY_UASYNCIO                     (1)
+#if MICROPY_PY_BLUETOOTH
+#if MICROPY_BLUETOOTH_BTSTACK
+struct _mp_bluetooth_btstack_root_pointers_t;
+#define MICROPY_BLUETOOTH_ROOT_POINTERS struct _mp_bluetooth_btstack_root_pointers_t *bluetooth_btstack_root_pointers;
 #endif
-
-// Use vfs's functions for import stat and builtin open.
-#define mp_import_stat mp_vfs_import_stat
-#define mp_builtin_open mp_vfs_open
-#define mp_builtin_open_obj mp_vfs_open_obj
+#if MICROPY_BLUETOOTH_NIMBLE
+struct _mp_bluetooth_nimble_root_pointers_t;
+struct _mp_bluetooth_nimble_malloc_t;
+#define MICROPY_BLUETOOTH_ROOT_POINTERS struct _mp_bluetooth_nimble_malloc_t *bluetooth_nimble_memory; struct _mp_bluetooth_nimble_root_pointers_t *bluetooth_nimble_root_pointers;
+#endif
+#endif
