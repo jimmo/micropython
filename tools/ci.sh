@@ -39,21 +39,34 @@ function ci_code_size_setup {
 }
 
 function ci_code_size_build {
-    # starts off at either the ref/pull/N/merge FETCH_HEAD, or the current branch HEAD
-    git checkout -b pull_request # save the current location
+    # HEAD will be a merge commit of upstream/master and the PR branch.
+    # get the latest non-merge commit, and save that as "pull_request"
+    git remote -v
+    #git fetch --depth=100 origin
+    git pull --ff-only --deepen=100
+    git show -s
+    git log --pretty='format:%H' --no-merges -10
+    git checkout -b pull_request `git log --pretty='format:%H' --no-merges -1` # save the current location
+    git show -s
     git remote add upstream https://github.com/micropython/micropython.git
-    git fetch --depth=100 upstream
+    git fetch --depth=100 upstream master
     # build reference, save to size0
     # ignore any errors with this build, in case master is failing
-    git checkout `git merge-base --fork-point upstream/master pull_request`
-    git show -s
-    tools/metrics.py clean bm
-    tools/metrics.py build bm | tee ~/size0 || true
+    echo our log
+    git log pull_request -10
+    echo upstream log
+    git log upstream/master -10
+    echo merge-base is
+    git merge-base --fork-point upstream/master pull_request
+    #git checkout `git merge-base --fork-point upstream/master pull_request`
+    #git show -s
+    echo tools/metrics.py clean bm
+    echo tools/metrics.py build bm | tee ~/size0 || true
     # build PR/branch, save to size1
-    git checkout pull_request
-    git log upstream/master..HEAD
-    tools/metrics.py clean bm
-    tools/metrics.py build bm | tee ~/size1
+    #git checkout pull_request
+    #git log upstream/master..HEAD
+    echo tools/metrics.py clean bm
+    echo tools/metrics.py build bm | tee ~/size1
 }
 
 ########################################################################################
