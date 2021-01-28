@@ -81,7 +81,7 @@ void mp_bluetooth_btstack_port_deinit(void) {
 
 
 // Provided by mpbstackport_common.c.
-extern bool mp_bluetooth_hci_poll(void);
+extern bool mp_bluetooth_hci_poll(bool *reschedule);
 
 STATIC void *btstack_thread(void *arg) {
     (void)arg;
@@ -94,7 +94,8 @@ STATIC void *btstack_thread(void *arg) {
     // Or, if a timeout results in it being set to TIMEOUT.
 
     while (true) {
-        if (!mp_bluetooth_hci_poll()) {
+        bool reschedule = false;
+        if (!mp_bluetooth_hci_poll(&reschedule)) {
             break;
         }
 

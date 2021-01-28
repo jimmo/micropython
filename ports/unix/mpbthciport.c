@@ -53,7 +53,7 @@ uint8_t mp_bluetooth_hci_cmd_buf[4 + 256];
 STATIC int uart_fd = -1;
 
 // Must be provided by the stack bindings (e.g. mpnimbleport.c or mpbtstackport.c).
-extern bool mp_bluetooth_hci_poll(void);
+extern bool mp_bluetooth_hci_poll(bool *reschedule);
 
 #if MICROPY_PY_BLUETOOTH_USE_SYNC_EVENTS
 
@@ -66,15 +66,29 @@ extern bool mp_bluetooth_hci_active(void);
 // Prevent double-enqueuing of the scheduled task.
 STATIC volatile bool events_task_is_scheduled = false;
 
+STATIC void reschedule_hci_task(void);
+
 STATIC mp_obj_t run_events_scheduled_task(mp_obj_t none_in) {
     (void)none_in;
     MICROPY_PY_BLUETOOTH_ENTER
-        events_task_is_scheduled = false;
+    events_task_is_scheduled = false;
     MICROPY_PY_BLUETOOTH_EXIT
-    mp_bluetooth_hci_poll();
+    bool reschedule;
+    mp_bluetooth_hci_poll(&reschedule);
+    if (reschedule) {
+        reschedule_hci_task();
+    }
     return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(run_events_scheduled_task_obj, run_events_scheduled_task);
+
+STATIC void reschedule_hci_task(void) {
+    MICROPY_PY_BLUETOOTH_ENTER
+    if (!events_task_is_scheduled) {
+        events_task_is_scheduled = mp_sched_schedule(MP_OBJ_FROM_PTR(&run_events_scheduled_task_obj), mp_const_none);
+    }
+    MICROPY_PY_BLUETOOTH_EXIT
+}
 
 #endif // MICROPY_PY_BLUETOOTH_USE_SYNC_EVENTS
 
@@ -91,11 +105,7 @@ STATIC void *hci_poll_thread(void *arg) {
     events_task_is_scheduled = false;
 
     while (mp_bluetooth_hci_active()) {
-        MICROPY_PY_BLUETOOTH_ENTER
-        if (!events_task_is_scheduled) {
-            events_task_is_scheduled = mp_sched_schedule(MP_OBJ_FROM_PTR(&run_events_scheduled_task_obj), mp_const_none);
-        }
-        MICROPY_PY_BLUETOOTH_EXIT
+        reschedule_hci_task();
         usleep(UART_POLL_INTERVAL_US);
     }
 

@@ -30,7 +30,7 @@
 #define MICROPY_HW_BLE_UART_ID (0)
 #define MICROPY_HW_BLE_UART_BAUDRATE (1000000)
 
-bool mp_bluetooth_hci_poll(void);
+bool mp_bluetooth_hci_poll(bool *reschedule);
 
 #if MICROPY_BLUETOOTH_BTSTACK_H4
 void mp_bluetooth_hci_poll_h4(void);

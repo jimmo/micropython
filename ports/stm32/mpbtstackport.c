@@ -63,9 +63,11 @@ STATIC const hci_transport_config_uart_t hci_transport_config_uart = {
     NULL,
 };
 
-void mp_bluetooth_hci_poll(void) {
+bool mp_bluetooth_hci_poll(bool *reschedule) {
+    *reschedule = false;
+
     if (mp_bluetooth_btstack_state == MP_BLUETOOTH_BTSTACK_STATE_OFF) {
-        return;
+        return false;
     }
 
     // Process uart data.
@@ -75,6 +77,8 @@ void mp_bluetooth_hci_poll(void) {
 
     // Call the BTstack run loop.
     btstack_run_loop_embedded_execute_once();
+
+    return true;
 }
 
 void mp_bluetooth_btstack_port_init(void) {

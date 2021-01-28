@@ -38,8 +38,9 @@
 #define DEBUG_printf(...) // printf(__VA_ARGS__)
 
 // Called by the UART polling thread in mpbthciport.c.
-bool mp_bluetooth_hci_poll(void) {
+bool mp_bluetooth_hci_poll(bool *reschedule) {
     // DEBUG_printf("mp_bluetooth_hci_poll (unix nimble) %d\n", mp_bluetooth_nimble_ble_state);
+    *reschedule = false;
 
     if (mp_bluetooth_nimble_ble_state == MP_BLUETOOTH_NIMBLE_BLE_STATE_OFF) {
         DEBUG_printf("mp_bluetooth_hci_poll (unix nimble) -- shutdown\n");
@@ -51,10 +52,7 @@ bool mp_bluetooth_hci_poll(void) {
         mp_bluetooth_nimble_os_callout_process();
 
         // Process incoming UART data, and run events as they are generated.
-        mp_bluetooth_nimble_hci_uart_process(true);
-
-        // Run any remaining events (e.g. if there was no UART data).
-        mp_bluetooth_nimble_os_eventq_run_all();
+        *reschedule = mp_bluetooth_nimble_hci_uart_process(true);
     }
 
     return true;

@@ -43,19 +43,21 @@
 
 // Get any pending data from the UART and send it to NimBLE's HCI buffers.
 // Any further processing by NimBLE will be run via its event queue.
-void mp_bluetooth_hci_poll(void) {
-    if (mp_bluetooth_nimble_ble_state >= MP_BLUETOOTH_NIMBLE_BLE_STATE_WAITING_FOR_SYNC) {
-        // DEBUG_printf("mp_bluetooth_hci_poll_uart %d\n", mp_bluetooth_nimble_ble_state);
-
-        // Run any timers.
-        mp_bluetooth_nimble_os_callout_process();
-
-        // Process incoming UART data, and run events as they are generated.
-        mp_bluetooth_nimble_hci_uart_process(true);
-
-        // Run any remaining events (e.g. if there was no UART data).
-        mp_bluetooth_nimble_os_eventq_run_all();
+// Set flag if there's more work remaining and it should be rescheduled ASAP.
+bool mp_bluetooth_hci_poll(bool *reschedule) {
+    if (mp_bluetooth_nimble_ble_state < MP_BLUETOOTH_NIMBLE_BLE_STATE_WAITING_FOR_SYNC) {
+        *reschedule = false;
+        return false;
     }
+
+    // DEBUG_printf("mp_bluetooth_hci_poll_uart %d\n", mp_bluetooth_nimble_ble_state);
+
+    // Run any timers.
+    mp_bluetooth_nimble_os_callout_process();
+
+    // Process incoming UART data, and run events as they are generated.
+    *reschedule = mp_bluetooth_nimble_hci_uart_process(true);
+    return true;
 }
 
 // --- Port-specific helpers for the generic NimBLE bindings. -----------------

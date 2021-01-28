@@ -42,7 +42,7 @@ uint8_t mp_bluetooth_hci_cmd_buf[4 + 256];
 
 // Must be provided by the stack bindings (e.g. mpnimbleport.c or mpbtstackport.c).
 // Request new data from the uart and pass to the stack, and run pending events/callouts.
-extern void mp_bluetooth_hci_poll(void);
+extern bool mp_bluetooth_hci_poll(bool *reschedule);
 
 // Hook for pendsv poller to run this periodically every 128ms
 #define BLUETOOTH_HCI_TICK(tick) (((tick) & ~(SYSTICK_DISPATCH_NUM_SLOTS - 1) & 0x7f) == 0)
@@ -56,11 +56,19 @@ extern void mp_bluetooth_hci_poll(void);
 // Prevent double-enqueuing of the scheduled task.
 STATIC volatile bool events_task_is_scheduled = false;
 
+void mp_bluetooth_hci_systick(uint32_t ticks_ms);
+
 STATIC mp_obj_t run_events_scheduled_task(mp_obj_t none_in) {
     (void)none_in;
     events_task_is_scheduled = false;
     // This will process all buffered HCI UART data, and run any callouts or events.
-    mp_bluetooth_hci_poll();
+    bool reschedule;
+    mp_bluetooth_hci_poll(&reschedule);
+    if (reschedule) {
+        // There's either more UART data to process or events to run, so
+        // reschedule immediately. This still allows a chance for the VM to do other things.
+        mp_bluetooth_hci_systick(0);
+    }
     return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(run_events_scheduled_task_obj, run_events_scheduled_task);
@@ -79,10 +87,15 @@ void mp_bluetooth_hci_systick(uint32_t ticks_ms) {
 
 #else // !MICROPY_PY_BLUETOOTH_USE_SYNC_EVENTS
 
+STATIC void mp_bluetooth_hci_poll_wrapper(void) {
+    bool reschedule;
+    mp_bluetooth_hci_poll(&reschedule);
+}
+
 // Called periodically (systick) or directly (e.g. uart irq).
 void mp_bluetooth_hci_systick(uint32_t ticks_ms) {
     if (ticks_ms == 0 || BLUETOOTH_HCI_TICK(ticks_ms)) {
-        pendsv_schedule_dispatch(PENDSV_DISPATCH_BLUETOOTH_HCI, mp_bluetooth_hci_poll);
+        pendsv_schedule_dispatch(PENDSV_DISPATCH_BLUETOOTH_HCI, mp_bluetooth_hci_poll_wrapper);
     }
 }
 

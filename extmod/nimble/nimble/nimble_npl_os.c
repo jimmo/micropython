@@ -179,53 +179,60 @@ int nimble_sprintf(char *str, const char *fmt, ...) {
 
 struct ble_npl_eventq *global_eventq = NULL;
 
+bool mp_bluetooth_nimble_os_eventq_available(void) {
+    if (mp_bluetooth_nimble_ble_state == MP_BLUETOOTH_NIMBLE_BLE_STATE_OFF) {
+        return false;
+    }
+
+    bool found = false;
+
+    os_sr_t sr;
+    OS_ENTER_CRITICAL(sr);
+    // Search all queues for an event.
+    for (struct ble_npl_eventq *evq = global_eventq; evq != NULL; evq = evq->nextq) {
+        if (evq->head) {
+            found = true;
+            break;
+        }
+    }
+    OS_EXIT_CRITICAL(sr);
+
+    return found;
+}
+
 // This must not be called recursively or concurrently with the UART handler.
-void mp_bluetooth_nimble_os_eventq_run_all(void) {
+void mp_bluetooth_nimble_os_eventq_run_next(void) {
     if (mp_bluetooth_nimble_ble_state == MP_BLUETOOTH_NIMBLE_BLE_STATE_OFF) {
         return;
     }
 
-    // Keep running while there are pending events.
-    while (true) {
-        struct ble_npl_event *ev = NULL;
+    struct ble_npl_event *ev = NULL;
 
-        os_sr_t sr;
-        OS_ENTER_CRITICAL(sr);
-        // Search all queues for an event.
-        for (struct ble_npl_eventq *evq = global_eventq; evq != NULL; evq = evq->nextq) {
-            ev = evq->head;
-            if (ev) {
-                // Remove this event from the queue.
-                evq->head = ev->next;
-                if (ev->next) {
-                    ev->next->prev = NULL;
-                    ev->next = NULL;
-                }
-                ev->prev = NULL;
-
-                ev->pending = false;
-
-                // Stop searching and execute this event.
-                break;
+    os_sr_t sr;
+    OS_ENTER_CRITICAL(sr);
+    // Search all queues for an event.
+    for (struct ble_npl_eventq *evq = global_eventq; evq != NULL; evq = evq->nextq) {
+        ev = evq->head;
+        if (ev) {
+            // Remove this event from the queue.
+            evq->head = ev->next;
+            if (ev->next) {
+                ev->next->prev = NULL;
+                ev->next = NULL;
             }
-        }
-        OS_EXIT_CRITICAL(sr);
+            ev->prev = NULL;
 
-        if (!ev) {
+            // Stop searching and execute this event.
             break;
         }
+    }
+    OS_EXIT_CRITICAL(sr);
 
+    if (ev) {
         // Run the event handler.
         DEBUG_EVENT_printf("event_run(%p)\n", ev);
         ev->fn(ev);
         DEBUG_EVENT_printf("event_run(%p) done\n", ev);
-
-        if (ev->pending) {
-            // If this event has been re-enqueued while it was running, then
-            // stop running further events. This prevents an infinite loop
-            // where the reset event re-enqueues itself on HCI timeout.
-            break;
-        }
     }
 }
 

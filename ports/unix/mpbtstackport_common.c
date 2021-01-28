@@ -41,7 +41,9 @@
 #include "mpbtstackport.h"
 
 // Called by the UART polling thread in mpbthciport.c, or by the USB polling thread in mpbtstackport_usb.c.
-bool mp_bluetooth_hci_poll(void) {
+bool mp_bluetooth_hci_poll(bool *reschedule) {
+    *reschedule = false;
+
     if (mp_bluetooth_btstack_state == MP_BLUETOOTH_BTSTACK_STATE_STARTING || mp_bluetooth_btstack_state == MP_BLUETOOTH_BTSTACK_STATE_ACTIVE || mp_bluetooth_btstack_state == MP_BLUETOOTH_BTSTACK_STATE_HALTING) {
         // Pretend like we're running in IRQ context (i.e. other things can't be running at the same time).
         mp_uint_t atomic_state = MICROPY_BEGIN_ATOMIC_SECTION();

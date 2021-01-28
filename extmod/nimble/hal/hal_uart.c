@@ -80,8 +80,16 @@ int hal_uart_close(uint32_t port) {
     return 0; // success
 }
 
-void mp_bluetooth_nimble_hci_uart_process(bool run_events) {
+// run_events will be true if we're being invoked from the scheduler, in which
+// case we process UART data until we get any event, and run it.
+// If we're being invoked from ble_npl_sem_pend, then just process as much
+// UART data as possible.
+// Return true if we should attempt to do more processing ASAP (i.e. there's
+// either UART data or events ready).
+bool mp_bluetooth_nimble_hci_uart_process(bool run_events) {
     bool host_wake = mp_bluetooth_hci_controller_woken();
+
+    bool reschedule = false;
 
     int chr;
     while ((chr = mp_bluetooth_hci_uart_readchar()) >= 0) {
@@ -92,14 +100,30 @@ void mp_bluetooth_nimble_hci_uart_process(bool run_events) {
 
         // Incoming data may result in events being enqueued. If we're in
         // scheduler context then we can run those events immediately.
-        if (run_events) {
-            mp_bluetooth_nimble_os_eventq_run_all();
+        if (run_events && mp_bluetooth_nimble_os_eventq_available()) {
+            // Assume that there might be more UART data we'll need to come back for.
+            // TODO: Consider a mp_bluetooth_hci_uart_peek() ?
+            reschedule = true;
+            break;
+        }
+    }
+
+    // Run an event, if available.
+    if (run_events) {
+        mp_bluetooth_nimble_os_eventq_run_next();
+
+        // See if there's more events that need handling (if we're not already
+        // rescheduling for more UART data).
+        if (!reschedule) {
+            reschedule = mp_bluetooth_nimble_os_eventq_available();
         }
     }
 
     if (host_wake) {
         mp_bluetooth_hci_controller_sleep_maybe();
     }
+
+    return reschedule;
 }
 
 #endif // MICROPY_PY_BLUETOOTH && MICROPY_BLUETOOTH_NIMBLE
