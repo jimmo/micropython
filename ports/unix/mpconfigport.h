@@ -235,7 +235,7 @@ extern const struct _mp_obj_module_t mp_module_jni;
 #else
 #define MICROPY_PY_SOCKET_DEF
 #endif
-#if MICROPY_PY_USELECT_POSIX
+#if MICROPY_PY_USELECT_POSIX || MICROPY_PY_USELECT
 #define MICROPY_PY_USELECT_DEF { MP_ROM_QSTR(MP_QSTR_uselect), MP_ROM_PTR(&mp_module_uselect) },
 #else
 #define MICROPY_PY_USELECT_DEF
