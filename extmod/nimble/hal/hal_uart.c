@@ -34,6 +34,7 @@
 #if MICROPY_PY_BLUETOOTH && MICROPY_BLUETOOTH_NIMBLE
 
 #define HCI_TRACE (0)
+#include <stdio.h>
 
 static hal_uart_tx_cb_t hal_uart_tx_cb;
 static void *hal_uart_tx_arg;

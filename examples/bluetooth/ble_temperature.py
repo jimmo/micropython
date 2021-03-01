@@ -7,6 +7,8 @@ import bluetooth
 import random
 import struct
 import time
+import machine
+import pyb
 from ble_advertising import advertising_payload
 
 from micropython import const
@@ -73,8 +75,10 @@ class BLETemperature:
                     # Indicate connected centrals.
                     self._ble.gatts_indicate(conn_handle, self._handle)
 
-    def _advertise(self, interval_us=500000):
+    def _advertise(self, interval_us=20000):
         self._ble.gap_advertise(interval_us, adv_data=self._payload)
+
+sw = pyb.Switch()
 
 
 def demo():
@@ -90,8 +94,15 @@ def demo():
         temp.set_temperature(t, notify=i == 0, indicate=False)
         # Random walk the temperature.
         t += random.uniform(-0.5, 0.5)
-        time.sleep_ms(1000)
+        #time.sleep_ms(1000)
+        print('sleep')
+        machine.lightsleep(10)
+        #time.sleep_ms(500)
+        print('wake')
+        if sw.value():
+            break
 
 
 if __name__ == "__main__":
-    demo()
+    while True:
+        demo()

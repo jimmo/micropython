@@ -49,3 +49,14 @@
 // Bluetooth config
 #define MICROPY_HW_BLE_UART_ID       (0)
 #define MICROPY_HW_BLE_UART_BAUDRATE (115200)
+
+
+// UART buses
+#define MICROPY_HW_UART1_TX         (pin_B6)
+#define MICROPY_HW_UART1_RX         (pin_B7)
+
+#define MICROPY_HW_UART_REPL        PYB_UART_1
+#define MICROPY_HW_UART_REPL_BAUD   115200
+
+#define C2_DEBUG_BLE_CMD_RX GPIOA, LL_GPIO_PIN_4
+

@@ -38,6 +38,7 @@
 #if defined(STM32WB)
 
 #include "stm32wbxx_ll_ipcc.h"
+#include "stm32wbxx_ll_gpio.h"
 
 #if MICROPY_PY_BLUETOOTH
 
@@ -72,6 +73,7 @@
 #define OCF_WRITE_CONFIG                  (0x0c)
 #define OCF_SET_TX_POWER                  (0x0f)
 #define OCF_BLE_INIT                      (0x66)
+#define OCF_C2_DEBUG_INIT                 (0x68)
 #define OCF_C2_FLASH_ERASE_ACTIVITY       (0x69)
 #define OCF_C2_SET_FLASH_ACTIVITY_CONTROL (0x73)
 
@@ -535,7 +537,89 @@ void rfcore_init(void) {
     PWR->CR4 |= PWR_CR4_C2BOOT;
 }
 
-static const struct {
+#define NBR_OF_TRACES_CONFIG_PARAMETERS (4)
+
+static const struct __attribute__((packed)) {
+  uint8_t thread_config;
+  uint8_t ble_config;
+  uint8_t mac_802_15_4_config;
+  uint8_t zigbee_config;
+} c2_debug_traces_config = { 0, 0, 0, 0 };
+
+#define NBR_OF_GENERAL_CONFIG_PARAMETERS (4)
+
+static const struct __attribute__((packed)) {
+  uint8_t ble_dtb_cfg;
+  uint8_t reserved[3];
+} c2_debug_general_config = { 0, { 0, 0, 0 } };
+
+#define GPIO_CFG_NBR_OF_FEATURES (34)
+
+typedef struct __attribute__((packed)) {
+  GPIO_TypeDef* port;
+  uint16_t pin;
+  uint8_t enable;
+  uint8_t reserved;
+} c2_debug_gpio_config_t;
+
+static const c2_debug_gpio_config_t c2_debug_gpio_config[GPIO_CFG_NBR_OF_FEATURES] = {
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // BLE_ISR - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // BLE_STACK_TICK - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // BLE_CMD_PROCESS - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // BLE_ACL_DATA_PROCESS - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // SYS_CMD_PROCESS - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // RNG_PROCESS - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // NVM_PROCESS - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // IPCC_GENERAL - Set on Entry / Reset on Exit
+    { C2_DEBUG_BLE_CMD_RX, 1, 0},  // IPCC_BLE_CMD_RX - Set on Entry / Reset on Exit              // Blue
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // IPCC_BLE_EVT_TX - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // IPCC_BLE_ACL_DATA_RX - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // IPCC_SYS_CMD_RX - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // IPCC_SYS_EVT_TX - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // IPCC_CLI_CMD_RX - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // IPCC_OT_CMD_RX - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // IPCC_OT_ACK_TX - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // IPCC_CLI_ACK_TX - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // IPCC_MEM_MANAGER_RX - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // IPCC_TRACES_TX - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // HARD_FAULT - Set on Entry / Reset on Exit
+// From v1.1.1
+    { GPIOB, LL_GPIO_PIN_1, 1, 0},  // IP_CORE_LP_STATUS - Set on Entry / Reset on Exit           // Red
+// From v1.2.0
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // END_OF_CONNECTION_EVENT - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // TIMER_SERVER_CALLBACK - Toggle on Entry
+    { GPIOB, LL_GPIO_PIN_0, 1, 0},  // PES_ACTIVITY - Set on Entry / Reset on Exit                // Green
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // MB_BLE_SEND_EVT - Set on Entry / Reset on Exit
+// From v1.3.0
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // BLE_NO_DELAY - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // BLE_STACK_STORE_NVM_CB - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // NVMA_WRITE_ONGOING - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // NVMA_WRITE_COMPLETE - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // NVMA_CLEANUP - Set on Entry / Reset on Exit
+// From v1.4.0
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // NVMA_START - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // FLASH_EOP - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // FLASH_WRITE - Set on Entry / Reset on Exit
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  // FLASH_ERASE - Set on Entry / Reset on Exit
+};
+
+static const struct __attribute__((packed)) {
+  uint8_t *pGpioConfig;
+  uint8_t *pTracesConfig;
+  uint8_t *pGeneralConfig;
+  uint8_t GpioConfigSize;
+  uint8_t TracesConfigSize;
+  uint8_t GeneralConfigSize;
+} c2_debug_init_params = {
+    (uint8_t *)&c2_debug_gpio_config,
+    (uint8_t *)&c2_debug_traces_config,
+    (uint8_t *)&c2_debug_general_config,
+    GPIO_CFG_NBR_OF_FEATURES,
+    NBR_OF_TRACES_CONFIG_PARAMETERS,
+    NBR_OF_GENERAL_CONFIG_PARAMETERS
+};
+
+static const struct __attribute__((packed)) {
     uint8_t *pBleBufferAddress;     // unused
     uint32_t BleBufferSize;         // unused
     uint16_t NumAttrRecord;
@@ -580,6 +664,9 @@ void rfcore_ble_init(void) {
 
     // Clear any outstanding messages from ipcc_init.
     tl_check_msg(&ipcc_mem_sys_queue, IPCC_CH_SYS, NULL);
+
+    // Enable C2 debug.
+    tl_sys_hci_cmd_resp(HCI_OPCODE(OGF_VENDOR, OCF_C2_DEBUG_INIT), (const uint8_t *)&c2_debug_init_params, sizeof(c2_debug_init_params), 0);
 
     // Configure and reset the BLE controller.
     tl_sys_hci_cmd_resp(HCI_OPCODE(OGF_VENDOR, OCF_BLE_INIT), (const uint8_t *)&ble_init_params, sizeof(ble_init_params), 0);

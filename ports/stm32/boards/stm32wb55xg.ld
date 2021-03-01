@@ -51,6 +51,7 @@ SECTIONS
     {
         . = ALIGN(4);
         *rfcore.o(.bss.ipcc_membuf_*)
+        *rfcore.o(.bss.c2_debug_*)
         . = ALIGN(4);
     } >RAM2B
 }
