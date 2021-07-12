@@ -602,3 +602,10 @@ mp_obj_t mp_generic_unary_op(mp_unary_op_t op, mp_obj_t o_in) {
             return MP_OBJ_NULL;      // op not supported
     }
 }
+
+mp_extra_fun_t mp_type_getextra(const mp_obj_type_t *type) {
+    if (!(type->flags & MP_TYPE_FLAG_EXTRA_SLOTS)) {
+        return NULL;
+    }
+    return type->MP_TYPE_EXTRA;
+}

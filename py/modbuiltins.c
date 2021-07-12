@@ -433,6 +433,7 @@ STATIC mp_obj_t mp_builtin_print(size_t n_args, const mp_obj_t *pos_args, mp_map
             mp_print_strn(&mp_plat_print, sep_data, u.len[0], 0, 0, 0);
             #endif
         }
+        mp_do_extra(pos_args[i]);
         #if MICROPY_PY_IO && MICROPY_PY_SYS_STDFILES
         mp_obj_print_helper(&print, pos_args[i], PRINT_STR);
         #else
