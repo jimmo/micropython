@@ -1569,3 +1569,10 @@ NORETURN void mp_raise_recursion_depth(void) {
         MP_OBJ_NEW_QSTR(MP_QSTR_maximum_space_recursion_space_depth_space_exceeded)));
 }
 #endif
+
+void mp_do_extra(mp_obj_t o) {
+    const mp_obj_type_t *type = mp_obj_get_type(o);
+    if (type->slot_index[MP_TYPE_SLOT_EXTRA]) {
+        ((mp_extra_fun_t)type->slot[type->slot_index[MP_TYPE_SLOT_EXTRA]])();
+    }
+}
