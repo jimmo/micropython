@@ -523,6 +523,10 @@ typedef struct _mp_buffer_p_t {
 bool mp_get_buffer(mp_obj_t obj, mp_buffer_info_t *bufinfo, mp_uint_t flags);
 void mp_get_buffer_raise(mp_obj_t obj, mp_buffer_info_t *bufinfo, mp_uint_t flags);
 
+
+#define MP_TYPE_SLOT_EXTRA 1
+typedef void (*mp_extra_fun_t)(void);
+
 struct _mp_obj_type_t {
     // A type is an object so must start with this entry, which points to mp_type_type.
     mp_obj_base_t base;
@@ -590,6 +594,13 @@ struct _mp_obj_type_t {
 
     // A dict mapping qstrs to objects local methods/constants/etc.
     struct _mp_obj_dict_t *locals_dict;
+
+    const int slot_none:4;
+    const int slot_extra:4;
+    const int slot_extra2:4;
+    const int slot_extra3:4;
+
+    const void* slot[];
 };
 
 // Constant types, globally accessible

@@ -447,6 +447,16 @@ STATIC const mp_rom_map_elem_t list_locals_dict_table[] = {
 
 STATIC MP_DEFINE_CONST_DICT(list_locals_dict, list_locals_dict_table);
 
+#include <stdio.h>
+
+void list_extra(void) {
+    printf("hello list\n");
+}
+
+void list_extra3(void) {
+    printf("hello list\n");
+}
+
 const mp_obj_type_t mp_type_list = {
     { &mp_type_type },
     .name = MP_QSTR_list,
@@ -457,6 +467,9 @@ const mp_obj_type_t mp_type_list = {
     .subscr = list_subscr,
     .getiter = list_getiter,
     .locals_dict = (mp_obj_dict_t *)&list_locals_dict,
+    .slot_extra = 1,
+    .slot_extra3 = 2,
+    .slot = {NULL, &list_extra, &list_extra3},
 };
 
 void mp_obj_list_init(mp_obj_list_t *o, size_t n) {

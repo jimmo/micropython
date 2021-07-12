@@ -208,4 +208,6 @@ void mp_warning(const char *category, const char *msg, ...);
 #define mp_warning(...)
 #endif
 
+void mp_do_extra(mp_obj_t t);
+
 #endif // MICROPY_INCLUDED_PY_RUNTIME_H
