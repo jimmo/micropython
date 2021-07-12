@@ -463,8 +463,7 @@ const mp_obj_type_t mp_type_list = {
     .subscr = list_subscr,
     .getiter = list_getiter,
     .locals_dict = (mp_obj_dict_t *)&list_locals_dict,
-    .slot_index = {[MP_TYPE_SLOT_EXTRA]=1},
-    .slot = {NULL, &list_extra},
+    .extra = list_extra,
 };
 
 void mp_obj_list_init(mp_obj_list_t *o, size_t n) {

@@ -1571,9 +1571,8 @@ NORETURN void mp_raise_recursion_depth(void) {
 #endif
 
 void mp_do_extra(mp_obj_t o) {
-    printf("mp_do_extra\n");
     const mp_obj_type_t *type = mp_obj_get_type(o);
-    if (type->slot_index[MP_TYPE_SLOT_EXTRA]) {
-        ((mp_extra_fun_t)type->slot[MP_TYPE_SLOT_EXTRA])();
+    if (type->extra) {
+        type->extra();
     }
 }
