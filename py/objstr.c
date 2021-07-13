@@ -1940,6 +1940,98 @@ mp_int_t mp_obj_str_get_buffer(mp_obj_t self_in, mp_buffer_info_t *bufinfo, mp_u
     }
 }
 
+#if MICROPY_PY_UBINASCII
+// When modubinascii is enabled, this provides the implementation of
+// binascii.hexlify and binascii.unhexlify. While it's enabled, also provide
+// bytes.hex, bytes.fromhex, bytearray.hex, and memoryview.hex.
+
+// Note: When unicode is disabled, str == bytes, so we will incorrectly also
+// add str.hex and str.fromhex. Also we do not provide bytearray.fromhex.
+
+// In CPython, binascii.hexlify returns bytes, but bytes.hex returns str.
+
+STATIC mp_obj_t bytes_hex(size_t n_args, const mp_obj_t *args, const mp_obj_type_t *type) {
+    // First argument is the data to convert.
+    // Second argument is an optional separator to be used between values.
+    const char *sep = NULL;
+    mp_buffer_info_t bufinfo;
+    mp_get_buffer_raise(args[0], &bufinfo, MP_BUFFER_READ);
+
+    // Code below assumes non-zero buffer length when computing size with
+    // separator, so handle the zero-length case here.
+    if (bufinfo.len == 0) {
+        return mp_const_empty_bytes;
+    }
+
+    vstr_t vstr;
+    size_t out_len = bufinfo.len * 2;
+    if (n_args > 1) {
+        // 1-char separator between hex numbers
+        out_len += bufinfo.len - 1;
+        sep = mp_obj_str_get_str(args[1]);
+    }
+    vstr_init_len(&vstr, out_len);
+    byte *in = bufinfo.buf, *out = (byte *)vstr.buf;
+    for (mp_uint_t i = bufinfo.len; i--;) {
+        byte d = (*in >> 4);
+        if (d > 9) {
+            d += 'a' - '9' - 1;
+        }
+        *out++ = d + '0';
+        d = (*in++ & 0xf);
+        if (d > 9) {
+            d += 'a' - '9' - 1;
+        }
+        *out++ = d + '0';
+        if (sep != NULL && i != 0) {
+            *out++ = *sep;
+        }
+    }
+    return mp_obj_new_str_from_vstr(type, &vstr);
+}
+
+STATIC mp_obj_t bytes_hex_as_bytes(size_t n_args, const mp_obj_t *args) {
+    return bytes_hex(n_args, args, &mp_type_bytes);
+}
+MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(bytes_hex_as_bytes_obj, 1, 2, bytes_hex_as_bytes);
+
+STATIC mp_obj_t bytes_hex_as_str(size_t n_args, const mp_obj_t *args) {
+    return bytes_hex(n_args, args, &mp_type_str);
+}
+MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(bytes_hex_as_str_obj, 1, 2, bytes_hex_as_str);
+
+STATIC mp_obj_t bytes_fromhex(mp_obj_t data) {
+    mp_buffer_info_t bufinfo;
+    mp_get_buffer_raise(data, &bufinfo, MP_BUFFER_READ);
+
+    if ((bufinfo.len & 1) != 0) {
+        mp_raise_ValueError(MP_ERROR_TEXT("odd-length string"));
+    }
+    vstr_t vstr;
+    vstr_init_len(&vstr, bufinfo.len / 2);
+    byte *in = bufinfo.buf, *out = (byte *)vstr.buf;
+    byte hex_byte = 0;
+    for (mp_uint_t i = bufinfo.len; i--;) {
+        byte hex_ch = *in++;
+        if (unichar_isxdigit(hex_ch)) {
+            hex_byte += unichar_xdigit_value(hex_ch);
+        } else {
+            mp_raise_ValueError(MP_ERROR_TEXT("non-hex digit found"));
+        }
+        if (i & 1) {
+            hex_byte <<= 4;
+        } else {
+            *out++ = hex_byte;
+            hex_byte = 0;
+        }
+    }
+    return mp_obj_new_str_from_vstr(&mp_type_bytes, &vstr);
+}
+MP_DEFINE_CONST_FUN_OBJ_1(bytes_fromhex_obj, bytes_fromhex);
+STATIC MP_DEFINE_CONST_STATICMETHOD_OBJ(bytes_fromhex_staticmethod_obj, MP_ROM_PTR(&bytes_fromhex_obj));
+
+#endif // MICROPY_PY_UBINASCII
+
 STATIC const mp_rom_map_elem_t str8_locals_dict_table[] = {
     #if MICROPY_CPYTHON_COMPAT
     { MP_ROM_QSTR(MP_QSTR_decode), MP_ROM_PTR(&bytes_decode_obj) },
@@ -1986,6 +2078,10 @@ STATIC const mp_rom_map_elem_t str8_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_isdigit), MP_ROM_PTR(&str_isdigit_obj) },
     { MP_ROM_QSTR(MP_QSTR_isupper), MP_ROM_PTR(&str_isupper_obj) },
     { MP_ROM_QSTR(MP_QSTR_islower), MP_ROM_PTR(&str_islower_obj) },
+    #if MICROPY_PY_UBINASCII
+    { MP_ROM_QSTR(MP_QSTR_hex), MP_ROM_PTR(&bytes_hex_as_str_obj) },
+    { MP_ROM_QSTR(MP_QSTR_fromhex), MP_ROM_PTR(&bytes_fromhex_staticmethod_obj) },
+    #endif
 };
 
 STATIC MP_DEFINE_CONST_DICT(str8_locals_dict, str8_locals_dict_table);

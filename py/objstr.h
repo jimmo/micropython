@@ -104,4 +104,10 @@ MP_DECLARE_CONST_FUN_OBJ_1(str_isupper_obj);
 MP_DECLARE_CONST_FUN_OBJ_1(str_islower_obj);
 MP_DECLARE_CONST_FUN_OBJ_VAR_BETWEEN(bytes_decode_obj);
 
+#if MICROPY_PY_UBINASCII
+MP_DECLARE_CONST_FUN_OBJ_VAR_BETWEEN(bytes_hex_as_bytes_obj);
+MP_DECLARE_CONST_FUN_OBJ_VAR_BETWEEN(bytes_hex_as_str_obj);
+MP_DECLARE_CONST_FUN_OBJ_1(bytes_fromhex_obj);
+#endif
+
 #endif // MICROPY_INCLUDED_PY_OBJSTR_H

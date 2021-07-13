@@ -245,6 +245,11 @@ STATIC void memoryview_attr(mp_obj_t self_in, qstr attr, mp_obj_t *dest) {
         mp_obj_array_t *self = MP_OBJ_TO_PTR(self_in);
         dest[0] = MP_OBJ_NEW_SMALL_INT(mp_binary_get_size('@', self->typecode & TYPECODE_MASK, NULL));
     }
+    if (attr == MP_QSTR_hex) {
+        // If we're providing .attr, then .locals_dict is unused.
+        dest[0] = MP_OBJ_FROM_PTR(&bytes_hex_as_str_obj);
+        dest[1] = self_in;
+    }
 }
 #endif
 
@@ -571,10 +576,22 @@ STATIC const mp_rom_map_elem_t array_locals_dict_table[] = {
     #if MICROPY_CPYTHON_COMPAT
     { MP_ROM_QSTR(MP_QSTR_decode), MP_ROM_PTR(&bytes_decode_obj) },
     #endif
+    #if MICROPY_PY_UBINASCII
+    { MP_ROM_QSTR(MP_QSTR_hex), MP_ROM_PTR(&bytes_hex_as_str_obj) },
+    #endif
 };
 
 STATIC MP_DEFINE_CONST_DICT(array_locals_dict, array_locals_dict_table);
 #endif
+
+#if MICROPY_PY_BUILTINS_MEMORYVIEW && MICROPY_PY_UBINASCII && !MICROPY_PY_BUILTINS_MEMORYVIEW_ITEMSIZE
+STATIC const mp_rom_map_elem_t memoryview_locals_dict_table[] = {
+    { MP_ROM_QSTR(MP_QSTR_hex), MP_ROM_PTR(&bytes_hex_as_str_obj) },
+};
+
+STATIC MP_DEFINE_CONST_DICT(memoryview_locals_dict, memoryview_locals_dict_table);
+#endif
+
 
 #if MICROPY_PY_ARRAY
 const mp_obj_type_t mp_type_array = {
@@ -618,6 +635,8 @@ const mp_obj_type_t mp_type_memoryview = {
     .binary_op = array_binary_op,
     #if MICROPY_PY_BUILTINS_MEMORYVIEW_ITEMSIZE
     .attr = memoryview_attr,
+    #elif MICROPY_PY_UBINASCII
+    .locals_dict = (mp_obj_dict_t *)&memoryview_locals_dict,
     #endif
     .subscr = array_subscr,
     .buffer_p = { .get_buffer = array_get_buffer },
