@@ -161,10 +161,9 @@ STATIC const mp_rom_map_elem_t pyb_pwm_locals_dict_table[] = {
 
 STATIC MP_DEFINE_CONST_DICT(pyb_pwm_locals_dict, pyb_pwm_locals_dict_table);
 
-const mp_obj_type_t pyb_pwm_type = {
-    { &mp_type_type },
-    .name = MP_QSTR_PWM,
-    .print = pyb_pwm_print,
-    .make_new = pyb_pwm_make_new,
-    .locals_dict = (mp_obj_dict_t *)&pyb_pwm_locals_dict,
-};
+MP_DEFINE_CONST_OBJ_TYPE(
+    pyb_pwm_type, &mp_type_type, MP_QSTR_PWM, MP_TYPE_FLAG_NONE,
+    print, pyb_pwm_print,
+    make_new, pyb_pwm_make_new,
+    locals_dict, (mp_obj_dict_t *)&pyb_pwm_locals_dict
+    );
