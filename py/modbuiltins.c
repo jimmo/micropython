@@ -455,7 +455,7 @@ STATIC mp_obj_t mp_builtin___repl_print__(mp_obj_t o) {
         #if MICROPY_CAN_OVERRIDE_BUILTINS
         // Set "_" special variable
         mp_obj_t dest[2] = {MP_OBJ_SENTINEL, o};
-        mp_type_module.attr(MP_OBJ_FROM_PTR(&mp_module_builtins), MP_QSTR__, dest);
+        MP_OBJ_TYPE_GET_SLOT(&mp_type_module, attr)(MP_OBJ_FROM_PTR(&mp_module_builtins), MP_QSTR__, dest);
         #endif
     }
     return mp_const_none;
@@ -547,7 +547,7 @@ STATIC mp_obj_t mp_builtin_sorted(size_t n_args, const mp_obj_t *args, mp_map_t 
     if (n_args > 1) {
         mp_raise_TypeError(MP_ERROR_TEXT("must use keyword argument for key function"));
     }
-    mp_obj_t self = mp_type_list.make_new(&mp_type_list, 1, 0, args);
+    mp_obj_t self = MP_OBJ_TYPE_GET_SLOT(&mp_type_list, make_new)(&mp_type_list, 1, 0, args);
     mp_obj_list_sort(1, &self, kwargs);
 
     return self;

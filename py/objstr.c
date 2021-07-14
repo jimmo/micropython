@@ -463,7 +463,7 @@ STATIC mp_obj_t str_join(mp_obj_t self_in, mp_obj_t arg) {
     if (!mp_obj_is_type(arg, &mp_type_list) && !mp_obj_is_type(arg, &mp_type_tuple)) {
         // arg is not a list nor a tuple, try to convert it to a list
         // TODO: Try to optimize?
-        arg = mp_type_list.make_new(&mp_type_list, 1, 0, &arg);
+        arg = MP_OBJ_TYPE_GET_SLOT(&mp_type_list, make_new)(&mp_type_list, 1, 0, &arg);
     }
     mp_obj_get_array(arg, &seq_len, &seq_items);
 

@@ -278,8 +278,8 @@ mp_obj_t mp_unary_op(mp_unary_op_t op, mp_obj_t arg) {
         return MP_OBJ_NEW_SMALL_INT(h);
     } else {
         const mp_obj_type_t *type = mp_obj_get_type(arg);
-        if (type->unary_op != NULL) {
-            mp_obj_t result = type->unary_op(op, arg);
+        if (MP_OBJ_TYPE_HAS_SLOT(type, unary_op)) {
+            mp_obj_t result = MP_OBJ_TYPE_GET_SLOT(type, unary_op)(op, arg);
             if (result != MP_OBJ_NULL) {
                 return result;
             }
@@ -569,8 +569,8 @@ mp_obj_t mp_binary_op(mp_binary_op_t op, mp_obj_t lhs, mp_obj_t rhs) {
     const mp_obj_type_t *type;
 generic_binary_op:
     type = mp_obj_get_type(lhs);
-    if (type->binary_op != NULL) {
-        mp_obj_t result = type->binary_op(op, lhs, rhs);
+    if (MP_OBJ_TYPE_HAS_SLOT(type, binary_op)) {
+        mp_obj_t result = MP_OBJ_TYPE_GET_SLOT(type, binary_op)(op, lhs, rhs);
         if (result != MP_OBJ_NULL) {
             return result;
         }
@@ -645,8 +645,8 @@ mp_obj_t mp_call_function_n_kw(mp_obj_t fun_in, size_t n_args, size_t n_kw, cons
     const mp_obj_type_t *type = mp_obj_get_type(fun_in);
 
     // do the call
-    if (type->call != NULL) {
-        return type->call(fun_in, n_args, n_kw, args);
+    if (MP_OBJ_TYPE_HAS_SLOT(type, call)) {
+        return MP_OBJ_TYPE_GET_SLOT(type, call)(fun_in, n_args, n_kw, args);
     }
 
     #if MICROPY_ERROR_REPORTING <= MICROPY_ERROR_REPORTING_TERSE
@@ -1085,19 +1085,19 @@ void mp_load_method_maybe(mp_obj_t obj, qstr attr, mp_obj_t *dest) {
     }
     #endif
 
-    if (attr == MP_QSTR___next__ && type->iternext != NULL) {
+    if (attr == MP_QSTR___next__ && MP_OBJ_TYPE_HAS_SLOT(type, iternext)) {
         dest[0] = MP_OBJ_FROM_PTR(&mp_builtin_next_obj);
         dest[1] = obj;
 
-    } else if (type->attr != NULL) {
+    } else if (MP_OBJ_TYPE_HAS_SLOT(type, attr)) {
         // this type can do its own load, so call it
-        type->attr(obj, attr, dest);
+        MP_OBJ_TYPE_GET_SLOT(type, attr)(obj, attr, dest);
 
-    } else if (type->locals_dict != NULL) {
+    } else if (MP_OBJ_TYPE_HAS_SLOT(type, locals_dict)) {
         // generic method lookup
         // this is a lookup in the object (ie not class or type)
-        assert(type->locals_dict->base.type == &mp_type_dict); // MicroPython restriction, for now
-        mp_map_t *locals_map = &type->locals_dict->map;
+        assert(MP_OBJ_TYPE_GET_SLOT(type, locals_dict)->base.type == &mp_type_dict); // MicroPython restriction, for now
+        mp_map_t *locals_map = &MP_OBJ_TYPE_GET_SLOT(type, locals_dict)->map;
         mp_map_elem_t *elem = mp_map_lookup(locals_map, MP_OBJ_NEW_QSTR(attr), MP_MAP_LOOKUP);
         if (elem != NULL) {
             mp_convert_member_lookup(obj, type, elem->value, dest);
@@ -1148,9 +1148,9 @@ void mp_load_method_protected(mp_obj_t obj, qstr attr, mp_obj_t *dest, bool catc
 void mp_store_attr(mp_obj_t base, qstr attr, mp_obj_t value) {
     DEBUG_OP_printf("store attr %p.%s <- %p\n", base, qstr_str(attr), value);
     const mp_obj_type_t *type = mp_obj_get_type(base);
-    if (type->attr != NULL) {
+    if (MP_OBJ_TYPE_HAS_SLOT(type, attr)) {
         mp_obj_t dest[2] = {MP_OBJ_SENTINEL, value};
-        type->attr(base, attr, dest);
+        MP_OBJ_TYPE_GET_SLOT(type, attr)(base, attr, dest);
         if (dest[0] == MP_OBJ_NULL) {
             // success
             return;
@@ -1169,20 +1169,21 @@ mp_obj_t mp_getiter(mp_obj_t o_in, mp_obj_iter_buf_t *iter_buf) {
     assert(o_in);
     const mp_obj_type_t *type = mp_obj_get_type(o_in);
 
-    // Check for native getiter which is the identity.  We handle this case explicitly
-    // so we don't unnecessarily allocate any RAM for the iter_buf, which won't be used.
-    if (type->getiter == mp_identity_getiter) {
-        return o_in;
-    }
 
-    // check for native getiter (corresponds to __iter__)
-    if (type->getiter != NULL) {
-        if (iter_buf == NULL && type->getiter != mp_obj_instance_getiter) {
+    if (MP_OBJ_TYPE_HAS_SLOT(type, getiter)) {
+        // Check for native getiter which is the identity.  We handle this case explicitly
+        // so we don't unnecessarily allocate any RAM for the iter_buf, which won't be used.
+        if (MP_OBJ_TYPE_GET_SLOT(type, getiter) == mp_identity_getiter) {
+            return o_in;
+        }
+
+        // check for native getiter (corresponds to __iter__)
+        if (iter_buf == NULL && MP_OBJ_TYPE_GET_SLOT(type, getiter) != mp_obj_instance_getiter) {
             // if caller did not provide a buffer then allocate one on the heap
             // mp_obj_instance_getiter is special, it will allocate only if needed
             iter_buf = m_new_obj(mp_obj_iter_buf_t);
         }
-        mp_obj_t iter = type->getiter(o_in, iter_buf);
+        mp_obj_t iter = MP_OBJ_TYPE_GET_SLOT(type, getiter)(o_in, iter_buf);
         if (iter != MP_OBJ_NULL) {
             return iter;
         }
@@ -1214,8 +1215,8 @@ mp_obj_t mp_getiter(mp_obj_t o_in, mp_obj_iter_buf_t *iter_buf) {
 // may also raise StopIteration()
 mp_obj_t mp_iternext_allow_raise(mp_obj_t o_in) {
     const mp_obj_type_t *type = mp_obj_get_type(o_in);
-    if (type->iternext != NULL) {
-        return type->iternext(o_in);
+    if (MP_OBJ_TYPE_HAS_SLOT(type, iternext)) {
+        return MP_OBJ_TYPE_GET_SLOT(type, iternext)(o_in);
     } else {
         // check for __next__ method
         mp_obj_t dest[2];
@@ -1239,8 +1240,8 @@ mp_obj_t mp_iternext_allow_raise(mp_obj_t o_in) {
 mp_obj_t mp_iternext(mp_obj_t o_in) {
     MP_STACK_CHECK(); // enumerate, filter, map and zip can recursively call mp_iternext
     const mp_obj_type_t *type = mp_obj_get_type(o_in);
-    if (type->iternext != NULL) {
-        return type->iternext(o_in);
+    if (MP_OBJ_TYPE_HAS_SLOT(type, iternext)) {
+        return MP_OBJ_TYPE_GET_SLOT(type, iternext)(o_in);
     } else {
         // check for __next__ method
         mp_obj_t dest[2];
@@ -1279,8 +1280,8 @@ mp_vm_return_kind_t mp_resume(mp_obj_t self_in, mp_obj_t send_value, mp_obj_t th
         return mp_obj_gen_resume(self_in, send_value, throw_value, ret_val);
     }
 
-    if (type->iternext != NULL && send_value == mp_const_none) {
-        mp_obj_t ret = type->iternext(self_in);
+    if (MP_OBJ_TYPE_HAS_SLOT(type, iternext) && send_value == mp_const_none) {
+        mp_obj_t ret = MP_OBJ_TYPE_GET_SLOT(type, iternext)(self_in);
         *ret_val = ret;
         if (ret != MP_OBJ_STOP_ITERATION) {
             return MP_VM_RETURN_YIELD;
