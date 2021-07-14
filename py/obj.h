@@ -535,18 +535,18 @@ struct _mp_obj_type_t {
     uint16_t name;
 
     // Corresponds to __repr__ and __str__ special methods.
-    mp_print_fun_t print;
+    mp_print_fun_t xprint;
 
     // Corresponds to __new__ and __init__ special methods, to make an instance of the type.
-    mp_make_new_fun_t make_new;
+    mp_make_new_fun_t xmake_new;
 
     // Corresponds to __call__ special method, ie T(...).
-    mp_call_fun_t call;
+    mp_call_fun_t xcall;
 
     // Implements unary and binary operations.
     // Can return MP_OBJ_NULL if the operation is not supported.
-    mp_unary_op_fun_t unary_op;
-    mp_binary_op_fun_t binary_op;
+    mp_unary_op_fun_t xunary_op;
+    mp_binary_op_fun_t xbinary_op;
 
     // Implements load, store and delete attribute.
     //
@@ -559,57 +559,66 @@ struct _mp_obj_type_t {
     // dest[0,1] = {MP_OBJ_SENTINEL, object} means store
     //  return: for fail, do nothing
     //          for success set dest[0] = MP_OBJ_NULL
-    mp_attr_fun_t attr;
+    mp_attr_fun_t xattr;
 
     // Implements load, store and delete subscripting:
     //  - value = MP_OBJ_SENTINEL means load
     //  - value = MP_OBJ_NULL means delete
     //  - all other values mean store the value
     // Can return MP_OBJ_NULL if operation not supported.
-    mp_subscr_fun_t subscr;
+    mp_subscr_fun_t xsubscr;
 
     // Corresponds to __iter__ special method.
     // Can use the given mp_obj_iter_buf_t to store iterator object,
     // otherwise can return a pointer to an object on the heap.
-    mp_getiter_fun_t getiter;
+    mp_getiter_fun_t xgetiter;
 
     // Corresponds to __next__ special method.  May return MP_OBJ_STOP_ITERATION
     // as an optimisation instead of raising StopIteration() with no args.
-    mp_fun_1_t iternext;
+    mp_fun_1_t xiternext;
 
     // Implements the buffer protocol if supported by this type.
-    mp_buffer_p_t buffer_p;
+    mp_buffer_p_t xbuffer_p;
 
     // One of disjoint protocols (interfaces), like mp_stream_p_t, etc.
-    const void *protocol;
+    const void *xprotocol;
 
     // A pointer to the parents of this type:
     //  - 0 parents: pointer is NULL (object is implicitly the single parent)
     //  - 1 parent: a pointer to the type of that parent
     //  - 2 or more parents: pointer to a tuple object containing the parent types
-    const void *parent;
+    const void *xparent;
 
     // A dict mapping qstrs to objects local methods/constants/etc.
-    struct _mp_obj_dict_t *locals_dict;
+    struct _mp_obj_dict_t *xlocals_dict;
 };
 
 #define MP_DEFINE_CONST_OBJ_TYPE_0(_typename, _base, _name, _flags) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags }
-#define MP_DEFINE_CONST_OBJ_TYPE_1(_typename, _base, _name, _flags, f1, v1) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1 }
-#define MP_DEFINE_CONST_OBJ_TYPE_2(_typename, _base, _name, _flags, f1, v1, f2, v2) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2 }
-#define MP_DEFINE_CONST_OBJ_TYPE_3(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3 }
-#define MP_DEFINE_CONST_OBJ_TYPE_4(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4 }
-#define MP_DEFINE_CONST_OBJ_TYPE_5(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4, .f5 = v5 }
-#define MP_DEFINE_CONST_OBJ_TYPE_6(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4, .f5 = v5, .f6 = v6 }
-#define MP_DEFINE_CONST_OBJ_TYPE_7(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4, .f5 = v5, .f6 = v6, .f7 = v7 }
-#define MP_DEFINE_CONST_OBJ_TYPE_8(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4, .f5 = v5, .f6 = v6, .f7 = v7, .f8 = v8 }
-#define MP_DEFINE_CONST_OBJ_TYPE_9(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8, f9, v9) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4, .f5 = v5, .f6 = v6, .f7 = v7, .f8 = v8, .f9 = v9 }
-#define MP_DEFINE_CONST_OBJ_TYPE_10(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8, f9, v9, f10, v10) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4, .f5 = v5, .f6 = v6, .f7 = v7, .f8 = v8, .f9 = v9, .f10 = v10 }
-#define MP_DEFINE_CONST_OBJ_TYPE_11(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8, f9, v9, f10, v10, f11, v11) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4, .f5 = v5, .f6 = v6, .f7 = v7, .f8 = v8, .f9 = v9, .f10 = v10, .f11 = v11 }
-#define MP_DEFINE_CONST_OBJ_TYPE_12(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8, f9, v9, f10, v10, f11, v11, f12, v12) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4, .f5 = v5, .f6 = v6, .f7 = v7, .f8 = v8, .f9 = v9, .f10 = v10, .f11 = v11, .f12 = v12 }
-#define MP_DEFINE_CONST_OBJ_TYPE_13(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8, f9, v9, f10, v10, f11, v11, f12, v12, f13, v13) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4, .f5 = v5, .f6 = v6, .f7 = v7, .f8 = v8, .f9 = v9, .f10 = v10, .f11 = v11, .f12 = v12, .f13 = v13 }
+#define MP_DEFINE_CONST_OBJ_TYPE_1(_typename, _base, _name, _flags, f1, v1) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .x##f1 = v1 }
+#define MP_DEFINE_CONST_OBJ_TYPE_2(_typename, _base, _name, _flags, f1, v1, f2, v2) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .x##f1 = v1, .x##f2 = v2 }
+#define MP_DEFINE_CONST_OBJ_TYPE_3(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .x##f1 = v1, .x##f2 = v2, .x##f3 = v3 }
+#define MP_DEFINE_CONST_OBJ_TYPE_4(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .x##f1 = v1, .x##f2 = v2, .x##f3 = v3, .x##f4 = v4 }
+#define MP_DEFINE_CONST_OBJ_TYPE_5(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .x##f1 = v1, .x##f2 = v2, .x##f3 = v3, .x##f4 = v4, .x##f5 = v5 }
+#define MP_DEFINE_CONST_OBJ_TYPE_6(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .x##f1 = v1, .x##f2 = v2, .x##f3 = v3, .x##f4 = v4, .x##f5 = v5, .x##f6 = v6 }
+#define MP_DEFINE_CONST_OBJ_TYPE_7(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .x##f1 = v1, .x##f2 = v2, .x##f3 = v3, .x##f4 = v4, .x##f5 = v5, .x##f6 = v6, .x##f7 = v7 }
+#define MP_DEFINE_CONST_OBJ_TYPE_8(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .x##f1 = v1, .x##f2 = v2, .x##f3 = v3, .x##f4 = v4, .x##f5 = v5, .x##f6 = v6, .x##f7 = v7, .x##f8 = v8 }
+#define MP_DEFINE_CONST_OBJ_TYPE_9(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8, f9, v9) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .x##f1 = v1, .x##f2 = v2, .x##f3 = v3, .x##f4 = v4, .x##f5 = v5, .x##f6 = v6, .x##f7 = v7, .x##f8 = v8, .x##f9 = v9 }
+#define MP_DEFINE_CONST_OBJ_TYPE_10(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8, f9, v9, f10, v10) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .x##f1 = v1, .x##f2 = v2, .x##f3 = v3, .x##f4 = v4, .x##f5 = v5, .x##f6 = v6, .x##f7 = v7, .x##f8 = v8, .x##f9 = v9, .x##f10 = v10 }
+#define MP_DEFINE_CONST_OBJ_TYPE_11(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8, f9, v9, f10, v10, f11, v11) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .x##f1 = v1, .x##f2 = v2, .x##f3 = v3, .x##f4 = v4, .x##f5 = v5, .x##f6 = v6, .x##f7 = v7, .x##f8 = v8, .x##f9 = v9, .x##f10 = v10, .x##f11 = v11 }
+#define MP_DEFINE_CONST_OBJ_TYPE_12(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8, f9, v9, f10, v10, f11, v11, f12, v12) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .x##f1 = v1, .x##f2 = v2, .x##f3 = v3, .x##f4 = v4, .x##f5 = v5, .x##f6 = v6, .x##f7 = v7, .x##f8 = v8, .x##f9 = v9, .x##f10 = v10, .x##f11 = v11, .x##f12 = v12 }
+#define MP_DEFINE_CONST_OBJ_TYPE_13(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8, f9, v9, f10, v10, f11, v11, f12, v12, f13, v13) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .x##f1 = v1, .x##f2 = v2, .x##f3 = v3, .x##f4 = v4, .x##f5 = v5, .x##f6 = v6, .x##f7 = v7, .x##f8 = v8, .x##f9 = v9, .x##f10 = v10, .x##f11 = v11, .x##f12 = v12, .x##f13 = v13 }
 
 #define MP_DEFINE_CONST_OBJ_TYPE_IMPL(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31, N, ...) MP_DEFINE_CONST_OBJ_TYPE_##N
 #define MP_DEFINE_CONST_OBJ_TYPE(...) MP_DEFINE_CONST_OBJ_TYPE_IMPL(__VA_ARGS__, _INV, 13, _INV, 12, _INV, 11, _INV, 10, _INV, 9, _INV, 8, _INV, 7, _INV, 6, _INV, 5, _INV, 4, _INV, 3, _INV, 2, _INV, 1, _INV, 0, _INV, _INV, _INV)(__VA_ARGS__)
+
+// Always safe, checks if the type can and does have this slot.
+#define MP_OBJ_TYPE_HAS_SLOT(t, f) ((t)->x##f)
+// Requires you know that this type can have this slot.
+#define MP_OBJ_TYPE_GET_SLOT(t, f) ((t)->x##f)
+// Always safe, returns NULL if the type cannot have this slot.
+#define MP_OBJ_TYPE_GET_SLOT_OR_NULL(t, f) ((t)->x##f)
+#define MP_OBJ_TYPE_SET_SLOT(t, f, v) ((t)->x##f = v)
+#define MP_OBJ_TYPE_OFFSETOF_SLOT(t, f) (offsetof(mp_obj_type_t, x##f))
 
 // Constant types, globally accessible
 extern const mp_obj_type_t mp_type_type;
