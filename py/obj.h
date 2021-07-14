@@ -473,6 +473,7 @@ typedef mp_obj_t (*mp_fun_kw_t)(size_t n, const mp_obj_t *, mp_map_t *);
 // operator and not the __ne__ operator.  If it's set then __ne__ may be implemented.
 // If MP_TYPE_FLAG_BINDS_SELF is set then the type as a method binds self as the first arg.
 // If MP_TYPE_FLAG_BUILTIN_FUN is set then the type is a built-in function type.
+#define MP_TYPE_FLAG_NONE (0x0000)
 #define MP_TYPE_FLAG_IS_SUBCLASSED (0x0001)
 #define MP_TYPE_FLAG_HAS_SPECIAL_ACCESSORS (0x0002)
 #define MP_TYPE_FLAG_EQ_NOT_REFLEXIVE (0x0004)
@@ -591,6 +592,24 @@ struct _mp_obj_type_t {
     // A dict mapping qstrs to objects local methods/constants/etc.
     struct _mp_obj_dict_t *locals_dict;
 };
+
+#define MP_DEFINE_CONST_OBJ_TYPE_0(_typename, _base, _name, _flags) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags }
+#define MP_DEFINE_CONST_OBJ_TYPE_1(_typename, _base, _name, _flags, f1, v1) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1 }
+#define MP_DEFINE_CONST_OBJ_TYPE_2(_typename, _base, _name, _flags, f1, v1, f2, v2) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2 }
+#define MP_DEFINE_CONST_OBJ_TYPE_3(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3 }
+#define MP_DEFINE_CONST_OBJ_TYPE_4(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4 }
+#define MP_DEFINE_CONST_OBJ_TYPE_5(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4, .f5 = v5 }
+#define MP_DEFINE_CONST_OBJ_TYPE_6(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4, .f5 = v5, .f6 = v6 }
+#define MP_DEFINE_CONST_OBJ_TYPE_7(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4, .f5 = v5, .f6 = v6, .f7 = v7 }
+#define MP_DEFINE_CONST_OBJ_TYPE_8(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4, .f5 = v5, .f6 = v6, .f7 = v7, .f8 = v8 }
+#define MP_DEFINE_CONST_OBJ_TYPE_9(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8, f9, v9) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4, .f5 = v5, .f6 = v6, .f7 = v7, .f8 = v8, .f9 = v9 }
+#define MP_DEFINE_CONST_OBJ_TYPE_10(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8, f9, v9, f10, v10) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4, .f5 = v5, .f6 = v6, .f7 = v7, .f8 = v8, .f9 = v9, .f10 = v10 }
+#define MP_DEFINE_CONST_OBJ_TYPE_11(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8, f9, v9, f10, v10, f11, v11) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4, .f5 = v5, .f6 = v6, .f7 = v7, .f8 = v8, .f9 = v9, .f10 = v10, .f11 = v11 }
+#define MP_DEFINE_CONST_OBJ_TYPE_12(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8, f9, v9, f10, v10, f11, v11, f12, v12) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4, .f5 = v5, .f6 = v6, .f7 = v7, .f8 = v8, .f9 = v9, .f10 = v10, .f11 = v11, .f12 = v12 }
+#define MP_DEFINE_CONST_OBJ_TYPE_13(_typename, _base, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8, f9, v9, f10, v10, f11, v11, f12, v12, f13, v13) const mp_obj_type_t _typename = { .base = { _base }, .name = _name, .flags = _flags, .f1 = v1, .f2 = v2, .f3 = v3, .f4 = v4, .f5 = v5, .f6 = v6, .f7 = v7, .f8 = v8, .f9 = v9, .f10 = v10, .f11 = v11, .f12 = v12, .f13 = v13 }
+
+#define MP_DEFINE_CONST_OBJ_TYPE_IMPL(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31, N, ...) MP_DEFINE_CONST_OBJ_TYPE_##N
+#define MP_DEFINE_CONST_OBJ_TYPE(...) MP_DEFINE_CONST_OBJ_TYPE_IMPL(__VA_ARGS__, _INV, 13, _INV, 12, _INV, 11, _INV, 10, _INV, 9, _INV, 8, _INV, 7, _INV, 6, _INV, 5, _INV, 4, _INV, 3, _INV, 2, _INV, 1, _INV, 0, _INV, _INV, _INV)(__VA_ARGS__)
 
 // Constant types, globally accessible
 extern const mp_obj_type_t mp_type_type;
