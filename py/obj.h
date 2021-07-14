@@ -611,6 +611,15 @@ struct _mp_obj_type_t {
 #define _MP_DEFINE_CONST_OBJ_TYPE_IMPL(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, N, ...) _MP_DEFINE_CONST_OBJ_TYPE_##N
 #define MP_DEFINE_CONST_OBJ_TYPE(...) _MP_DEFINE_CONST_OBJ_TYPE_EXPAND(_MP_DEFINE_CONST_OBJ_TYPE_IMPL(__VA_ARGS__, _INV, 12, _INV, 11, _INV, 10, _INV, 9, _INV, 8, _INV, 7, _INV, 6, _INV, 5, _INV, 4, _INV, 3, _INV, 2, _INV, 1, _INV, 0, _INV, _INV, _INV)(__VA_ARGS__))
 
+// Always safe, checks if the type can and does have this slot.
+#define MP_OBJ_TYPE_HAS_SLOT(t, f) ((t)->f)
+// Requires you know that this type can have this slot.
+#define MP_OBJ_TYPE_GET_SLOT(t, f) ((t)->f)
+// Always safe, returns NULL if the type cannot have this slot.
+#define MP_OBJ_TYPE_GET_SLOT_OR_NULL(t, f) ((t)->f)
+#define MP_OBJ_TYPE_SET_SLOT(t, f, v) ((t)->f = v)
+#define MP_OBJ_TYPE_OFFSETOF_SLOT(t, f) (offsetof(mp_obj_type_t, f))
+
 // Constant types, globally accessible
 extern const mp_obj_type_t mp_type_type;
 extern const mp_obj_type_t mp_type_object;
