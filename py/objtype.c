@@ -1141,6 +1141,10 @@ mp_obj_t mp_obj_new_type(qstr name, mp_obj_t bases_tuple, mp_obj_t locals_dict) 
     mp_obj_type_t *o = (mp_obj_type_t *)m_malloc0(sizeof(mp_obj_type_t) + MICROPY_OBJ_TYPE_EXTRA_ALLOC);
     o->base.type = &mp_type_type;
     o->flags = base_flags
+        #if MICROPY_OBJ_TYPE_REPR == MICROPY_OBJ_TYPE_REPR_SPLIT
+        | MP_OBJ_TYPE_FLAG_EXTENDED
+        #endif
+    ;
     o->name = name;
     o->make_new = mp_obj_instance_make_new;
     MP_OBJ_TYPE_SET_SLOT(o, print, instance_print, 1);
