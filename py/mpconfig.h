@@ -120,6 +120,17 @@
 #define MICROPY_OBJ_IMMEDIATE_OBJS (MICROPY_OBJ_REPR != MICROPY_OBJ_REPR_D)
 #endif
 
+#define MICROPY_OBJ_TYPE_REPR_FULL (0)
+#define MICROPY_OBJ_TYPE_REPR_SLOT_INDEX (1)
+
+#ifndef MICROPY_OBJ_TYPE_REPR
+#define MICROPY_OBJ_TYPE_REPR (MICROPY_OBJ_TYPE_REPR_FULL)
+#endif
+
+#ifndef MICROPY_OBJ_TYPE_SLOT_INDEX_BITS
+#define MICROPY_OBJ_TYPE_SLOT_INDEX_BITS (8)
+#endif
+
 /*****************************************************************************/
 /* Memory allocation policy                                                  */
 
