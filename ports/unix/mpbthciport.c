@@ -143,7 +143,7 @@ STATIC int configure_uart(void) {
     toptions.c_cflag |= CRTSCTS;
 
     // 1Mbit (TODO: make this configurable).
-    speed_t brate = B1000000;
+    speed_t brate = B115200;
     cfsetospeed(&toptions, brate);
     cfsetispeed(&toptions, brate);
 

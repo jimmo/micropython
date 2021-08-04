@@ -50,6 +50,7 @@ STATIC const mp_rom_map_elem_t stm_module_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR_rfcore_status), MP_ROM_PTR(&rfcore_status_obj) },
     { MP_ROM_QSTR(MP_QSTR_rfcore_fw_version), MP_ROM_PTR(&rfcore_fw_version_obj) },
     { MP_ROM_QSTR(MP_QSTR_rfcore_sys_hci), MP_ROM_PTR(&rfcore_sys_hci_obj) },
+    { MP_ROM_QSTR(MP_QSTR_rfcore_transparent), MP_ROM_PTR(&rfcore_transparent_obj) },
     #endif
 };
 

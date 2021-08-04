@@ -84,6 +84,8 @@ class BLETemperatureCentral:
         self._end_handle = None
         self._value_handle = None
 
+        self._discovery_done = False
+
     def _irq(self, event, data):
         if event == _IRQ_SCAN_RESULT:
             addr_type, addr, adv_type, rssi, adv_data = data
@@ -152,6 +154,8 @@ class BLETemperatureCentral:
             else:
                 print("Failed to find temperature characteristic.")
 
+            self._discovery_done = True
+
         elif event == _IRQ_GATTC_READ_RESULT:
             # A read completed successfully.
             conn_handle, value_handle, char_data = data
@@ -175,7 +179,7 @@ class BLETemperatureCentral:
 
     # Returns true if we've successfully connected and discovered characteristics.
     def is_connected(self):
-        return self._conn_handle is not None and self._value_handle is not None
+        return self._conn_handle is not None and self._value_handle is not None and self._discovery_done
 
     # Find a device advertising the environmental sensor service.
     def scan(self, callback=None):
@@ -246,12 +250,14 @@ def demo():
 
     print("Connected")
 
+    # time.sleep_ms(100)
+
     # Explicitly issue reads, using "print" as the callback.
     while central.is_connected():
         central.read(callback=print)
         time.sleep_ms(2000)
 
-    # Alternative to the above, just show the most recently notified value.
+    # # Alternative to the above, just show the most recently notified value.
     # while central.is_connected():
     #     print(central.value())
     #     time.sleep_ms(2000)

@@ -39,6 +39,7 @@ class BLETemperature:
     def __init__(self, ble, name="mpy-temp"):
         self._ble = ble
         self._ble.active(True)
+        self._ble.config(addr_mode=1)
         self._ble.irq(self._irq)
         ((self._handle,),) = self._ble.gatts_register_services((_ENV_SENSE_SERVICE,))
         self._connections = set()
@@ -87,7 +88,7 @@ def demo():
     while True:
         # Write every second, notify every 10 seconds.
         i = (i + 1) % 10
-        temp.set_temperature(t, notify=i == 0, indicate=False)
+        temp.set_temperature(t, notify=False, indicate=False)
         # Random walk the temperature.
         t += random.uniform(-0.5, 0.5)
         time.sleep_ms(1000)

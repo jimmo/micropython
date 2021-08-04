@@ -261,7 +261,7 @@ void ipcc_init(uint32_t irq_pri) {
     // Enable receive IRQ on the BLE channel.
     LL_C1_IPCC_EnableIT_RXO(IPCC);
     LL_C1_IPCC_DisableReceiveChannel(IPCC, LL_IPCC_CHANNEL_1 | LL_IPCC_CHANNEL_2 | LL_IPCC_CHANNEL_3 | LL_IPCC_CHANNEL_4 | LL_IPCC_CHANNEL_5 | LL_IPCC_CHANNEL_6);
-    LL_C1_IPCC_EnableReceiveChannel(IPCC, IPCC_CH_BLE);
+    // LL_C1_IPCC_EnableReceiveChannel(IPCC, IPCC_CH_BLE);
     NVIC_SetPriority(IPCC_C1_RX_IRQn, irq_pri);
     HAL_NVIC_EnableIRQ(IPCC_C1_RX_IRQn);
 
@@ -447,10 +447,10 @@ STATIC void tl_check_msg(volatile tl_list_node_t *head, unsigned int ch, parse_h
         // Clear receive channel (allows RF core to send more data to us).
         LL_C1_IPCC_ClearFlag_CHx(IPCC, ch);
 
-        if (ch == IPCC_CH_BLE) {
-            // Renable IRQs for BLE now that we've cleared the flag.
-            LL_C1_IPCC_EnableReceiveChannel(IPCC, IPCC_CH_BLE);
-        }
+        // if (ch == IPCC_CH_BLE) {
+        //     // Renable IRQs for BLE now that we've cleared the flag.
+        //     LL_C1_IPCC_EnableReceiveChannel(IPCC, IPCC_CH_BLE);
+        // }
     }
 }
 
