@@ -312,7 +312,7 @@ void asm_thumb_mov_reg_reg(asm_thumb_t *as, uint reg_dest, uint reg_src);
 #if MICROPY_EMIT_THUMB_ARMV7M
 size_t asm_thumb_mov_reg_i16(asm_thumb_t *as, uint mov_op, uint reg_dest, int i16_src);
 #else
-void asm_thumb_mov_rlo_i16(asm_thumb_t *as, uint rlo_dest, int i16_src);
+size_t asm_thumb_mov_rlo_i16(asm_thumb_t *as, uint rlo_dest, int i16_src);
 #endif
 
 // these return true if the destination is in range, false otherwise

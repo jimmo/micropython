@@ -261,10 +261,12 @@ size_t asm_thumb_mov_reg_i16(asm_thumb_t *as, uint mov_op, uint reg_dest, int i1
 
 #else
 
-void asm_thumb_mov_rlo_i16(asm_thumb_t *as, uint rlo_dest, int i16_src) {
+size_t asm_thumb_mov_rlo_i16(asm_thumb_t *as, uint rlo_dest, int i16_src) {
+    size_t loc = mp_asm_base_get_code_pos(&as->base);
     asm_thumb_mov_rlo_i8(as, rlo_dest, (i16_src >> 8) & 0xff);
     asm_thumb_lsl_rlo_rlo_i5(as, rlo_dest, rlo_dest, 8);
     asm_thumb_add_rlo_i8(as, rlo_dest, i16_src & 0xff);
+    return loc;
 }
 
 #endif
@@ -318,9 +320,8 @@ size_t asm_thumb_mov_reg_i32(asm_thumb_t *as, uint reg_dest, mp_uint_t i32) {
     // movw, movt does it in 8 bytes
     // ldr [pc, #], dw does it in 6 bytes, but we might not reach to end of code for dw
 
-    size_t loc = mp_asm_base_get_code_pos(&as->base);
-
     #if MICROPY_EMIT_THUMB_ARMV7M
+    size_t loc = mp_asm_base_get_code_pos(&as->base);
     asm_thumb_mov_reg_i16(as, ASM_THUMB_OP_MOVW, reg_dest, i32);
     asm_thumb_mov_reg_i16(as, ASM_THUMB_OP_MOVT, reg_dest, i32 >> 16);
     #else
@@ -341,6 +342,7 @@ size_t asm_thumb_mov_reg_i32(asm_thumb_t *as, uint reg_dest, mp_uint_t i32) {
     }
     asm_thumb_ldr_rlo_pcrel_i8(as, reg_dest, 0);
     asm_thumb_op16(as, OP_B_N(2));
+    size_t loc = mp_asm_base_get_code_pos(&as->base);
     asm_thumb_op16(as, i32 & 0xffff);
     asm_thumb_op16(as, i32 >> 16);
     #endif

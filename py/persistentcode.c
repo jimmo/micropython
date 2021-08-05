@@ -158,6 +158,7 @@ typedef struct _reloc_info_t {
 } reloc_info_t;
 
 #if MICROPY_EMIT_THUMB
+#if MICROPY_EMIT_THUMB_ARMV7M
 STATIC void asm_thumb_rewrite_mov(uint8_t *pc, uint16_t val) {
     // high part
     *(uint16_t *)pc = (*(uint16_t *)pc & 0xfbf0) | (val >> 1 & 0x0400) | (val >> 12);
@@ -165,6 +166,14 @@ STATIC void asm_thumb_rewrite_mov(uint8_t *pc, uint16_t val) {
     *(uint16_t *)(pc + 2) = (*(uint16_t *)(pc + 2) & 0x0f00) | (val << 4 & 0x7000) | (val & 0x00ff);
 
 }
+#else
+STATIC void asm_thumb_rewrite_data(uint8_t *pc, uint16_t val) {
+    *(uint16_t *)pc = val;
+}
+STATIC void asm_thumb_rewrite_format3(uint8_t *pc, uint8_t val) {
+    *(uint8_t *)pc = val;
+}
+#endif
 #endif
 
 STATIC void arch_link_qstr(uint8_t *pc, bool is_obj, qstr qst) {
@@ -179,12 +188,24 @@ STATIC void arch_link_qstr(uint8_t *pc, bool is_obj, qstr qst) {
     pc[3] = (val >> 24) & 0xff;
     #elif MICROPY_EMIT_THUMB
     if (is_obj) {
-        // qstr object, movw and movt
+        #if MICROPY_EMIT_THUMB_ARMV7M
+        // qstr object, movw and movt (asm_thumb_mov_reg_i32)
         asm_thumb_rewrite_mov(pc, val); // movw
         asm_thumb_rewrite_mov(pc + 4, val >> 16); // movt
+        #else
+        // qstr object, data16 and data16 (asm_thumb_mov_reg_i32)
+        asm_thumb_rewrite_data(pc, val);
+        asm_thumb_rewrite_data(pc + 2, val >> 16);
+        #endif
     } else {
-        // qstr number, movw instruction
+        #if MICROPY_EMIT_THUMB_ARMV7M
+        // qstr number, movw instruction (asm_thumb_mov_reg_i16)
         asm_thumb_rewrite_mov(pc, val); // movw
+        #else
+        // qstr number, mov3, lsl, add3 (asm_thumb_mov_rlo_i16)
+        asm_thumb_rewrite_format3(pc, val >> 8);
+        asm_thumb_rewrite_format3(pc + 4, val);
+        #endif
     }
     #endif
 }
