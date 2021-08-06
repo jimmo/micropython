@@ -198,6 +198,12 @@ mp_obj_t mp_parse_num_decimal(const char *str, size_t len, bool allow_imag, bool
     bool dec_neg = false;
     bool imag = false;
 
+    #if MICROPY_PY_BUILTINS_COMPLEX
+    mp_float_t dec_real = 0;
+    bool has_real = false;
+    #endif
+
+parse:
     // skip leading space
     for (; str < top && unichar_isspace(*str); str++) {
     }
@@ -332,13 +338,29 @@ mp_obj_t mp_parse_num_decimal(const char *str, size_t len, bool allow_imag, bool
 
     // check we reached the end of the string
     if (str != top) {
+        #if MICROPY_PY_BUILTINS_COMPLEX
+        if (force_complex && !imag && !has_real) {
+            // If we've only seen a real so far, keep parsing for the imaginary part.
+            dec_real = dec_val;
+            dec_val = 0;
+            has_real = true;
+            goto parse;
+        }
+        #endif
         goto value_error;
     }
+
+    #if MICROPY_PY_BUILTINS_COMPLEX
+    if (has_real && !imag) {
+        // We're on the second part, but didn't get the expected imaginary number.
+        goto value_error;
+    }
+    #endif
 
     // return the object
     #if MICROPY_PY_BUILTINS_COMPLEX
     if (imag) {
-        return mp_obj_new_complex(0, dec_val);
+        return mp_obj_new_complex(dec_real, dec_val);
     } else if (force_complex) {
         return mp_obj_new_complex(dec_val, 0);
     }
