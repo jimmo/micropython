@@ -84,7 +84,7 @@ typedef enum {
 #define NATIVE_EMITTER(f) emit_native_table[mp_dynamic_compiler.native_arch]->emit_##f
 #define NATIVE_EMITTER_TABLE emit_native_table[mp_dynamic_compiler.native_arch]
 
-STATIC const emit_method_table_t *emit_native_table[] = {
+STATIC const emit_method_table_t * emit_native_table[] = {
     NULL,
     &emit_native_x86_method_table,
     &emit_native_x64_method_table,
@@ -123,7 +123,7 @@ STATIC const emit_method_table_t *emit_native_table[] = {
 #define ASM_EMITTER(f) emit_asm_table[mp_dynamic_compiler.native_arch]->asm_##f
 #define ASM_EMITTER_TABLE emit_asm_table[mp_dynamic_compiler.native_arch]
 
-STATIC const emit_inline_asm_method_table_t *emit_asm_table[] = {
+STATIC const emit_inline_asm_method_table_t * emit_asm_table[] = {
     NULL,
     NULL,
     NULL,

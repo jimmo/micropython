@@ -245,7 +245,7 @@ extern const struct _mp_obj_module_t mp_module_jni;
     MICROPY_PY_FFI_DEF \
     MICROPY_PY_JNI_DEF \
     MICROPY_PY_UTIME_DEF \
-    MICROPY_PY_SOCKET_DEF \
+        MICROPY_PY_SOCKET_DEF \
     { MP_ROM_QSTR(MP_QSTR_umachine), MP_ROM_PTR(&mp_module_machine) }, \
     MICROPY_PY_UOS_DEF \
     MICROPY_PY_USELECT_DEF \
