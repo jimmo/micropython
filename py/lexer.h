@@ -162,7 +162,9 @@ typedef struct _mp_lexer_t {
     mp_reader_t reader;         // stream source
 
     unichar chr0, chr1, chr2;   // current cached characters from source
-    unichar chr3, chr4, chr5;   // current cached characters from alt source
+    #if MICROPY_PY_FSTRING
+    unichar chr0_saved, chr1_saved, chr2_saved;   // current cached characters from alt source
+    #endif
 
     size_t line;                // current source line
     size_t column;              // current source column
@@ -179,9 +181,8 @@ typedef struct _mp_lexer_t {
     mp_token_kind_t tok_kind;   // token kind
     vstr_t vstr;                // token data
     #if MICROPY_PY_FSTRING
-    vstr_t vstr_postfix;        // postfix to apply to string
-    bool vstr_postfix_processing;
-    uint16_t vstr_postfix_idx;
+    vstr_t fstring_args;          // extracted arguments to pass to .format()
+    uint16_t fstring_args_idx;    // how many bytes of fstring_args have been read
     #endif
 } mp_lexer_t;
 
