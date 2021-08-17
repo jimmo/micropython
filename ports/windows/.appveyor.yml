@@ -82,3 +82,6 @@ after_test:
       & $env:MICROPY_CPYTHON3 run-tests.py --print-failures
       throw "Test failure"
     }
+
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
