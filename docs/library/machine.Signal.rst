@@ -1,8 +1,7 @@
 .. currentmodule:: machine
-.. _machine.Signal:
 
-class Signal -- control and sense external I/O devices
-======================================================
+class :class:`Signal`
+=====================
 
 The Signal class is a simple extension of the `Pin` class. Unlike Pin, which
 can be only in "absolute" 0 and 1 states, a Signal can be in "asserted"
@@ -77,15 +76,15 @@ Constructors
 .. class:: Signal(pin_obj, invert=False)
            Signal(pin_arguments..., *, invert=False)
 
-   Create a Signal object. There're two ways to create it:
+    Create a Signal object. There're two ways to create it:
 
-   * By wrapping existing Pin object - universal method which works for
-     any board.
-   * By passing required Pin parameters directly to Signal constructor,
-     skipping the need to create intermediate Pin object. Available on
-     many, but not all boards.
+    * By wrapping existing Pin object - universal method which works for
+      any board.
+    * By passing required Pin parameters directly to Signal constructor,
+      skipping the need to create intermediate Pin object. Available on
+      many, but not all boards.
 
-   The arguments are:
+    The arguments are:
 
      - ``pin_obj`` is existing Pin object.
 
@@ -98,26 +97,26 @@ Methods
 
 .. method:: Signal.value([x])
 
-   This method allows to set and get the value of the signal, depending on whether
-   the argument ``x`` is supplied or not.
+    This method allows to set and get the value of the signal, depending on whether
+    the argument ``x`` is supplied or not.
 
-   If the argument is omitted then this method gets the signal level, 1 meaning
-   signal is asserted (active) and 0 - signal inactive.
+    If the argument is omitted then this method gets the signal level, 1 meaning
+    signal is asserted (active) and 0 - signal inactive.
 
-   If the argument is supplied then this method sets the signal level. The
-   argument ``x`` can be anything that converts to a boolean. If it converts
-   to ``True``, the signal is active, otherwise it is inactive.
+    If the argument is supplied then this method sets the signal level. The
+    argument ``x`` can be anything that converts to a boolean. If it converts
+    to ``True``, the signal is active, otherwise it is inactive.
 
-   Correspondence between signal being active and actual logic level on the
-   underlying pin depends on whether signal is inverted (active-low) or not.
-   For non-inverted signal, active status corresponds to logical 1, inactive -
-   to logical 0. For inverted/active-low signal, active status corresponds
-   to logical 0, while inactive - to logical 1.
+    Correspondence between signal being active and actual logic level on the
+    underlying pin depends on whether signal is inverted (active-low) or not.
+    For non-inverted signal, active status corresponds to logical 1, inactive -
+    to logical 0. For inverted/active-low signal, active status corresponds
+    to logical 0, while inactive - to logical 1.
 
 .. method:: Signal.on()
 
-   Activate signal.
+    Activate signal.
 
 .. method:: Signal.off()
 
-   Deactivate signal.
+    Deactivate signal.

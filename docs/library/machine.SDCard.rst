@@ -1,8 +1,7 @@
 .. currentmodule:: machine
-.. _machine.SDCard:
 
-class SDCard -- secure digital memory card
-==========================================
+class :class:`SDCard`
+=====================
 
 SD cards are one of the most common small form factor removable storage media.
 SD cards come in a variety of sizes and physical form factors. MMC cards are
@@ -10,13 +9,13 @@ similar removable storage devices while eMMC devices are electrically similar
 storage devices designed to be embedded into other systems. All three form
 share a common protocol for communication with their host system and high-level
 support looks the same for them all. As such in MicroPython they are implemented
-in a single class called :class:`machine.SDCard` .
+in a single class called :class:`SDCard` .
 
 Both SD and MMC interfaces support being accessed with a variety of bus widths.
 When being accessed with a 1-bit wide interface they can be accessed using the
 SPI protocol. Different MicroPython hardware platforms support different widths
 and pin configurations but for most platforms there is a standard configuration
-for any given hardware. In general constructing an ``SDCard`` object with without
+for any given hardware. In general constructing an :class:`SDCard` object with without
 passing any parameters will initialise the interface to the default card slot
 for the current hardware. The arguments listed below represent the common
 arguments that might need to be set in order to use either a non-standard slot
@@ -121,7 +120,7 @@ You can set the pins used for SPI access by passing a tuple as the
 *pins* argument.
 
 *Note:* The current cc3200 SD card implementation names the this class
-:class:`machine.SD` rather than :class:`machine.SDCard` .
+:class:`SD` rather than :class:`SDCard` .
 
 mimxrt
 ``````
@@ -129,7 +128,7 @@ mimxrt
 The SDCard module for the mimxrt port only supports access via dedicated SD/MMC
 peripheral (USDHC) in 4-bit mode with 50MHz clock frequency exclusively.
 Unfortunately the MIMXRT1011 controller does not support the USDHC peripheral.
-Hence this controller does not feature the ``machine.SDCard`` module.
+Hence this controller does not feature the :class:`SDCard` class.
 
 Due to the decision to only support 4-bit mode with 50MHz clock frequency the
 interface has been simplified, and the constructor signature is:
@@ -161,7 +160,94 @@ filled with the following dummy value::
   #define USDHC_DUMMY_PIN NULL , 0
 
 Based on the definition of macro ``MICROPY_USDHC1`` and/or ``MICROPY_USDHC2``
-the ``machine.SDCard`` module either supports one or two slots.  If only one of
+the :class:`SDCard` class either supports one or two slots.  If only one of
 the defines is provided, calling ``machine.SDCard()`` or ``machine.SDCard(1)``
 will return an instance using the respective USDHC peripheral.  When both macros
 are defined, calling ``machine.SDCard(2)`` returns an instance using USDHC2.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+See :class:`SDCard`. ::
+
+    import machine, os
+
+    # Slot 2 uses pins sck=18, cs=5, miso=19, mosi=23
+    sd = machine.SDCard(slot=2)
+    os.mount(sd, "/sd")  # mount
+
+    os.listdir('/sd')    # list directory contents
+
+    os.umount('/sd')     # eject
+
+
+
+imx
+---
+
+See :class:`SDCard`::
+
+    import machine, os
+
+    sd = machine.SDCard()
+    fs = os.VfsFat(sd)
+    os.mount(fs, "/sd")  # mount
+    os.listdir('/sd')    # list directory contents
+    os.umount('/sd')     # eject
+
+Note: The i.mx-rt 1011 and 1015 based boards do not support the :class:`SDCard`
+class.  For these, the SPI based driver ``sdcard.py`` from the MicroPython drivers
+can be used.  When using it, you have to overdrive the CS pin of the SPI hardware
+module.  Example::
+
+    import os, sdcard, machine
+
+    cs_pin = "D10"
+    spi = machine.SPI(0) # SPI0 with cs at Pin "D10" used for SDCARD
+    cs = machine.Pin(cs_pin, machine.Pin.OUT, value=1)
+    sd = sdcard.SDCard(spi, cs)
+    vfs = os.VfsFat(sd)
+    os.mount(vfs, "/sdcard")
+
+renesas
+-------
+
+
+The frozen sdcard driver (drivers/sdcard/sdcard.py) is available by connecting microSD card device to hardware SPI0 pins.::
+
+    from machine import Pin, SPI
+    import os, sdcard
+
+    spi = SPI(0, baudrate=500000)
+    cs = Pin.cpu.P103
+    sd = sdcard.SDCard(spi, cs)
+    os.mount(sd, '/sd')
+    os.listdir('/')
+    os.chdir('/sd')
+    os.umount('/sd')
+
+
+wipy
+----
+
+
+See :class:`SD`. ::
+
+    from machine import SD
+    import os
+
+    # clock pin, cmd pin, data0 pin
+    sd = SD(pins=('GP10', 'GP11', 'GP15'))
+    # or use default ones for the expansion board
+    sd = SD()
+    os.mount(sd, '/sd')

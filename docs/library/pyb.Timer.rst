@@ -55,22 +55,22 @@ Constructors
 
 .. class:: Timer(id, ...)
 
-   Construct a new timer object of the given id.  If additional
-   arguments are given, then the timer is initialised by ``init(...)``.
-   ``id`` can be 1 to 14.
+    Construct a new timer object of the given id.  If additional
+    arguments are given, then the timer is initialised by ``init(...)``.
+    ``id`` can be 1 to 14.
 
 Methods
 -------
 
 .. method:: Timer.init(*, freq, prescaler, period, mode=Timer.UP, div=1, callback=None, deadtime=0, brk=Timer.BRK_OFF)
 
-   Initialise the timer.  Initialisation must be either by frequency (in Hz)
-   or by prescaler and period::
+    Initialise the timer.  Initialisation must be either by frequency (in Hz)
+    or by prescaler and period::
 
        tim.init(freq=100)                  # set the timer to trigger at 100Hz
        tim.init(prescaler=83, period=999)  # set the prescaler and period directly
 
-   Keyword arguments:
+    Keyword arguments:
 
      - ``freq`` --- specifies the periodic frequency of the timer. You might also
        view this as the frequency with which the timer goes through one complete cycle.
@@ -119,31 +119,31 @@ Methods
 
 .. method:: Timer.deinit()
 
-   Deinitialises the timer.
+    Deinitialises the timer.
 
-   Disables the callback (and the associated irq).
+    Disables the callback (and the associated irq).
 
-   Disables any channel callbacks (and the associated irq).
-   Stops the timer, and disables the timer peripheral.
+    Disables any channel callbacks (and the associated irq).
+    Stops the timer, and disables the timer peripheral.
 
 .. method:: Timer.callback(fun)
 
-   Set the function to be called when the timer triggers.
-   ``fun`` is passed 1 argument, the timer object.
-   If ``fun`` is ``None`` then the callback will be disabled.
+    Set the function to be called when the timer triggers.
+    ``fun`` is passed 1 argument, the timer object.
+    If ``fun`` is ``None`` then the callback will be disabled.
 
 .. method:: Timer.channel(channel, mode, ...)
 
-   If only a channel number is passed, then a previously initialized channel
-   object is returned (or ``None`` if there is no previous channel).
+    If only a channel number is passed, then a previously initialized channel
+    object is returned (or ``None`` if there is no previous channel).
 
-   Otherwise, a TimerChannel object is initialized and returned.
+    Otherwise, a TimerChannel object is initialized and returned.
 
-   Each channel can be configured to perform pwm, output compare, or
-   input capture. All channels share the same underlying timer, which means
-   that they share the same timer clock.
+    Each channel can be configured to perform pwm, output compare, or
+    input capture. All channels share the same underlying timer, which means
+    that they share the same timer clock.
 
-   Keyword arguments:
+    Keyword arguments:
 
      - ``mode`` can be one of:
 
@@ -167,12 +167,12 @@ Methods
        to be configured for this timer channel. An error will be raised if
        the pin doesn't support any alternate functions for this timer channel.
 
-   Keyword arguments for Timer.PWM modes:
+    Keyword arguments for Timer.PWM modes:
 
      - ``pulse_width`` - determines the initial pulse width value to use.
      - ``pulse_width_percent`` - determines the initial pulse width percentage to use.
 
-   Keyword arguments for Timer.OC modes:
+    Keyword arguments for Timer.OC modes:
 
      - ``compare`` - determines the initial value of the compare register.
 
@@ -181,7 +181,7 @@ Methods
        - ``Timer.HIGH`` - output is active high
        - ``Timer.LOW`` - output is active low
 
-   Optional keyword arguments for Timer.IC modes:
+    Optional keyword arguments for Timer.IC modes:
 
      - ``polarity`` can be one of:
 
@@ -192,7 +192,7 @@ Methods
      Note that capture only works on the primary channel, and not on the
      complimentary channels.
 
-   Notes for Timer.ENC modes:
+    Notes for Timer.ENC modes:
 
      - Requires 2 pins, so one or both pins will need to be configured to use
        the appropriate timer AF using the Pin API.
@@ -200,7 +200,7 @@ Methods
      - Only works on CH1 and CH2 (and not on CH1N or CH2N)
      - The channel number is ignored when setting the encoder mode.
 
-   PWM Example::
+    PWM Example::
 
        timer = pyb.Timer(2, freq=1000)
        ch2 = timer.channel(2, pyb.Timer.PWM, pin=pyb.Pin.board.X2, pulse_width=8000)
@@ -219,23 +219,23 @@ Methods
 
 .. method:: Timer.counter([value])
 
-   Get or set the timer counter.
+    Get or set the timer counter.
 
 .. method:: Timer.freq([value])
 
-   Get or set the frequency for the timer (changes prescaler and period if set).
+    Get or set the frequency for the timer (changes prescaler and period if set).
 
 .. method:: Timer.period([value])
 
-   Get or set the period of the timer.
+    Get or set the period of the timer.
 
 .. method:: Timer.prescaler([value])
 
-   Get or set the prescaler for the timer.
+    Get or set the prescaler for the timer.
 
 .. method:: Timer.source_freq()
 
-   Get the frequency of the source of the timer.
+    Get the frequency of the source of the timer.
 
 class TimerChannel --- setup a channel for a timer
 ==================================================
@@ -249,38 +249,38 @@ Methods
 
 .. method:: timerchannel.callback(fun)
 
-   Set the function to be called when the timer channel triggers.
-   ``fun`` is passed 1 argument, the timer object.
-   If ``fun`` is ``None`` then the callback will be disabled.
+    Set the function to be called when the timer channel triggers.
+    ``fun`` is passed 1 argument, the timer object.
+    If ``fun`` is ``None`` then the callback will be disabled.
 
 .. method:: timerchannel.capture([value])
 
-   Get or set the capture value associated with a channel.
-   capture, compare, and pulse_width are all aliases for the same function.
-   capture is the logical name to use when the channel is in input capture mode.
+    Get or set the capture value associated with a channel.
+    capture, compare, and pulse_width are all aliases for the same function.
+    capture is the logical name to use when the channel is in input capture mode.
 
 .. method:: timerchannel.compare([value])
 
-   Get or set the compare value associated with a channel.
-   capture, compare, and pulse_width are all aliases for the same function.
-   compare is the logical name to use when the channel is in output compare mode.
+    Get or set the compare value associated with a channel.
+    capture, compare, and pulse_width are all aliases for the same function.
+    compare is the logical name to use when the channel is in output compare mode.
 
 .. method:: timerchannel.pulse_width([value])
 
-   Get or set the pulse width value associated with a channel.
-   capture, compare, and pulse_width are all aliases for the same function.
-   pulse_width is the logical name to use when the channel is in PWM mode.
+    Get or set the pulse width value associated with a channel.
+    capture, compare, and pulse_width are all aliases for the same function.
+    pulse_width is the logical name to use when the channel is in PWM mode.
 
-   In edge aligned mode, a pulse_width of ``period + 1`` corresponds to a duty cycle of 100%
-   In center aligned mode, a pulse width of ``period`` corresponds to a duty cycle of 100%
+    In edge aligned mode, a pulse_width of ``period + 1`` corresponds to a duty cycle of 100%
+    In center aligned mode, a pulse width of ``period`` corresponds to a duty cycle of 100%
 
 .. method:: timerchannel.pulse_width_percent([value])
 
-   Get or set the pulse width percentage associated with a channel.  The value
-   is a number between 0 and 100 and sets the percentage of the timer period
-   for which the pulse is active.  The value can be an integer or
-   floating-point number for more accuracy.  For example, a value of 25 gives
-   a duty cycle of 25%.
+    Get or set the pulse width percentage associated with a channel.  The value
+    is a number between 0 and 100 and sets the percentage of the timer period
+    for which the pulse is active.  The value can be an integer or
+    floating-point number for more accuracy.  For example, a value of 25 gives
+    a duty cycle of 25%.
 
 Constants
 ---------
@@ -289,10 +289,10 @@ Constants
           Timer.DOWN
           Timer.CENTER
 
-   Configures the timer to count Up, Down, or from 0 to ARR and then back down to 0.
+    Configures the timer to count Up, Down, or from 0 to ARR and then back down to 0.
 
 .. data:: Timer.BRK_OFF
           Timer.BRK_LOW
           Timer.BRK_HIGH
 
-   Configures the break mode when passed to the ``brk`` keyword argument.
+    Configures the break mode when passed to the ``brk`` keyword argument.

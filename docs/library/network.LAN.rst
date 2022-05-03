@@ -21,10 +21,10 @@ Constructors
 
 .. class:: LAN(id, *, phy_type=<board_default>, phy_addr=<board_default>, ref_clk_mode=<board_default>)
 
-   Create a LAN driver object, initialise the LAN module using the given
-   PHY driver name, and return the LAN object.
+    Create a LAN driver object, initialise the LAN module using the given
+    PHY driver name, and return the LAN object.
 
-   Arguments are:
+    Arguments are:
 
      - *id* is the number of the Ethernet port, either 0 or 1.
      - *phy_type* is the name of the PHY driver. For most board the on-board PHY has to be used and
@@ -37,7 +37,7 @@ Constructors
        or ``True``, the clock is driven by the Ethernet controller, if set to ``LAN.IN``
        or ``Pin.IN`` or ``False``, the clock is driven by the PHY interface.
 
-   For example, with the Seeed Arch Mix board you can  use::
+    For example, with the Seeed Arch Mix board you can  use::
 
      nic = LAN(0, phy_type=LAN.PHY_LAN8720, phy_addr=1, ref_clk_mode=Pin.IN)
 
@@ -46,37 +46,37 @@ Methods
 
 .. method:: LAN.active([state])
 
-   With a parameter, it sets the interface active if *state* is true, otherwise it
-   sets it inactive.
-   Without a parameter, it returns the state.
+    With a parameter, it sets the interface active if *state* is true, otherwise it
+    sets it inactive.
+    Without a parameter, it returns the state.
 
 .. method:: LAN.isconnected()
 
-   Returns ``True`` if the physical Ethernet link is connected and up.
-   Returns ``False`` otherwise.
+    Returns ``True`` if the physical Ethernet link is connected and up.
+    Returns ``False`` otherwise.
 
 .. method:: LAN.status()
 
-   Returns the LAN status.
+    Returns the LAN status.
 
 .. method:: LAN.ifconfig([(ip, subnet, gateway, dns)])
 
-   Get/set IP address, subnet mask, gateway and DNS.
+    Get/set IP address, subnet mask, gateway and DNS.
 
-   When called with no arguments, this method returns a 4-tuple with the above information.
+    When called with no arguments, this method returns a 4-tuple with the above information.
 
-   To set the above values, pass a 4-tuple with the required information.  For example::
+    To set the above values, pass a 4-tuple with the required information.  For example::
 
-    nic.ifconfig(('192.168.0.4', '255.255.255.0', '192.168.0.1', '8.8.8.8'))
+        nic.ifconfig(('192.168.0.4', '255.255.255.0', '192.168.0.1', '8.8.8.8'))
 
 .. method:: LAN.config(config_parameters)
 
-   Sets or gets parameters of the LAN interface. The only parameter that can be
-   retrieved is the MAC address, using::
+    Sets or gets parameters of the LAN interface. The only parameter that can be
+    retrieved is the MAC address, using::
 
-      mac = LAN.config("mac")
+        mac = LAN.config("mac")
 
-   The parameters that can be set are:
+    The parameters that can be set are:
 
     - ``trace=n`` sets trace levels; suitable values are:
 

@@ -1,8 +1,10 @@
 # Helpers for generating BLE advertising payloads.
 
-from micropython import const
+#from micropython import const
+const = lambda x: x
+
 import struct
-import bluetooth
+#import bluetooth
 
 # Advertising payloads are repeated packets of the following form:
 #   1 byte data length (N + 1)
@@ -68,14 +70,16 @@ def decode_name(payload):
     return str(n[0], "utf-8") if n else ""
 
 
+UUID = lambda x: x
+
 def decode_services(payload):
     services = []
     for u in decode_field(payload, _ADV_TYPE_UUID16_COMPLETE):
-        services.append(bluetooth.UUID(struct.unpack("<h", u)[0]))
+        services.append(UUID(struct.unpack("<h", u)[0]))
     for u in decode_field(payload, _ADV_TYPE_UUID32_COMPLETE):
-        services.append(bluetooth.UUID(struct.unpack("<d", u)[0]))
+        services.append(UUID(struct.unpack("<d", u)[0]))
     for u in decode_field(payload, _ADV_TYPE_UUID128_COMPLETE):
-        services.append(bluetooth.UUID(u))
+        services.append(UUID(u))
     return services
 
 

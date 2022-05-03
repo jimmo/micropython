@@ -3,9 +3,9 @@
 *************************************
 
 .. module:: wipy
-   :synopsis: WiPy specific features
+    :synopsis: WiPy specific features
 
-The ``wipy`` module contains functions to control specific features of the
+The :mod:`wipy` module contains functions to control specific features of the
 WiPy, such as the heartbeat LED.
 
 Functions
@@ -13,5 +13,5 @@ Functions
 
 .. function:: heartbeat([enable])
 
-   Get or set the state (enabled or disabled) of the heartbeat LED. Accepts and
-   returns boolean values (``True`` or ``False``).
+    Get or set the state (enabled or disabled) of the heartbeat LED. Accepts and
+    returns boolean values (``True`` or ``False``).

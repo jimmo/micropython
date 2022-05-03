@@ -2,18 +2,18 @@
 ===============================================
 
 .. module:: lcd160cr
-   :synopsis: control of LCD160CR display
+    :synopsis: control of LCD160CR display
 
 This module provides control of the MicroPython LCD160CR display.
 
-.. image:: http://micropython.org/resources/LCD160CRv10-persp.jpg
+.. image:: https://micropython.org/resources/LCD160CRv10-persp.jpg
     :alt: LCD160CRv1.0 picture
     :width: 640px
 
 Further resources are available via the following links:
 
-* `LCD160CRv1.0 reference manual <http://micropython.org/resources/LCD160CRv10-refmanual.pdf>`_ (100KiB PDF)
-* `LCD160CRv1.0 schematics <http://micropython.org/resources/LCD160CRv10-schematics.pdf>`_ (1.6MiB PDF)
+* `LCD160CRv1.0 reference manual <https://micropython.org/resources/LCD160CRv10-refmanual.pdf>`_ (100KiB PDF)
+* `LCD160CRv1.0 schematics <https://micropython.org/resources/LCD160CRv10-schematics.pdf>`_ (1.6MiB PDF)
 
 class LCD160CR
 --------------
@@ -69,7 +69,7 @@ Constructors
         - "YX" is for the left-side and uses:
           ``pwr=Pin("Y4")``, ``i2c=I2C("X")``, ``spi=SPI("Y")``
 
-    See `this image <http://micropython.org/resources/LCD160CRv10-positions.jpg>`_
+    See `this image <https://micropython.org/resources/LCD160CRv10-positions.jpg>`_
     for how the display can be connected to the pyboard.
 
 Static methods
@@ -384,11 +384,11 @@ Constants
           lcd160cr.PORTRAIT_UPSIDEDOWN
           lcd160cr.LANDSCAPE_UPSIDEDOWN
 
-   Orientations of the display, used by :meth:`LCD160CR.set_orient`.
+    Orientations of the display, used by :meth:`LCD160CR.set_orient`.
 
 .. data:: lcd160cr.STARTUP_DECO_NONE
           lcd160cr.STARTUP_DECO_MLOGO
           lcd160cr.STARTUP_DECO_INFO
 
-   Types of start-up decoration, can be OR'ed together, used by
-   :meth:`LCD160CR.set_startup_deco`.
+    Types of start-up decoration, can be OR'ed together, used by
+    :meth:`LCD160CR.set_startup_deco`.

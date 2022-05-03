@@ -4,7 +4,7 @@ Python 3.9
 ==========
 
 Python 3.9.0 (final) was released on the 5th October 2020. The Features for 3.9 are
-defined in `PEP 596 <https://www.python.org/dev/peps/pep-0596/#features-for-3-9>`_
+defined in `PEP 596 <https://peps.python.org/pep-0596/#features-for-3-9>`_
 and a detailed description of the changes can be found in
 `What's New in Python 3.9 <https://docs.python.org/3/whatsnew/3.9.html>`_
 

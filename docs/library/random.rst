@@ -2,31 +2,33 @@
 ========================================
 
 .. module:: random
-   :synopsis: random numbers
-
-This module implements a pseudo-random number generator (PRNG).
+    :synopsis: random numbers
 
 |see_cpython_module| :mod:`python:random` .
 
-.. note::
-
-   The following notation is used for intervals:
-
-   - () are open interval brackets and do not include their endpoints.
-     For example, (0, 1) means greater than 0 and less than 1.
-     In set notation: (0, 1) = {x | 0 < x < 1}.
-
-   - [] are closed interval brackets which include all their limit points.
-     For example, [0, 1] means greater than or equal to 0 and less than
-     or equal to 1.
-     In set notation: [0, 1] = {x | 0 <= x <= 1}.
+This module implements a pseudo-random number generator (PRNG).
 
 .. note::
 
-   The :func:`randrange`, :func:`randint` and :func:`choice` functions are only
-   available if the ``MICROPY_PY_URANDOM_EXTRA_FUNCS`` configuration option is
-   enabled.
+    The following notation is used for intervals:
 
+    - () are open interval brackets and do not include their endpoints.
+      For example, (0, 1) means greater than 0 and less than 1.
+      In set notation: (0, 1) = {x | 0 < x < 1}.
+
+    - [] are closed interval brackets which include all their limit points.
+      For example, [0, 1] means greater than or equal to 0 and less than
+      or equal to 1.
+      In set notation: [0, 1] = {x | 0 <= x <= 1}.
+
+.. note::
+
+    The :func:`randrange`, :func:`randint` and :func:`choice` functions are only
+    available if the ``MICROPY_PY_URANDOM_EXTRA_FUNCS`` build configuration
+    option is enabled.
+
+.. note::
+    An extended version of this module is `available from micropython-lib <https://github.com/micropython/micropython-lib/tree/master/python-stdlib/random>`_.
 
 Functions for integers
 ----------------------

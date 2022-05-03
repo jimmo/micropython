@@ -32,7 +32,7 @@ Methods
     argument is passed. Otherwise, query current state if no argument is
     provided. Most other methods require active interface.
 
-.. method:: WLAN.connect(ssid=None, key=None, *, bssid=None)
+.. method:: WLAN.connect(ssid=None, key=None, /, bssid=None)
 
     Connect to the specified wireless network, using the specified key.
     If *bssid* is given then the connection will be restricted to the
@@ -95,42 +95,41 @@ Methods
 
 .. method:: WLAN.ifconfig([(ip, subnet, gateway, dns)])
 
-   Get/set IP-level network interface parameters: IP address, subnet mask,
-   gateway and DNS server. When called with no arguments, this method returns
-   a 4-tuple with the above information. To set the above values, pass a
-   4-tuple with the required information.  For example::
+    Get/set IP-level network interface parameters: IP address, subnet mask,
+    gateway and DNS server. When called with no arguments, this method returns
+    a 4-tuple with the above information. To set the above values, pass a
+    4-tuple with the required information.  For example::
 
-    nic.ifconfig(('192.168.0.4', '255.255.255.0', '192.168.0.1', '8.8.8.8'))
+        nic.ifconfig(('192.168.0.4', '255.255.255.0', '192.168.0.1', '8.8.8.8'))
 
 .. method:: WLAN.config('param')
             WLAN.config(param=value, ...)
 
-   Get or set general network interface parameters. These methods allow to work
-   with additional parameters beyond standard IP configuration (as dealt with by
-   `WLAN.ifconfig()`). These include network-specific and hardware-specific
-   parameters. For setting parameters, keyword argument syntax should be used,
-   multiple parameters can be set at once. For querying, parameters name should
-   be quoted as a string, and only one parameter can be queries at time::
+    Get or set general network interface parameters. These methods allow to work
+    with additional parameters beyond standard IP configuration (as dealt with by
+    `WLAN.ifconfig()`). These include network-specific and hardware-specific
+    parameters. For setting parameters, keyword argument syntax should be used,
+    multiple parameters can be set at once. For querying, parameters name should
+    be quoted as a string, and only one parameter can be queries at time::
 
-    # Set WiFi access point name (formally known as SSID) and WiFi channel
-    ap.config(ssid='My AP', channel=11)
-    # Query params one by one
-    print(ap.config('ssid'))
-    print(ap.config('channel'))
+        # Set WiFi access point name (formally known as SSID) and WiFi channel
+        ap.config(ssid='My AP', channel=11)
+        # Query params one by one
+        print(ap.config('ssid'))
+        print(ap.config('channel'))
 
-   Following are commonly supported parameters (availability of a specific parameter
-   depends on network technology type, driver, and :term:`MicroPython port`).
+    The following parameters are commonly available on most ports.
 
-   =============  ===========
-   Parameter      Description
-   =============  ===========
-   mac            MAC address (bytes)
-   ssid           WiFi access point name (string)
-   channel        WiFi channel (integer)
-   hidden         Whether SSID is hidden (boolean)
-   security       Security protocol supported (enumeration, see module constants)
-   key            Access key (string)
-   hostname       The hostname that will be sent to DHCP (STA interfaces) and mDNS (if supported, both STA and AP)
-   reconnects     Number of reconnect attempts to make (integer, 0=none, -1=unlimited)
-   txpower        Maximum transmit power in dBm (integer or float)
-   =============  ===========
+    =============  ===========
+    Parameter      Description
+    =============  ===========
+    mac            MAC address (bytes)
+    ssid           WiFi access point name (string)
+    channel        WiFi channel (integer)
+    hidden         Whether SSID is hidden (boolean)
+    security       Security protocol supported (enumeration, see module constants)
+    key            Access key (string)
+    hostname       The hostname that will be sent to DHCP (STA interfaces) and mDNS (if supported, both STA and AP)
+    reconnects     Number of reconnect attempts to make (integer, 0=none, -1=unlimited)
+    txpower        Maximum transmit power in dBm (integer or float)
+    =============  ===========

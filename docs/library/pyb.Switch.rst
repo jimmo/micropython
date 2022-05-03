@@ -25,7 +25,7 @@ Constructors
 
 .. class:: Switch()
 
-   Create and return a switch object.
+    Create and return a switch object.
 
 
 Methods
@@ -33,14 +33,14 @@ Methods
 
 .. method:: Switch.__call__()
 
-   Call switch object directly to get its state: ``True`` if pressed down,
-   ``False`` otherwise.
+    Call switch object directly to get its state: ``True`` if pressed down,
+    ``False`` otherwise.
 
 .. method:: Switch.value()
 
-   Get the switch state.  Returns ``True`` if pressed down, otherwise ``False``.
+    Get the switch state.  Returns ``True`` if pressed down, otherwise ``False``.
 
 .. method:: Switch.callback(fun)
 
-   Register the given function to be called when the switch is pressed down.
-   If ``fun`` is ``None``, then it disables the callback.
+    Register the given function to be called when the switch is pressed down.
+    If ``fun`` is ``None``, then it disables the callback.

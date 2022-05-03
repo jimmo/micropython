@@ -3,7 +3,7 @@
 ****************************************
 
 .. module:: network
-   :synopsis: network configuration
+    :synopsis: network configuration
 
 This module provides network drivers and routing configuration. To use this
 module, a MicroPython variant/build with network capabilities must be installed.
@@ -39,7 +39,7 @@ Common network adapter interface
 ================================
 
 This section describes an (implied) abstract base class for all network
-interface classes implemented by :term:`MicroPython ports <MicroPython port>`
+interface classes implemented by :term:`various ports <port>`
 for different hardware. This means that MicroPython does not actually
 provide ``AbstractNIC`` class, but any actual NIC class, as described
 in the following sections, implements methods as described here.
@@ -146,12 +146,12 @@ The following concrete classes implement the AbstractNIC interface and
 provide a way to control networking interfaces of various kinds.
 
 .. toctree::
-   :maxdepth: 1
+    :maxdepth: 1
 
-   network.WLAN.rst
-   network.WLANWiPy.rst
-   network.WIZNET5K.rst
-   network.LAN.rst
+    network.WLAN.rst
+    network.WLANWiPy.rst
+    network.WIZNET5K.rst
+    network.LAN.rst
 
 Network functions
 =================

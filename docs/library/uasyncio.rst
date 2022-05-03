@@ -2,34 +2,37 @@
 ==============================================
 
 .. module:: uasyncio
-   :synopsis: asynchronous I/O scheduler for writing concurrent code
+    :synopsis: asynchronous I/O scheduler for writing concurrent code
 
-|see_cpython_module|
-`asyncio <https://docs.python.org/3.8/library/asyncio.html>`_
+|see_cpython_module| :mod:`python:asyncio`.
+
+This module provides an implementation of a subset of :mod:`python:asyncio` and
+can be used to implement asynchronous tasks. See the :ref:`asyncio guide
+<guides_software_asyncio>` for more information.
 
 Example::
 
-    import uasyncio
+    import uasyncio as asyncio
 
     async def blink(led, period_ms):
         while True:
             led.on()
-            await uasyncio.sleep_ms(5)
+            await asyncio.sleep_ms(5)
             led.off()
-            await uasyncio.sleep_ms(period_ms)
+            await asyncio.sleep_ms(period_ms)
 
     async def main(led1, led2):
-        uasyncio.create_task(blink(led1, 700))
-        uasyncio.create_task(blink(led2, 400))
-        await uasyncio.sleep_ms(10_000)
+        asyncio.create_task(blink(led1, 700))
+        asyncio.create_task(blink(led2, 400))
+        await asyncio.sleep_ms(10_000)
 
     # Running on a pyboard
     from pyb import LED
-    uasyncio.run(main(LED(1), LED(2)))
+    asyncio.run(main(LED(1), LED(2)))
 
     # Running on a generic board
     from machine import Pin
-    uasyncio.run(main(Pin(1), Pin(2)))
+    asyncio.run(main(Pin(1), Pin(2)))
 
 Core functions
 --------------
@@ -38,7 +41,7 @@ Core functions
 
     Create a new task from the given coroutine and schedule it to run.
 
-    Returns the corresponding `Task` object.
+    Returns the corresponding :class:`Task` object.
 
 .. function:: current_task()
 
@@ -95,8 +98,8 @@ Additional functions
 
     This is a coroutine.
 
-class Task
-----------
+class :class:`Task`
+-------------------
 
 .. class:: Task()
 
@@ -112,13 +115,17 @@ class Task
     ignore this exception.  Cleanup code may be run by trapping it, or via
     ``try ... finally``.
 
-class Event
------------
+class :class:`Event`
+--------------------
 
 .. class:: Event()
 
     Create a new event which can be used to synchronise tasks.  Events start
     in the cleared state.
+
+    *Note:* The :class:`Event` class is not thread-safe, and so should not be
+    used from an interrupt handler or :func:`scheduled task <micropython.schedule>`.
+    See :class:`ThreadSafeFlag`.
 
 .. method:: Event.is_set()
 
@@ -142,8 +149,8 @@ class Event
 
     This is a coroutine.
 
-class ThreadSafeFlag
---------------------
+class :class:`ThreadSafeFlag`
+-----------------------------
 
 .. class:: ThreadSafeFlag()
 
@@ -151,6 +158,11 @@ class ThreadSafeFlag
     outside the uasyncio loop, such as other threads, IRQs, or scheduler
     callbacks.  Flags start in the cleared state.  The class does not currently
     work under the Unix build of MicroPython.
+
+    .. admonition:: Difference to CPython
+        :class: attention
+
+        This is a MicroPython extension.
 
 .. method:: ThreadSafeFlag.set()
 
@@ -165,7 +177,7 @@ class ThreadSafeFlag
 .. method:: ThreadSafeFlag.wait()
 
     Wait for the flag to be set.  If the flag is already set then it returns
-    immediately.  The flag is automatically reset upon return from ``wait``.
+    immediately.  The flag is automatically reset upon return from :meth:`wait`.
 
     A flag may only be waited on by a single task at a time.
 
@@ -204,10 +216,10 @@ TCP stream connections
 .. function:: open_connection(host, port)
 
     Open a TCP connection to the given *host* and *port*.  The *host* address will be
-    resolved using `socket.getaddrinfo`, which is currently a blocking call.
+    resolved using :func:`socket.getaddrinfo`, which is currently a blocking call.
 
     Returns a pair of streams: a reader and a writer stream.
-    Will raise a socket-specific ``OSError`` if the host could not be resolved or if
+    Will raise a socket-specific :exc:`OSError` if the host could not be resolved or if
     the connection could not be made.
 
     This is a coroutine.

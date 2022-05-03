@@ -2,62 +2,63 @@
 ==========================================================
 
 .. module:: cmath
-   :synopsis: mathematical functions for complex numbers
+    :synopsis: mathematical functions for complex numbers
 
 |see_cpython_module| :mod:`python:cmath`.
 
-The ``cmath`` module provides some basic mathematical functions for
-working with complex numbers.
+This module provides some basic mathematical functions for working with complex
+numbers. This is only available on ports that have both floating point support
+and enable complex numbers.
 
-Availability: not available on WiPy and ESP8266. Floating point support
-required for this module.
+*Note:* On most microcontroller-based ports, floating-point numbers are
+ single-precision (i.e. 32-bit).
 
 Functions
 ---------
 
 .. function:: cos(z)
 
-   Return the cosine of ``z``.
+    Return the cosine of ``z``.
 
 .. function:: exp(z)
 
-   Return the exponential of ``z``.
+    Return the exponential of ``z``.
 
 .. function:: log(z)
 
-   Return the natural logarithm of ``z``.  The branch cut is along the negative real axis.
+    Return the natural logarithm of ``z``.  The branch cut is along the negative real axis.
 
 .. function:: log10(z)
 
-   Return the base-10 logarithm of ``z``.  The branch cut is along the negative real axis.
+    Return the base-10 logarithm of ``z``.  The branch cut is along the negative real axis.
 
 .. function:: phase(z)
 
-   Returns the phase of the number ``z``, in the range (-pi, +pi].
+    Returns the phase of the number ``z``, in the range (-pi, +pi].
 
 .. function:: polar(z)
 
-   Returns, as a tuple, the polar form of ``z``.
+    Returns, as a tuple, the polar form of ``z``.
 
 .. function:: rect(r, phi)
 
-   Returns the complex number with modulus ``r`` and phase ``phi``.
+    Returns the complex number with modulus ``r`` and phase ``phi``.
 
 .. function:: sin(z)
 
-   Return the sine of ``z``.
+    Return the sine of ``z``.
 
 .. function:: sqrt(z)
 
-   Return the square-root of ``z``.
+    Return the square-root of ``z``.
 
 Constants
 ---------
 
 .. data:: e
 
-   base of the natural logarithm
+    base of the natural logarithm
 
 .. data:: pi
 
-   the ratio of a circle's circumference to its diameter
+    the ratio of a circle's circumference to its diameter

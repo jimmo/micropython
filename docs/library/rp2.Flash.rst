@@ -9,8 +9,10 @@ This class gives access to the SPI flash memory.
 In most cases, to store persistent data on the device, you'll want to use a
 higher-level abstraction, for example the filesystem via Python's standard file
 API, but this interface is useful to :ref:`customise the filesystem
-configuration <filesystem>` or implement a low-level storage system for your
-application.
+configuration <guides_software_filesystem>` or implement a low-level storage
+system for your application.
+
+TODO: duplicate of pyb.
 
 
 Constructors
@@ -18,7 +20,7 @@ Constructors
 
 .. class:: Flash()
 
-   Gets the singleton object for accessing the SPI flash memory.
+    Gets the singleton object for accessing the SPI flash memory.
 
 
 Methods

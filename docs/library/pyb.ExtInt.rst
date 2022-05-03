@@ -21,7 +21,7 @@ Note: ExtInt will automatically configure the gpio line as an input. ::
 Now every time a falling edge is seen on the X1 pin, the callback will be
 called. Caution: mechanical pushbuttons have "bounce" and pushing or
 releasing a switch will often generate multiple edges.
-See: http://www.eng.utah.edu/~cs5780/debouncing.pdf for a detailed
+See: https://my.eng.utah.edu/~cs5780/debouncing.pdf for a detailed
 explanation, along with various techniques for debouncing.
 
 Trying to register 2 callbacks onto the same pin will throw an exception.
@@ -53,7 +53,7 @@ Constructors
 
 .. class:: ExtInt(pin, mode, pull, callback)
 
-   Create an ExtInt object:
+    Create an ExtInt object:
 
      - ``pin`` is the pin on which to enable the interrupt (can be a pin object or any valid pin name).
      - ``mode`` can be one of:
@@ -74,7 +74,7 @@ Class methods
 
 .. classmethod:: ExtInt.regs()
 
-   Dump the values of the EXTI registers.
+    Dump the values of the EXTI registers.
 
 
 Methods
@@ -82,20 +82,20 @@ Methods
 
 .. method:: ExtInt.disable()
 
-   Disable the interrupt associated with the ExtInt object.
-   This could be useful for debouncing.
+    Disable the interrupt associated with the ExtInt object.
+    This could be useful for debouncing.
 
 .. method:: ExtInt.enable()
 
-   Enable a disabled interrupt.
+    Enable a disabled interrupt.
 
 .. method:: ExtInt.line()
 
-   Return the line number that the pin is mapped to.
+    Return the line number that the pin is mapped to.
 
 .. method:: ExtInt.swint()
 
-   Trigger the callback from software.
+    Trigger the callback from software.
 
 
 Constants
@@ -103,12 +103,12 @@ Constants
 
 .. data:: ExtInt.IRQ_FALLING
 
-   interrupt on a falling edge
+    interrupt on a falling edge
 
 .. data:: ExtInt.IRQ_RISING
 
-   interrupt on a rising edge
+    interrupt on a rising edge
 
 .. data:: ExtInt.IRQ_RISING_FALLING
 
-   interrupt on a rising or falling edge
+    interrupt on a rising or falling edge

@@ -2,26 +2,28 @@
 ========================================================
 
 .. module:: uctypes
-   :synopsis: access binary data in a structured way
+    :synopsis: access binary data in a structured way
 
-This module implements "foreign data interface" for MicroPython. The idea
-behind it is similar to CPython's ``ctypes`` modules, but the actual API is
-different, streamlined and optimized for small size. The basic idea of the
-module is to define data structure layout with about the same power as the
-C language allows, and then access it using familiar dot-syntax to reference
-sub-fields.
+This module implements a "foreign data interface" for MicroPython. The idea
+behind it is similar to CPython's :mod:`python:ctypes` module, but the actual
+API is different, streamlined and optimized for smaller code size. The basic
+idea of the module is to define a flexible recursive data structure layout and
+then access it using a familiar Python syntax to reference sub-fields.
+
+This can be useful for implementing networking protocols or for making it easier
+to work with memory-mapped hardware peripherals (e.g. peripheral registers)
+from Python.
 
 .. warning::
 
-    ``uctypes`` module allows access to arbitrary memory addresses of the
-    machine (including I/O and control registers). Uncareful usage of it
-    may lead to crashes, data loss, and even hardware malfunction.
+    The :mod:`uctypes` module allows access to arbitrary memory addresses of the
+    machine (including I/O and control registers). Usage of it may lead to
+    crashes, data loss, and even hardware malfunction.
 
 .. seealso::
 
-    Module :mod:`struct`
-        Standard Python way to access binary data structures (doesn't scale
-        well to large and complex structures).
+    :mod:`struct` module
+        The standard Python way to generate and parse simple binary data structures.
 
 Usage examples::
 
@@ -84,7 +86,7 @@ Usage examples::
 Defining structure layout
 -------------------------
 
-Structure layout is defined by a "descriptor" - a Python dictionary which
+The structure layout is defined by a "descriptor" - a Python dictionary which
 encodes field names as keys and other properties required to access them as
 associated values::
 
@@ -94,66 +96,66 @@ associated values::
         ...
     }
 
-Currently, ``uctypes`` requires explicit specification of offsets for each
-field. Offset are given in bytes from the structure start.
+Currently, :mod:`uctypes` requires the offsets for each field to be explicitly
+specified. Offset are given in bytes from the structure start.
 
-Following are encoding examples for various field types:
+Examples of how to define the descriptor for for various field types are shown
+below:
 
 * Scalar types::
 
     "field_name": offset | uctypes.UINT32
 
-  in other words, the value is a scalar type identifier ORed with a field offset
-  (in bytes) from the start of the structure.
+  The value is a scalar type identifier ORed with the field offset (in bytes)
+  from the start of the structure.
 
 * Recursive structures::
 
-    "sub": (offset, {
-        "b0": 0 | uctypes.UINT8,
-        "b1": 1 | uctypes.UINT8,
-    })
+      "sub": (offset, {
+          "b0": 0 | uctypes.UINT8,
+          "b1": 1 | uctypes.UINT8,
+      })
 
-  i.e. value is a 2-tuple, first element of which is an offset, and second is
-  a structure descriptor dictionary (note: offsets in recursive descriptors
-  are relative to the structure it defines). Of course, recursive structures
-  can be specified not just by a literal dictionary, but by referring to a
-  structure descriptor dictionary (defined earlier) by name.
+  The value is a 2-tuple, the first element of which is an offset, and second is
+  a structure descriptor dictionary. Note: offsets in recursive descriptors
+  are relative to the sub-structure, and a sub-structure dictionary can be defined
+  once as a variable and used in multiple places.
 
 * Arrays of primitive types::
 
       "arr": (offset | uctypes.ARRAY, size | uctypes.UINT8),
 
-  i.e. value is a 2-tuple, first element of which is ARRAY flag ORed
-  with offset, and second is scalar element type ORed number of elements
-  in the array.
+  The value is a 2-tuple, the first element of which is the :data:`ARRAY` flag ORed
+  with the offset, and the second is the scalar element type ORed with the
+  number of elements in the array.
 
 * Arrays of aggregate types::
 
-    "arr2": (offset | uctypes.ARRAY, size, {"b": 0 | uctypes.UINT8}),
+      "arr2": (offset | uctypes.ARRAY, size, {"b": 0 | uctypes.UINT8}),
 
-  i.e. value is a 3-tuple, first element of which is ARRAY flag ORed
-  with offset, second is a number of elements in the array, and third is
-  a descriptor of element type.
+  The value is a 3-tuple, the first element of which is the :data:`ARRAY` flag ORed
+  with the offset, the second is the number of elements in the array, and the
+  third is a descriptor for the element type.
 
 * Pointer to a primitive type::
 
-    "ptr": (offset | uctypes.PTR, uctypes.UINT8),
+      "ptr": (offset | uctypes.PTR, uctypes.UINT8),
 
-  i.e. value is a 2-tuple, first element of which is PTR flag ORed
-  with offset, and second is a scalar element type.
+  The value is a 2-tuple, the first element of which is the :data:`PTR` flag ORed
+  with the offset, and the second is a scalar element type.
 
 * Pointer to an aggregate type::
 
-    "ptr2": (offset | uctypes.PTR, {"b": 0 | uctypes.UINT8}),
+      "ptr2": (offset | uctypes.PTR, {"b": 0 | uctypes.UINT8}),
 
-  i.e. value is a 2-tuple, first element of which is PTR flag ORed
-  with offset, second is a descriptor of type pointed to.
+  The value is a 2-tuple, the first element of which is the :data:`PTR` flag ORed
+  with the offset, and the second is a descriptor of the type pointed to.
 
 * Bitfields::
 
-    "bitf0": offset | uctypes.BFUINT16 | lsbit << uctypes.BF_POS | bitsize << uctypes.BF_LEN,
+      "bitf0": offset | uctypes.BFUINT16 | lsbit << uctypes.BF_POS | bitsize << uctypes.BF_LEN,
 
-  i.e. value is a type of scalar value containing given bitfield (typenames are
+  The value is a type of scalar value containing given bitfield (typenames are
   similar to scalar types, but prefixes with ``BF``), ORed with offset for
   scalar value containing the bitfield, and further ORed with values for
   bit position and bit length of the bitfield within the scalar value, shifted by
@@ -177,54 +179,60 @@ Following are encoding examples for various field types:
   numbering in their native ABI, but ``uctypes`` always uses the normalized
   numbering described above.
 
-Module contents
----------------
+class :class:`struct`
+---------------------
 
 .. class:: struct(addr, descriptor, layout_type=NATIVE, /)
 
-   Instantiate a "foreign data structure" object based on structure address in
-   memory, descriptor (encoded as a dictionary), and layout type (see below).
+    Instantiate a "foreign data structure" object based on the structure address in
+    memory, descriptor (encoded as a dictionary), and layout type (see below).
 
-.. data:: LITTLE_ENDIAN
-
-   Layout type for a little-endian packed structure. (Packed means that every
-   field occupies exactly as many bytes as defined in the descriptor, i.e.
-   the alignment is 1).
-
-.. data:: BIG_ENDIAN
-
-   Layout type for a big-endian packed structure.
-
-.. data:: NATIVE
-
-   Layout type for a native structure - with data endianness and alignment
-   conforming to the ABI of the system on which MicroPython runs.
+Methods
+-------
 
 .. function:: sizeof(struct, layout_type=NATIVE, /)
 
-   Return size of data structure in bytes. The *struct* argument can be
-   either a structure class or a specific instantiated structure object
-   (or its aggregate field).
+    Return size of the data structure in bytes. The *struct* argument can be
+    either a structure class or a specific instantiated structure object
+    (or its aggregate field).
 
 .. function:: addressof(obj)
 
-   Return address of an object. Argument should be bytes, bytearray or
-   other object supporting buffer protocol (and address of this buffer
-   is what actually returned).
+    Return the address of an object. Argument should be ``bytes``, ``bytearray``
+    or other object supporting the :term:`buffer protocol` (and the address of
+    this buffer is what actually returned).
 
 .. function:: bytes_at(addr, size)
 
-   Capture memory at the given address and size as bytes object. As bytes
-   object is immutable, memory is actually duplicated and copied into
-   bytes object, so if memory contents change later, created object
-   retains original value.
+    Capture memory at the given address and size as a ``bytes`` object. As the
+    returned bytes object is immutable, memory is actually duplicated and
+    copied into the bytes object, so if memory contents change later, this
+    object will retain its original value.
 
 .. function:: bytearray_at(addr, size)
 
-   Capture memory at the given address and size as bytearray object.
-   Unlike bytes_at() function above, memory is captured by reference,
-   so it can be both written too, and you will access current value
-   at the given memory address.
+    Capture memory at the given address and size as a ``bytearray`` object.
+    Unlike bytes_at() function above, memory is captured by reference, so it
+    can be both written too, and you will access the current value at the given
+    memory address.
+
+Constants
+---------
+
+.. data:: LITTLE_ENDIAN
+
+    Layout type for a little-endian packed structure. (Packed means that every
+    field occupies exactly as many bytes as defined in the descriptor, i.e.
+    the alignment is 1).
+
+.. data:: BIG_ENDIAN
+
+    Layout type for a big-endian packed structure.
+
+.. data:: NATIVE
+
+    Layout type for a native structure - with data endianness and alignment
+    conforming to the ABI of the system on which MicroPython runs.
 
 .. data:: UINT8
           INT8
@@ -235,39 +243,39 @@ Module contents
           UINT64
           INT64
 
-   Integer types for structure descriptors. Constants for 8, 16, 32,
-   and 64 bit types are provided, both signed and unsigned.
+    Integer types for structure descriptors. Constants for 8, 16, 32,
+    and 64 bit types are provided, both signed and unsigned.
 
 .. data:: FLOAT32
           FLOAT64
 
-   Floating-point types for structure descriptors.
+    Floating-point types for structure descriptors.
 
 .. data:: VOID
 
-   ``VOID`` is an alias for ``UINT8``, and is provided to conveniently define
-   C's void pointers: ``(uctypes.PTR, uctypes.VOID)``.
+    ``VOID`` is an alias for ``UINT8``, and is provided to conveniently define
+    C's void pointers: ``(uctypes.PTR, uctypes.VOID)``.
 
 .. data:: PTR
           ARRAY
 
-   Type constants for pointers and arrays. Note that there is no explicit
-   constant for structures, it's implicit: an aggregate type without ``PTR``
-   or ``ARRAY`` flags is a structure.
+    Type constants for pointers and arrays. Note that there is no explicit
+    constant for structures, it's implicit: an aggregate type without ``PTR``
+    or ``ARRAY`` flags is a structure.
 
-Structure descriptors and instantiating structure objects
----------------------------------------------------------
+Instantiating structure objects
+-------------------------------
 
 Given a structure descriptor dictionary and its layout type, you can
 instantiate a specific structure instance at a given memory address
-using :class:`uctypes.struct()` constructor. Memory address usually comes from
-following sources:
+using the :class:`uctypes.struct` constructor. The memory address
+usually comes from following sources:
 
-* Predefined address, when accessing hardware registers on a baremetal
-  system. Lookup these addresses in datasheet for a particular MCU/SoC.
+* Predefined address, when accessing hardware registers on a :term:`bare-metal`
+  system. Look up these addresses in datasheet for a particular MCU/SoC.
 * As a return value from a call to some FFI (Foreign Function Interface)
   function.
-* From `uctypes.addressof()`, when you want to pass arguments to an FFI
+* From :func:`uctypes.addressof`, when you want to pass arguments to an FFI
   function, or alternatively, to access some data for I/O (for example,
   data read from a file or network socket).
 
@@ -283,22 +291,19 @@ be assigned to.
 If a field is an array, its individual elements can be accessed with
 the standard subscript operator ``[]`` - both read and assigned to.
 
-If a field is a pointer, it can be dereferenced using ``[0]`` syntax
+If a field is a pointer, it can be de-referenced using ``[0]`` syntax
 (corresponding to C ``*`` operator, though ``[0]`` works in C too).
 Subscripting a pointer with other integer values but 0 are also supported,
-with the same semantics as in C.
-
-Summing up, accessing structure fields generally follows the C syntax,
-except for pointer dereference, when you need to use ``[0]`` operator
-instead of ``*``.
+with the same semantics as in C. Note that unlike in C, the ``*`` operator
+cannot be used to de-reference a pointer field.
 
 Limitations
 -----------
 
 1. Accessing non-scalar fields leads to allocation of intermediate objects
-to represent them. This means that special care should be taken to
-layout a structure which needs to be accessed when memory allocation
-is disabled (e.g. from an interrupt). The recommendations are:
+   to represent them. This means that special care should be taken to
+   layout a structure which needs to be accessed when memory allocation
+   is disabled (e.g. from an interrupt). The recommendations are:
 
 * Avoid accessing nested structures. For example, instead of
   ``mcu_registers.peripheral_a.register1``, define separate layout
@@ -312,14 +317,13 @@ is disabled (e.g. from an interrupt). The recommendations are:
   an alternative is to cache intermediate values, e.g.
   ``register0 = peripheral_a.register[0]``.
 
-2. Range of offsets supported by the ``uctypes`` module is limited.
-The exact range supported is considered an implementation detail,
-and the general suggestion is to split structure definitions to
-cover from a few kilobytes to a few dozen of kilobytes maximum.
-In most cases, this is a natural situation anyway, e.g. it doesn't make
-sense to define all registers of an MCU (spread over 32-bit address
-space) in one structure, but rather a peripheral block by peripheral
-block. In some extreme cases, you may need to split a structure in
-several parts artificially (e.g. if accessing native data structure
-with multi-megabyte array in the middle, though that would be a very
-synthetic case).
+2. The range of field offsets supported by the :mod:`uctypes` module is limited.
+   The exact range supported is considered an implementation detail, and the
+   general suggestion is to split structure definitions to cover from a few
+   kilobytes to a few dozen of kilobytes maximum. In most cases, this is a natural
+   situation anyway, e.g. it doesn't make sense to define all registers of an MCU
+   (spread over 32-bit address space) in one structure, but rather a peripheral
+   block by peripheral block. In some extreme cases, you may need to split a
+   structure in several parts artificially (e.g. if accessing native data
+   structure with multi-megabyte array in the middle, though that would be a very
+   synthetic case).

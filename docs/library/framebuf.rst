@@ -2,13 +2,13 @@
 =============================================
 
 .. module:: framebuf
-   :synopsis: Frame buffer manipulation
+    :synopsis: Frame buffer manipulation
 
 This module provides a general frame buffer which can be used to create
 bitmap images, which can then be sent to a display.
 
-class FrameBuffer
------------------
+class :class:`FrameBuffer`
+--------------------------
 
 The FrameBuffer class provides a pixel buffer which can be drawn upon with
 pixels, lines, rectangles, ellipses, polygons, text and even other
@@ -26,7 +26,7 @@ For example::
     fbuf.hline(0, 9, 96, 0xffff)
 
 Constructors
-------------
+~~~~~~~~~~~~
 
 .. class:: FrameBuffer(buffer, width, height, format, stride=width, /)
 
@@ -54,7 +54,7 @@ Constructors
     unexpected errors.
 
 Drawing primitive shapes
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following methods draw shapes onto the FrameBuffer.
 
@@ -110,7 +110,7 @@ The following methods draw shapes onto the FrameBuffer.
     Otherwise just a one pixel outline is drawn.
 
 Drawing text
-------------
+~~~~~~~~~~~~
 
 .. method:: FrameBuffer.text(s, x, y[, c])
 
@@ -121,7 +121,7 @@ Drawing text
 
 
 Other methods
--------------
+~~~~~~~~~~~~~
 
 .. method:: FrameBuffer.scroll(xstep, ystep)
 
@@ -149,7 +149,7 @@ Other methods
     color of the corresponding source pixel.
 
 Constants
----------
+~~~~~~~~~
 
 .. data:: framebuf.MONO_VLSB
 

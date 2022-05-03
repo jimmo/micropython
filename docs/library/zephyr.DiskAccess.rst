@@ -4,7 +4,7 @@
 class DiskAccess -- access to disk storage
 ==========================================
 
-Uses `Zephyr Disk Access API <https://docs.zephyrproject.org/latest/reference/storage/disk/access.html>`_.
+Uses `Zephyr Disk Access API <https://docs.zephyrproject.org/latest/services/storage/disk/access.html>`_.
 
 This class allows access to storage devices on the board, such as support for SD card controllers and
 interfacing with SD cards via SPI. Disk devices are automatically detected and initialized on boot using
@@ -19,9 +19,9 @@ Constructors
 
 .. class:: DiskAccess(disk_name)
 
-   Gets an object for accessing disk memory of the specific disk.
-   For accessing an SD card on the mimxrt1050_evk, ``disk_name`` would be ``SDHC``. See board documentation and
-   devicetree for usable disk names for your board (ex. RT boards use style USDHC#).
+    Gets an object for accessing disk memory of the specific disk.
+    For accessing an SD card on the mimxrt1050_evk, ``disk_name`` would be ``SDHC``. See board documentation and
+    devicetree for usable disk names for your board (ex. RT boards use style USDHC#).
 
 Methods
 -------

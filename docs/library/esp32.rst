@@ -6,9 +6,11 @@
 .. module:: esp32
     :synopsis: functionality specific to the ESP32
 
-The ``esp32`` module contains functions and classes specifically aimed at
-controlling ESP32 modules.
+This module contains functions and classes specifically aimed at controlling
+ESP32 modules.
 
+.. toctree::
+    :maxdepth: 2
 
 Functions
 ---------
@@ -188,12 +190,12 @@ with each number, the bitstream is ``0101`` with durations of [100ns, 2000ns,
 100ns, 4000ns].
 
 For more details see Espressif's `ESP-IDF RMT documentation.
-<https://docs.espressif.com/projects/esp-idf/en/latest/api-reference/peripherals/rmt.html>`_.
+<https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/rmt.html>`_.
 
 .. Warning::
-   The current MicroPython RMT implementation lacks some features, most notably
-   receiving pulses. RMT should be considered a
-   *beta feature* and the interface may change in the future.
+    The current MicroPython RMT implementation lacks some features, most notably
+    receiving pulses. RMT should be considered a
+    *beta feature* and the interface may change in the future.
 
 
 .. class:: RMT(channel, *, pin=None, clock_div=8, idle_level=False, tx_carrier=None)
@@ -266,12 +268,12 @@ For more details see Espressif's `ESP-IDF RMT documentation.
 
 .. staticmethod:: RMT.bitstream_channel([value])
 
-    Select which RMT channel is used by the `machine.bitstream` implementation.
+    Select which RMT channel is used by the :func:`machine.bitstream` implementation.
     *value* can be ``None`` or a valid RMT channel number.  The default RMT
     channel is the highest numbered one.
 
     Passing in ``None`` disables the use of RMT and instead selects a bit-banging
-    implementation for `machine.bitstream`.
+    implementation for :func:`machine.bitstream`.
 
     Passing in no argument will not change the channel.  This function returns
     the current channel number.
@@ -302,7 +304,7 @@ Constants
 .. data:: esp32.WAKEUP_ALL_LOW
           esp32.WAKEUP_ANY_HIGH
 
-   Selects the wake level for pins.
+    Selects the wake level for pins.
 
 Non-Volatile Storage
 --------------------

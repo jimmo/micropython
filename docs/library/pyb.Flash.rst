@@ -9,28 +9,28 @@ The Flash class allows direct access to the primary flash device on the pyboard.
 In most cases, to store persistent data on the device, you'll want to use a
 higher-level abstraction, for example the filesystem via Python's standard file
 API, but this interface is useful to :ref:`customise the filesystem
-configuration <filesystem>` or implement a low-level storage system for your
-application.
+configuration <guides_software_filesystem>` or implement a low-level storage
+system for your application.
 
 Constructors
 ------------
 
 .. class:: Flash()
 
-   Create and return a block device that represents the flash device presented
-   to the USB mass storage interface.
+    Create and return a block device that represents the flash device presented
+    to the USB mass storage interface.
 
-   It includes a virtual partition table at the start, and the actual flash
-   starts at block ``0x100``.
+    It includes a virtual partition table at the start, and the actual flash
+    starts at block ``0x100``.
 
-   This constructor is deprecated and will be removed in a future version of MicroPython.
+    This constructor is deprecated and will be removed in a future version of MicroPython.
 
 .. class:: Flash(*, start=-1, len=-1)
-   :noindex:
+    :noindex:
 
-   Create and return a block device that accesses the flash at the specified offset. The length defaults to the remaining size of the device.
+    Create and return a block device that accesses the flash at the specified offset. The length defaults to the remaining size of the device.
 
-   The *start* and *len* offsets are in bytes, and must be a multiple of the block size (typically 512 for internal flash).
+    The *start* and *len* offsets are in bytes, and must be a multiple of the block size (typically 512 for internal flash).
 
 Methods
 -------

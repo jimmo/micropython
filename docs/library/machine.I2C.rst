@@ -1,8 +1,7 @@
 .. currentmodule:: machine
-.. _machine.I2C:
 
-class I2C -- a two-wire serial protocol
-=======================================
+class :class:`I2C`
+==================
 
 I2C is a two-wire protocol for communicating between devices.  At the physical
 level it consists of 2 wires: SCL and SDA, the clock and data lines respectively.
@@ -13,12 +12,12 @@ when created, or initialised later on.
 Printing the I2C object gives you information about its configuration.
 
 Both hardware and software I2C implementations exist via the
-:ref:`machine.I2C <machine.I2C>` and `machine.SoftI2C` classes.  Hardware I2C uses
-underlying hardware support of the system to perform the reads/writes and is
-usually efficient and fast but may have restrictions on which pins can be used.
-Software I2C is implemented by bit-banging and can be used on any pin but is not
-as efficient.  These classes have the same methods available and differ primarily
-in the way they are constructed.
+:class:`I2C` and :class:`SoftI2C` classes.  Hardware I2C uses underlying
+hardware support of the system to perform the reads/writes and is usually
+efficient and fast but may have restrictions on which pins can be used.
+Software I2C is implemented by bit-banging and can be used on any pin but is
+not as efficient.  These classes have the same methods available and differ
+primarily in the way they are constructed.
 
 .. Note::
 
@@ -54,31 +53,30 @@ Constructors
 
 .. class:: I2C(id, *, scl, sda, freq=400000)
 
-   Construct and return a new I2C object using the following parameters:
+    Construct and return a new I2C object using the following parameters:
 
-      - *id* identifies a particular I2C peripheral.  Allowed values for
-        depend on the particular port/board
-      - *scl* should be a pin object specifying the pin to use for SCL.
-      - *sda* should be a pin object specifying the pin to use for SDA.
-      - *freq* should be an integer which sets the maximum frequency
-        for SCL.
+        - *id* identifies a particular I2C peripheral.  Allowed values for
+          depend on the particular port/board
+        - *scl* should be a pin object specifying the pin to use for SCL.
+        - *sda* should be a pin object specifying the pin to use for SDA.
+        - *freq* should be an integer which sets the maximum frequency
+          for SCL.
 
-   Note that some ports/boards will have default values of *scl* and *sda*
-   that can be changed in this constructor.  Others will have fixed values
-   of *scl* and *sda* that cannot be changed.
+    Note that some ports/boards will have default values of *scl* and *sda*
+    that can be changed in this constructor.  Others will have fixed values
+    of *scl* and *sda* that cannot be changed.
 
-.. _machine.SoftI2C:
 .. class:: SoftI2C(scl, sda, *, freq=400000, timeout=50000)
 
-   Construct a new software I2C object.  The parameters are:
+    Construct a new software I2C object.  The parameters are:
 
-      - *scl* should be a pin object specifying the pin to use for SCL.
-      - *sda* should be a pin object specifying the pin to use for SDA.
-      - *freq* should be an integer which sets the maximum frequency
-        for SCL.
-      - *timeout* is the maximum time in microseconds to wait for clock
-        stretching (SCL held low by another device on the bus), after
-        which an ``OSError(ETIMEDOUT)`` exception is raised.
+        - *scl* should be a pin object specifying the pin to use for SCL.
+        - *sda* should be a pin object specifying the pin to use for SDA.
+        - *freq* should be an integer which sets the maximum frequency
+          for SCL.
+        - *timeout* is the maximum time in microseconds to wait for clock
+          stretching (SCL held low by another device on the bus), after
+          which an ``OSError(ETIMEDOUT)`` exception is raised.
 
 General Methods
 ---------------
@@ -97,15 +95,15 @@ General Methods
 
 .. method:: I2C.deinit()
 
-   Turn off the I2C bus.
+    Turn off the I2C bus.
 
-   Availability: WiPy.
+    Availability: WiPy.
 
 .. method:: I2C.scan()
 
-   Scan all I2C addresses between 0x08 and 0x77 inclusive and return a list of
-   those that respond.  A device responds if it pulls the SDA line low after
-   its address (including a write bit) is sent on the bus.
+    Scan all I2C addresses between 0x08 and 0x77 inclusive and return a list of
+    those that respond.  A device responds if it pulls the SDA line low after
+    its address (including a write bit) is sent on the bus.
 
 Primitive I2C operations
 ------------------------
@@ -114,29 +112,29 @@ The following methods implement the primitive I2C controller bus operations and 
 be combined to make any I2C transaction.  They are provided if you need more
 control over the bus, otherwise the standard methods (see below) can be used.
 
-These methods are only available on the `machine.SoftI2C` class.
+These methods are only available on the :class:`SoftI2C` class.
 
 .. method:: I2C.start()
 
-   Generate a START condition on the bus (SDA transitions to low while SCL is high).
+    Generate a START condition on the bus (SDA transitions to low while SCL is high).
 
 .. method:: I2C.stop()
 
-   Generate a STOP condition on the bus (SDA transitions to high while SCL is high).
+    Generate a STOP condition on the bus (SDA transitions to high while SCL is high).
 
 .. method:: I2C.readinto(buf, nack=True, /)
 
-   Reads bytes from the bus and stores them into *buf*.  The number of bytes
-   read is the length of *buf*.  An ACK will be sent on the bus after
-   receiving all but the last byte.  After the last byte is received, if *nack*
-   is true then a NACK will be sent, otherwise an ACK will be sent (and in this
-   case the peripheral assumes more bytes are going to be read in a later call).
+    Reads bytes from the bus and stores them into *buf*.  The number of bytes
+    read is the length of *buf*.  An ACK will be sent on the bus after
+    receiving all but the last byte.  After the last byte is received, if *nack*
+    is true then a NACK will be sent, otherwise an ACK will be sent (and in this
+    case the peripheral assumes more bytes are going to be read in a later call).
 
 .. method:: I2C.write(buf)
 
-   Write the bytes from *buf* to the bus.  Checks that an ACK is received
-   after each byte and stops transmitting the remaining bytes if a NACK is
-   received.  The function returns the number of ACKs that were received.
+    Write the bytes from *buf* to the bus.  Checks that an ACK is received
+    after each byte and stops transmitting the remaining bytes if a NACK is
+    received.  The function returns the number of ACKs that were received.
 
 Standard bus operations
 -----------------------
@@ -146,39 +144,39 @@ operations that target a given peripheral device.
 
 .. method:: I2C.readfrom(addr, nbytes, stop=True, /)
 
-   Read *nbytes* from the peripheral specified by *addr*.
-   If *stop* is true then a STOP condition is generated at the end of the transfer.
-   Returns a `bytes` object with the data read.
+    Read *nbytes* from the peripheral specified by *addr*.
+    If *stop* is true then a STOP condition is generated at the end of the transfer.
+    Returns a `bytes` object with the data read.
 
 .. method:: I2C.readfrom_into(addr, buf, stop=True, /)
 
-   Read into *buf* from the peripheral specified by *addr*.
-   The number of bytes read will be the length of *buf*.
-   If *stop* is true then a STOP condition is generated at the end of the transfer.
+    Read into *buf* from the peripheral specified by *addr*.
+    The number of bytes read will be the length of *buf*.
+    If *stop* is true then a STOP condition is generated at the end of the transfer.
 
-   The method returns ``None``.
+    The method returns ``None``.
 
 .. method:: I2C.writeto(addr, buf, stop=True, /)
 
-   Write the bytes from *buf* to the peripheral specified by *addr*.  If a
-   NACK is received following the write of a byte from *buf* then the
-   remaining bytes are not sent.  If *stop* is true then a STOP condition is
-   generated at the end of the transfer, even if a NACK is received.
-   The function returns the number of ACKs that were received.
+    Write the bytes from *buf* to the peripheral specified by *addr*.  If a
+    NACK is received following the write of a byte from *buf* then the
+    remaining bytes are not sent.  If *stop* is true then a STOP condition is
+    generated at the end of the transfer, even if a NACK is received.
+    The function returns the number of ACKs that were received.
 
 .. method:: I2C.writevto(addr, vector, stop=True, /)
 
-   Write the bytes contained in *vector* to the peripheral specified by *addr*.
-   *vector* should be a tuple or list of objects with the buffer protocol.
-   The *addr* is sent once and then the bytes from each object in *vector*
-   are written out sequentially.  The objects in *vector* may be zero bytes
-   in length in which case they don't contribute to the output.
+    Write the bytes contained in *vector* to the peripheral specified by *addr*.
+    *vector* should be a tuple or list of objects with the buffer protocol.
+    The *addr* is sent once and then the bytes from each object in *vector*
+    are written out sequentially.  The objects in *vector* may be zero bytes
+    in length in which case they don't contribute to the output.
 
-   If a NACK is received following the write of a byte from one of the
-   objects in *vector* then the remaining bytes, and any remaining objects,
-   are not sent.  If *stop* is true then a STOP condition is generated at
-   the end of the transfer, even if a NACK is received.  The function
-   returns the number of ACKs that were received.
+    If a NACK is received following the write of a byte from one of the
+    objects in *vector* then the remaining bytes, and any remaining objects,
+    are not sent.  If *stop* is true then a STOP condition is generated at
+    the end of the transfer, even if a NACK is received.  The function
+    returns the number of ACKs that were received.
 
 Memory operations
 -----------------
@@ -190,26 +188,309 @@ methods are convenience functions to communicate with such devices.
 
 .. method:: I2C.readfrom_mem(addr, memaddr, nbytes, *, addrsize=8)
 
-   Read *nbytes* from the peripheral specified by *addr* starting from the memory
-   address specified by *memaddr*.
-   The argument *addrsize* specifies the address size in bits.
-   Returns a `bytes` object with the data read.
+    Read *nbytes* from the peripheral specified by *addr* starting from the memory
+    address specified by *memaddr*.
+    The argument *addrsize* specifies the address size in bits.
+    Returns a `bytes` object with the data read.
 
 .. method:: I2C.readfrom_mem_into(addr, memaddr, buf, *, addrsize=8)
 
-   Read into *buf* from the peripheral specified by *addr* starting from the
-   memory address specified by *memaddr*.  The number of bytes read is the
-   length of *buf*.
-   The argument *addrsize* specifies the address size in bits (on ESP8266
-   this argument is not recognised and the address size is always 8 bits).
+    Read into *buf* from the peripheral specified by *addr* starting from the
+    memory address specified by *memaddr*.  The number of bytes read is the
+    length of *buf*.
+    The argument *addrsize* specifies the address size in bits (on ESP8266
+    this argument is not recognised and the address size is always 8 bits).
 
-   The method returns ``None``.
+    The method returns ``None``.
 
 .. method:: I2C.writeto_mem(addr, memaddr, buf, *, addrsize=8)
 
-   Write *buf* to the peripheral specified by *addr* starting from the
-   memory address specified by *memaddr*.
-   The argument *addrsize* specifies the address size in bits (on ESP8266
-   this argument is not recognised and the address size is always 8 bits).
+    Write *buf* to the peripheral specified by *addr* starting from the
+    memory address specified by *memaddr*.
+    The argument *addrsize* specifies the address size in bits (on ESP8266
+    this argument is not recognised and the address size is always 8 bits).
 
-   The method returns ``None``.
+    The method returns ``None``.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Software I2C bus
+----------------
+
+Software I2C (using bit-banging) works on all output-capable pins, and is
+accessed via the :class:`SoftI2C` class::
+
+    from machine import Pin, SoftI2C
+
+    i2c = SoftI2C(scl=Pin(5), sda=Pin(4), freq=100000)
+
+    i2c.scan()              # scan for devices
+
+    i2c.readfrom(0x3a, 4)   # read 4 bytes from device with address 0x3a
+    i2c.writeto(0x3a, '12') # write '12' to device with address 0x3a
+
+    buf = bytearray(10)     # create a buffer with 10 bytes
+    i2c.writeto(0x3a, buf)  # write the given buffer to the peripheral
+
+Hardware I2C bus
+----------------
+
+There are two hardware I2C peripherals with identifiers 0 and 1.  Any available
+output-capable pins can be used for SCL and SDA but the defaults are given
+below.
+
+=====  ===========  ============
+\      I2C(0)       I2C(1)
+=====  ===========  ============
+scl    18           25
+sda    19           26
+=====  ===========  ============
+
+The driver is accessed via the :class:`I2C` class and
+has the same methods as software I2C above::
+
+    from machine import Pin, I2C
+
+    i2c = I2C(0)
+    i2c = I2C(1, scl=Pin(5), sda=Pin(4), freq=400000)
+
+
+ESP8266
+-------
+
+The I2C driver is implemented in software and works on all pins,
+and is accessed via the :class:`I2C` class (which is an
+alias of :class:`SoftI2C`)::
+
+    from machine import Pin, I2C
+
+    # construct an I2C bus
+    i2c = I2C(scl=Pin(5), sda=Pin(4), freq=100000)
+
+    i2c.readfrom(0x3a, 4)   # read 4 bytes from peripheral device with address 0x3a
+    i2c.writeto(0x3a, '12') # write '12' to peripheral device with address 0x3a
+
+    buf = bytearray(10)     # create a buffer with 10 bytes
+    i2c.writeto(0x3a, buf)  # write the given buffer to the peripheral
+
+
+
+imx
+---
+
+
+Software I2C bus
+----------------
+
+Software I2C (using bit-banging) works on all output-capable pins, and is
+accessed via the :class:`SoftI2C` class::
+
+    from machine import Pin, SoftI2C
+
+    i2c = SoftI2C(scl=Pin(5), sda=Pin(4), freq=100000)
+
+    i2c.scan()              # scan for devices
+
+    i2c.readfrom(0x3a, 4)   # read 4 bytes from device with address 0x3a
+    i2c.writeto(0x3a, '12') # write '12' to device with address 0x3a
+
+    buf = bytearray(10)     # create a buffer with 10 bytes
+    i2c.writeto(0x3a, buf)  # write the given buffer to the slave
+
+The highest supported freq is 400000.
+
+Hardware I2C bus
+----------------
+
+There are up to four hardware I2C channels that allow faster transmission rates
+and support the full I2C protocol.  The I2C signals have fixed assignments to GPIO pins.
+For the assignment of Pins to I2C signals, refer to :ref:`Hardware I2C pinout <devices_mimxrt_pins_i2c>`.
+
+Hardware I2C is accessed via the :class:`I2C` class and
+has the same methods as software SPI above::
+
+    from machine import I2C
+
+    i2c = I2C(0, 400_000)
+    i2c.writeto(0x76, b"Hello World")
+
+
+
+
+
+stm32
+-----
+
+Hardware I2C is available on the X and Y halves of the pyboard via ``I2C('X')``
+and ``I2C('Y')``.  Alternatively pass in the integer identifier of the peripheral,
+eg ``I2C(1)``.  Software I2C is also available by explicitly specifying the
+``scl`` and ``sda`` pins instead of the bus name.  For more details see
+:class:`I2C`. ::
+
+    from machine import I2C
+
+    i2c = I2C('X', freq=400000)                 # create hardware I2c object
+    i2c = I2C(scl='X1', sda='X2', freq=100000)  # create software I2C object
+
+    i2c.scan()                          # returns list of peripheral addresses
+    i2c.writeto(0x42, 'hello')          # write 5 bytes to peripheral with address 0x42
+    i2c.readfrom(0x42, 5)               # read 5 bytes from peripheral
+
+    i2c.readfrom_mem(0x42, 0x10, 2)     # read 2 bytes from peripheral 0x42, peripheral memory 0x10
+    i2c.writeto_mem(0x42, 0x10, 'xy')   # write 2 bytes to peripheral 0x42, peripheral memory 0x10
+
+Note: for legacy I2C support see :ref:`pyb.I2C <pyb.I2C>`.
+
+
+renesas
+-------
+
+
+The RA MCU has some hardware IIC (Inter-Integrated Circuit Bus).
+I2C id is available corresponding to the RA MCU's I2C number which are I2C(0) as IIC0 and I2C(1) as IIC1. If with no additional parameters, machine.SoftI2C() is called.
+
+See :class:`I2C` ::
+
+    from machine import I2C
+
+    i2c = I2C(0)
+
+    i2c.scan()         # returns list of slave addresses
+    i2c.readfrom_mem(0x50, 0x10, 2, addrsize=16)  # read 2 bytes from slave 0x50, slave memory 0x10
+
+
+i2c
+---
+
+
+Software I2C bus
+----------------
+
+Software I2C (using bit-banging) works on all output-capable pins, and is
+accessed via the :class:`SoftI2C` class::
+
+    from machine import Pin, SoftI2C
+
+    i2c = SoftI2C(scl=Pin(5), sda=Pin(4), freq=100_000)
+
+    i2c.scan()              # scan for devices
+
+    i2c.readfrom(0x3a, 4)   # read 4 bytes from device with address 0x3a
+    i2c.writeto(0x3a, '12') # write '12' to device with address 0x3a
+
+    buf = bytearray(10)     # create a buffer with 10 bytes
+    i2c.writeto(0x3a, buf)  # write the given buffer to the peripheral
+
+Hardware I2C bus
+----------------
+
+The driver is accessed via the :class:`I2C` class and
+has the same methods as software I2C above::
+
+    from machine import Pin, I2C
+
+    i2c = I2C(0)   # default assignment: scl=Pin(9), sda=Pin(8)
+    i2c = I2C(1, scl=Pin(3), sda=Pin(2), freq=400_000)
+
+
+
+
+wipy
+----
+
+
+See :class:`I2C`. ::
+
+    from machine import I2C
+    # configure the I2C bus
+    i2c = I2C(baudrate=100000)
+    i2c.scan() # returns list of peripheral addresses
+    i2c.writeto(0x42, 'hello') # send 5 bytes to peripheral with address 0x42
+    i2c.readfrom(0x42, 5) # receive 5 bytes from peripheral
+    i2c.readfrom_mem(0x42, 0x10, 2) # read 2 bytes from peripheral 0x42, peripheral memory 0x10
+    i2c.writeto_mem(0x42, 0x10, 'xy') # write 2 bytes to peripheral 0x42, peripheral memory 0x10
+
+
+zephyr
+------
+
+
+Hardware I2C bus
+----------------
+
+Hardware I2C is accessed via the :class:`I2C` class::
+
+    from machine import I2C
+
+    i2c = I2C("I2C_0")          # construct an i2c bus
+    print(i2c)                  # print device name
+
+    i2c.scan()                  # scan the device for available I2C slaves
+
+    i2c.readfrom(0x1D, 4)                # read 4 bytes from slave 0x1D
+    i2c.readfrom_mem(0x1D, 0x0D, 1)      # read 1 byte from slave 0x1D at slave memory 0x0D
+
+    i2c.writeto(0x1D, b'abcd')           # write to slave with address 0x1D
+    i2c.writeto_mem(0x1D, 0x0D, b'ab')   # write to slave 0x1D at slave memory 0x0D
+
+    buf = bytearray(8)                  # create buffer of size 8
+    i2c.writeto(0x1D, b'abcd')          # write buf to slave 0x1D
+
+samd
+----
+
+Software I2C bus
+----------------
+
+Software I2C (using bit-banging) works on all output-capable pins, and is
+accessed via the :ref:`machine.SoftI2C <machine.SoftI2C>` class::
+
+    from machine import Pin, SoftI2C
+
+    i2c = SoftI2C(scl=Pin(10), sda=Pin(11), freq=100000)
+
+    i2c.scan()              # scan for devices
+
+    i2c.readfrom(0x3a, 4)   # read 4 bytes from device with address 0x3a
+    i2c.writeto(0x3a, '12') # write '12' to device with address 0x3a
+
+    buf = bytearray(10)     # create a buffer with 10 bytes
+    i2c.writeto(0x3a, buf)  # write the given buffer to the slave
+
+The highest supported freq is 400000.
+
+Hardware I2C bus
+----------------
+
+The SAMD21/SAMD51 MCUs have up to eight hardware so called SERCOM devices,
+which can be used as UART, SPI or I2C device, but not every MCU variant
+and board exposes all signal pins for users.
+For the assignment of Pins to devices and I2C signals, refer to :ref:`SAMD pinout <samd_pinout>`.
+
+Hardware I2C is accessed via the :ref:`machine.I2C <machine.I2C>` class and
+has the same methods as software SPI above::
+
+    from machine import I2C
+
+    i2c = I2C(2, scl=Pin("SCL"), sda=Pin("SDA"), freq=400_000)
+    i2c.writeto(0x76, b"Hello World")

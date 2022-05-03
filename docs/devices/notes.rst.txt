@@ -1,0 +1,541 @@
+:orphan:
+
+MicroPython aims to implement the Python 3.4 standard (with selected
+features from later versions) with respect to language syntax, and most
+of the features of MicroPython are identical to those described by the
+"Language Reference" documentation at
+`docs.python.org <https://docs.python.org/3/reference/index.html>`_.
+
+The MicroPython standard library is described in the
+:ref:`corresponding chapter <micropython_lib>`. The :ref:`cpython_diffs`
+chapter describes differences between MicroPython and CPython (which
+mostly concern standard library and types, but also some language-level
+features).
+
+This chapter describes features and peculiarities of MicroPython
+implementation and the best practices to use them.
+
+
+
+
+
+This chapter covers a tour of MicroPython from the perspective of a developer, contributing
+to MicroPython. It acts as a comprehensive resource on the implementation details of MicroPython
+for both novice and expert contributors.
+
+Development around MicroPython usually involves modifying the core runtime, porting or
+maintaining a new library. This guide describes at great depth, the implementation
+details of MicroPython including a getting started guide, compiler internals, porting
+MicroPython to a new platform and implementing a core MicroPython library.
+
+
+
+
+
+
+
+.. warning::
+
+    Important summary of this section
+
+    * MicroPython provides built-in modules that mirror the functionality of the
+      Python standard library (e.g. :mod:`os`, :mod:`time`), as well as
+      MicroPython-specific modules (e.g. :mod:`bluetooth`, :mod:`machine`).
+    * Most standard library modules , and in a few cases provide some
+      MicroPython-specific extensions (e.g. :mod:`array`, :mod:`os`)
+    *
+    * To allow for extensibility, the built-in modules can be extended from
+      Python code loaded onto the device.
+
+This documentation in general aspires to describe all modules and
+functions/classes which are implemented in the MicroPython project. However,
+MicroPython is highly configurable, and each port to a particular
+board/embedded system may include only a subset of the available MicroPython
+libraries.
+
+With that in mind, please be warned that some functions/classes in a module (or
+even the entire module) described in this documentation **may be unavailable**
+in a particular build of MicroPython on a particular system. The best place to
+find general information of the availability/non-availability of a particular
+feature is the "General Information" section which contains information
+pertaining to a specific :term:`port`.
+
+
+
+
+
+
+General board control
+---------------------
+
+See :mod:`pyb`. ::
+
+    import pyb
+
+    pyb.repl_uart(pyb.UART(1, 9600)) # duplicate REPL on UART(1)
+    pyb.wfi() # pause CPU, waiting for interrupt
+    pyb.freq() # get CPU and bus frequencies
+    pyb.freq(60000000) # set CPU freq to 60MHz
+    pyb.stop() # stop CPU, waiting for external interrupt
+
+
+
+renesas not supported
+---------------------
+
+
+Following functions are not supported at the present::
+
+    machine.reset_cause()
+    machine.bootloader([value])
+    machine.disable_irq()
+    machine.enable_irq(state)
+    machine.freq([hz])
+    machine.idle()
+    machine.sleep()
+    machine.lightsleep()
+    machine.lightsleep([time_ms])
+    machine.deepsleep()
+    machine.deepsleep([time_ms])
+    machine.wake_reason()
+    machine.time_pulse_us(pin, pulse_level, timeout_us=1000000,/)
+    machine.bitstream(pin, encoding, timing, data, /)
+    machine.rng()
+
+
+
+Following functions are not supported at the present::
+
+    UART.init(baudrate)   # now only 115200 is confirmed
+    UART.init(cts, rts)   # Pins are fixed.
+    UART.init(invert)
+    UART.init(tx,rx)      # Pins are fixed.
+    UART.init(txbuf)
+    UART.init(flow)
+    UART.irq(handler)
+    UART.irq(trigger=RX_ANY)
+    UART.irq(priority)
+    UART.irq(wake=machine.IDLE)
+
+Following functions are not supported at the present::
+
+    RTC.init(datetime)
+    RTC.now()
+    RTC.deinit()
+    RTC.alarm()
+    RTC.alarm_left()
+    RTC.cancel()
+    RTC.irq()
+
+Following functions are not supported at the present::
+
+    SPI.init(firstbit)    # now fixed with SPI.LSB
+    SPI.init(baudrate)    # now confirmed only 500000
+
+
+Following functions are not supported at the present::
+
+    I2C.init(freq)    # now confirmed only 400000
+    I2C.deinit()
+    I2C.start()
+    I2C.stop()
+
+Following functions are not supported at the present::
+
+    ADC.init()
+    ADC(sample_ns)
+    ADC(atten)
+    ADC.read_uv()
+    ADC.block()
+
+
+renesas
+-------
+
+
+Using peripherals
+=================
+
+For quick help information, please enter::
+
+    help()
+
+You can access RA MCU's peripherals using MicroPython modules.
+To list supported modules, please enter::
+
+    help('modules')
+
+Especially `machine` module and class :class:`machine.Pin` are very important for using
+peripherals. Note that prefix 'u' is added to the module for MicroPython,
+so you can see "umachine" in the list but you can use it like "import machine".
+
+Using "from machine import Pin", Pin name is available corresponding to
+the RA MCU's pin name which are Pin.cpu.P000 and 'P000'.
+In addition, you can use 'LED1', 'LED2', 'SW1', and 'SW2' name if the board
+has these LEDs and switches.
+
+LED blinking
+------------
+
+As simple example, you can enter following program to blink LED1.
+Please enter key 4 times after the input of last time.sleep(1). ::
+
+    import time
+    from machine import Pin
+    led1 = Pin('LED1')
+    print(led1)
+    while True:
+        led1.on()
+        time.sleep(1)
+        led1.off()
+        time.sleep(1)
+
+You can see the LED1 blinking per 1 second.
+
+If you want to stop the program, please enter CTRL-C. ::
+
+    Traceback (most recent call last):
+        File "<stdin>", line 5, in <module>
+    KeyboardInterrupt:
+
+This message is displayed, and the program stops.
+The message means the program was interrupted at line 5 "while" statement.
+
+Using print(led1), you can confirm that LED1 is assigned to Pin.cpu.P106
+on the board.::
+
+     Pin(Pin.cpu.P106, mode=Pin.OUT, pull=Pin.PULL_NONE, drive=Pin.LOW_POWER)
+
+So you can get the same result if Pin(Pin.cpu.P106) is specified
+instead of Pin('LED1'). ::
+
+    import time
+    from machine import Pin
+    led1 = Pin(Pin.cpu.P106)
+    print(led1)
+    while True:
+        led1.on()
+        time.sleep(1)
+        led1.off()
+        time.sleep(1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+If your board has an LED attached to GPIO2 then you can
+turn it on and off using the following code::
+
+    >>> import machine
+    >>> pin = machine.Pin(2, machine.Pin.OUT)
+    >>> pin.on()
+    >>> pin.off()
+
+Note that ``on`` method of a Pin might turn the LED off and ``off`` might
+turn it on (or vice versa), depending on how the LED is wired on your board.
+To resolve this, machine.Signal class is provided.
+
+
+
+
+The :mod:`esp` module::
+
+    import esp
+
+    esp.osdebug(None)       # turn off vendor O/S debugging messages
+    esp.osdebug(0)          # redirect vendor O/S debugging messages to UART(0)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+wipy
+----
+
+Getting a MicroPython REPL prompt
+=================================
+
+REPL stands for Read Evaluate Print Loop, and is the name given to the
+interactive MicroPython prompt that you can access on the WiPy.  Using
+the REPL is by far the easiest way to test out your code and run commands.
+You can use the REPL in addition to writing scripts in ``main.py``.
+
+.. _wipy_uart:
+
+To use the REPL, you must connect to the WiPy either via :ref:`telnet <wipy_telnet>`,
+or with a USB to serial converter wired to one of the two UARTs on the
+WiPy. To enable REPL duplication on UART0 (the one accessible via the expansion board)
+do::
+
+    >>> from machine import UART
+    >>> import os
+    >>> uart = UART(0, 115200)
+    >>> os.dupterm(uart)
+
+Place this piece of code inside your ``boot.py`` so that it's done automatically after
+reset.
+
+Windows
+-------
+
+First you need to install the FTDI drivers for the expansion board's USB to serial
+converter. Then you need a terminal software. The best option is to download the
+free program PuTTY: `putty.exe <https://www.chiark.greenend.org.uk/~sgtatham/putty/download.html>`_.
+
+**In order to get to the telnet REPL:**
+
+Using putty, select ``Telnet`` as connection type, leave the default port (23)
+and enter the IP address of your WiPy (192.168.1.1 when in ``WLAN.AP`` mode),
+then click open.
+
+**In order to get to the REPL UART:**
+
+Using your serial program you must connect to the COM port that you found in the
+previous step.  With PuTTY, click on "Session" in the left-hand panel, then click
+the "Serial" radio button on the right, then enter you COM port (eg COM4) in the
+"Serial Line" box.  Finally, click the "Open" button.
+
+macOS
+-----
+
+Open a terminal and run::
+
+    $ telnet 192.168.1.1
+
+or::
+
+    $ screen /dev/tty.usbmodem* 115200
+
+When you are finished and want to exit ``screen``, type Ctrl-A Ctrl-\\. If your keyboard does not have a \\-key (i.e. you need an obscure combination for \\ like ALT-SHIFT-7) you can remap the ``quit`` command:
+
+- create ``~/.screenrc``
+- add ``bind q quit``
+
+This will allow you to quit ``screen`` by hitting Ctrl-A Q.
+
+Linux
+-----
+
+Open a terminal and run::
+
+    $ telnet 192.168.1.1
+
+or::
+
+    $ screen /dev/ttyUSB0 115200
+
+You can also try ``picocom`` or ``minicom`` instead of screen.  You may have to
+use ``/dev/ttyUSB01`` or a higher number for ``ttyUSB``.  And, you may need to give
+yourself the correct permissions to access this devices (eg group ``uucp`` or ``dialout``,
+or use sudo).
+
+Using the REPL prompt
+---------------------
+
+Now let's try running some MicroPython code directly on the WiPy.
+
+With your serial program open (PuTTY, screen, picocom, etc) you may see a blank
+screen with a flashing cursor.  Press Enter and you should be presented with a
+MicroPython prompt, i.e. ``>>>``.  Let's make sure it is working with the obligatory test::
+
+    >>> print("hello WiPy!")
+    hello WiPy!
+
+In the above, you should not type in the ``>>>`` characters.  They are there to
+indicate that you should type the text after it at the prompt.  In the end, once
+you have entered the text ``print("hello WiPy!")`` and pressed Enter, the output
+on your screen should look like it does above.
+
+If you already know some Python you can now try some basic commands here.
+
+If any of this is not working you can try either a hard reset or a soft reset;
+see below.
+
+Go ahead and try typing in some other commands.  For example::
+
+    >>> from machine import Pin
+    >>> import wipy
+    >>> wipy.heartbeat(False)  # disable the heartbeat
+    >>> led = Pin('GP25', mode=Pin.OUT)
+    >>> led(1)
+    >>> led(0)
+    >>> led.toggle()
+    >>> 1 + 2
+    3
+    >>> 4 // 2
+    2
+    >>> 20 * 'py'
+    'pypypypypypypypypypypypypypypypypypypypy'
+
+Resetting the board
+-------------------
+
+If something goes wrong, you can reset the board in two ways. The first is to press Ctrl-D
+at the MicroPython prompt, which performs a soft reset.  You will see a message something like::
+
+    >>>
+    MPY: soft reboot
+    MicroPython v1.4.6-146-g1d8b5e5 on 2015-10-21; WiPy with CC3200
+    Type "help()" for more information.
+    >>>
+
+If that isn't working you can perform a hard reset (turn-it-off-and-on-again) by pressing the
+RST switch (the small black button next to the heartbeat LED). During telnet, this will end
+your session, disconnecting whatever program that you used to connect to the WiPy.
+
+
+
+
+
+
+
+
+
+
+
+
+
+SAMD quickref
+-------------
+
+OneWire driver
+--------------
+
+The OneWire driver is implemented in software and works on all pins::
+
+    from machine import Pin
+    import onewire
+
+    ow = onewire.OneWire(Pin(12)) # create a OneWire bus on GPIO12
+    ow.scan()                     # return a list of devices on the bus
+    ow.reset()                    # reset the bus
+    ow.readbyte()                 # read a byte
+    ow.writebyte(0x12)            # write a byte on the bus
+    ow.write('123')               # write bytes on the bus
+    ow.select_rom(b'12345678')    # select a specific device by its ROM code
+
+There is a specific driver for DS18S20 and DS18B20 devices::
+
+    import time, ds18x20
+    ds = ds18x20.DS18X20(ow)
+    roms = ds.scan()
+    ds.convert_temp()
+    time.sleep_ms(750)
+    for rom in roms:
+        print(ds.read_temp(rom))
+
+Be sure to put a 4.7k pull-up resistor on the data line.  Note that
+the ``convert_temp()`` method must be called each time you want to
+sample the temperature.
+
+DHT driver
+----------
+
+The DHT driver is implemented in software and works on all pins::
+
+    import dht
+    import machine
+
+    d = dht.DHT11(machine.Pin(4))
+    d.measure()
+    d.temperature() # eg. 23 (°C)
+    d.humidity()    # eg. 41 (% RH)
+
+    d = dht.DHT22(machine.Pin(4))
+    d.measure()
+    d.temperature() # eg. 23.6 (°C)
+    d.humidity()    # eg. 41.3 (% RH)
+
+Be sure to have a 4.7k pull-up resistor on the data line.  Some
+DHT modules may already have one.
+
+Driving an APA102 LED
+---------------------
+
+The APA102 on some Adafruit boards can be controlled using SoftSPI::
+
+    from machine import SoftSPI, Pin
+    # create the SPI object. miso can be any unused pin.
+    spi=SoftSPI(sck=Pin(25), mosi=Pin(26), miso=Pin(14))
+
+    # define a little function that writes the data with
+    # preamble and postfix
+    def write(red, green, blue):
+        spi.write(b"\x00\x00\x00\x00\xff")
+        spi.write(bytearray((blue, green, red)))
+        spi.write(b"\xff\xff\xff")
+
+    # set the LED to red
+    write(128, 0, 0)
+
+Since SoftSPI does not allow miso to be undefined, miso has to be
+assigned to an otherwise unused pin.
+
+Driving a Neopixel LED
+----------------------
+
+The built-in machine.bitstream() method supports driving Neopixel LEDs in combination
+with the Neopixel driver from the MicroPython driver library::
+
+    import neopixel
+    import machine
+
+    # 1 LED connected to Pin D8 on Adafruit Feather boards
+    p = machine.Pin(8, machine.Pin.OUT)
+    n = neopixel.NeoPixel(p, 1)
+
+    # set the led to red.
+    n[0] = (128, 0, 0)
+
+    # Update the LED.
+    n.write()
+
+machine.bitstream() is set up for a SAMD21 clock frequency of 48MHz and a SAMD51
+clock frequency of 120 MHz. At other clock frequencies, the timing will not fit.
+
+Transferring files
+------------------
+
+Files can be transferred to the SAMD21/SAMD51 devices for instance with the
+:ref:`mpremote <mpremote>` tool. See the MicroPython forum for community-supported
+alternatives to transfer files to an SAMD21/SAMD51 board, like rshell or Thonny.
+
+
+
+
+
+
+
+
+
+
+

@@ -19,7 +19,8 @@ import os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('.'))
+TOP_DIR = os.path.abspath('.')
+sys.path.insert(0, os.path.join(TOP_DIR, 'stubs'))
 
 # The members of the html_context dict are available inside topindex.html
 micropy_version = os.getenv('MICROPY_VERSION') or 'latest'
@@ -51,6 +52,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
+    'sphinx_tabs.tabs'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -306,3 +308,13 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'python': ('https://docs.python.org/3.5', None)}
+
+# -- Autodoc options ------------------------------------------------------
+
+autodoc_member_order = "bysource"
+autodoc_default_options = {
+    "members": True,
+    "undoc-members": True,
+}
+autoclass_content = "both"  # This ensures init arguments are not ignored
+add_module_names = False  # Hide module name

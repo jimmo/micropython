@@ -1,12 +1,13 @@
-.. currentmodule:: machine
-.. _machine.SD:
+:orphan:
 
-class SD -- secure digital memory card (cc3200 port only)
-=========================================================
+.. currentmodule:: machine
+
+class :class:`SD`
+=================
 
 .. warning::
 
-   This is a non-standard class and is only available on the cc3200 port.
+    This is a non-standard class and is only available on the cc3200 port.
 
 
 The SD card class allows to configure and enable the memory card
@@ -32,16 +33,16 @@ Constructors
 
 .. class:: SD(id,... )
 
-   Create a SD card object. See ``init()`` for parameters if initialization.
+    Create a SD card object. See ``init()`` for parameters if initialization.
 
 Methods
 -------
 
 .. method:: SD.init(id=0, pins=('GP10', 'GP11', 'GP15'))
 
-   Enable the SD card. In order to initialize the card, give it a 3-tuple:
-   ``(clk_pin, cmd_pin, dat0_pin)``.
+    Enable the SD card. In order to initialize the card, give it a 3-tuple:
+    ``(clk_pin, cmd_pin, dat0_pin)``.
 
 .. method:: SD.deinit()
 
-   Disable the SD card.
+    Disable the SD card.

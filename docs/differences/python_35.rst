@@ -5,8 +5,7 @@ Python 3.5
 
 Below is a list of finalised/accepted PEPs for Python 3.5 grouped into their impact to MicroPython.
 
-.. table::
-  :widths: 30 50 20
+
 
   +--------------------------------------------------------------------------------------------------------------+--------------------+
   | **Extensions to the syntax**                                                                                 | **Status**         |

@@ -58,31 +58,31 @@ Constructors
 
 .. class:: I2C(bus, ...)
 
-   Construct an I2C object on the given bus.  ``bus`` can be 1 or 2, 'X' or
-   'Y'. With no additional parameters, the I2C object is created but not
-   initialised (it has the settings from the last initialisation of
-   the bus, if any).  If extra arguments are given, the bus is initialised.
-   See ``init`` for parameters of initialisation.
+    Construct an I2C object on the given bus.  ``bus`` can be 1 or 2, 'X' or
+    'Y'. With no additional parameters, the I2C object is created but not
+    initialised (it has the settings from the last initialisation of
+    the bus, if any).  If extra arguments are given, the bus is initialised.
+    See ``init`` for parameters of initialisation.
 
-   The physical pins of the I2C buses on Pyboards V1.0 and V1.1 are:
+    The physical pins of the I2C buses on Pyboards V1.0 and V1.1 are:
 
      - ``I2C(1)`` is on the X position: ``(SCL, SDA) = (X9, X10) = (PB6, PB7)``
      - ``I2C(2)`` is on the Y position: ``(SCL, SDA) = (Y9, Y10) = (PB10, PB11)``
 
-   On the Pyboard Lite:
+    On the Pyboard Lite:
 
      - ``I2C(1)`` is on the X position: ``(SCL, SDA) = (X9, X10) = (PB6, PB7)``
      - ``I2C(3)`` is on the Y position: ``(SCL, SDA) = (Y9, Y10) = (PA8, PB8)``
 
-   Calling the constructor with 'X' or 'Y' enables portability between Pyboard
-   types.
+    Calling the constructor with 'X' or 'Y' enables portability between Pyboard
+    types.
 
 Methods
 -------
 
 .. method:: I2C.deinit()
 
-   Turn off the I2C bus.
+    Turn off the I2C bus.
 
 .. method:: I2C.init(mode, *, addr=0x12, baudrate=400000, gencall=False, dma=False)
 
@@ -102,11 +102,11 @@ Methods
 
 .. method:: I2C.is_ready(addr)
 
-   Check if an I2C device responds to the given address.  Only valid when in controller mode.
+    Check if an I2C device responds to the given address.  Only valid when in controller mode.
 
 .. method:: I2C.mem_read(data, addr, memaddr, *, timeout=5000, addr_size=8)
 
-   Read from the memory of an I2C device:
+    Read from the memory of an I2C device:
 
      - ``data`` can be an integer (number of bytes to read) or a buffer to read into
      - ``addr`` is the I2C device address
@@ -114,12 +114,12 @@ Methods
      - ``timeout`` is the timeout in milliseconds to wait for the read
      - ``addr_size`` selects width of memaddr: 8 or 16 bits
 
-   Returns the read data.
-   This is only valid in controller mode.
+    Returns the read data.
+    This is only valid in controller mode.
 
 .. method:: I2C.mem_write(data, addr, memaddr, *, timeout=5000, addr_size=8)
 
-   Write to the memory of an I2C device:
+    Write to the memory of an I2C device:
 
      - ``data`` can be an integer or a buffer to write from
      - ``addr`` is the I2C device address
@@ -127,43 +127,43 @@ Methods
      - ``timeout`` is the timeout in milliseconds to wait for the write
      - ``addr_size`` selects width of memaddr: 8 or 16 bits
 
-   Returns ``None``.
-   This is only valid in controller mode.
+    Returns ``None``.
+    This is only valid in controller mode.
 
 .. method:: I2C.recv(recv, addr=0x00, *, timeout=5000)
 
-   Receive data on the bus:
+    Receive data on the bus:
 
      - ``recv`` can be an integer, which is the number of bytes to receive,
        or a mutable buffer, which will be filled with received bytes
      - ``addr`` is the address to receive from (only required in controller mode)
      - ``timeout`` is the timeout in milliseconds to wait for the receive
 
-   Return value: if ``recv`` is an integer then a new buffer of the bytes received,
-   otherwise the same buffer that was passed in to ``recv``.
+    Return value: if ``recv`` is an integer then a new buffer of the bytes received,
+    otherwise the same buffer that was passed in to ``recv``.
 
 .. method:: I2C.send(send, addr=0x00, *, timeout=5000)
 
-   Send data on the bus:
+    Send data on the bus:
 
      - ``send`` is the data to send (an integer to send, or a buffer object)
      - ``addr`` is the address to send to (only required in controller mode)
      - ``timeout`` is the timeout in milliseconds to wait for the send
 
-   Return value: ``None``.
+    Return value: ``None``.
 
 .. method:: I2C.scan()
 
-   Scan all I2C addresses from 0x01 to 0x7f and return a list of those that respond.
-   Only valid when in controller mode.
+    Scan all I2C addresses from 0x01 to 0x7f and return a list of those that respond.
+    Only valid when in controller mode.
 
 Constants
 ---------
 
 .. data:: I2C.CONTROLLER
 
-   for initialising the bus to controller mode
+    for initialising the bus to controller mode
 
 .. data:: I2C.PERIPHERAL
 
-   for initialising the bus to peripheral mode
+    for initialising the bus to peripheral mode

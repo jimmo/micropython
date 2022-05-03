@@ -2,9 +2,12 @@
 =====================================================
 
 .. module:: struct
-   :synopsis: pack and unpack primitive data types
+    :synopsis: pack and unpack primitive data types
 
 |see_cpython_module| :mod:`python:struct`.
+
+This module provides a way to convert Python datatypes to/from packed binary
+representations and is useful for preparing payloads to send over the network.
 
 The following byte orders are supported:
 
@@ -60,35 +63,43 @@ The following data types are supported:
 (2) Requires floating point support.
 
 .. admonition:: Difference to CPython
-   :class: attention
+    :class: attention
 
-   Whitespace is not supported in format strings.
+    Whitespace is not supported in format strings.
+
+.. seealso::
+
+    :mod:`uctypes` module
+        A MicroPython-specific module that provides more sophisticated ways
+        to work with binary structured data.
 
 Functions
 ---------
 
 .. function:: calcsize(fmt)
 
-   Return the number of bytes needed to store the given *fmt*.
+    Return the number of bytes needed to store the given *fmt*.
 
 .. function:: pack(fmt, v1, v2, ...)
 
-   Pack the values *v1*, *v2*, ... according to the format string *fmt*.
-   The return value is a bytes object encoding the values.
+    Pack the values *v1*, *v2*, ... according to the format string *fmt*.
+    The return value is a bytes object encoding the values.
+
+    Prefer using :func:`pack_into` to avoid re-allocating the target buffer.
 
 .. function:: pack_into(fmt, buffer, offset, v1, v2, ...)
 
-   Pack the values *v1*, *v2*, ... according to the format string *fmt*
-   into a *buffer* starting at *offset*. *offset* may be negative to count
-   from the end of *buffer*.
+    Pack the values *v1*, *v2*, ... according to the format string *fmt*
+    into a *buffer* starting at *offset*. *offset* may be negative to count
+    from the end of *buffer*.
 
 .. function:: unpack(fmt, data)
 
-   Unpack from the *data* according to the format string *fmt*.
-   The return value is a tuple of the unpacked values.
+    Unpack from the *data* according to the format string *fmt*.
+    The return value is a tuple of the unpacked values.
 
 .. function:: unpack_from(fmt, data, offset=0, /)
 
-   Unpack from the *data* starting at *offset* according to the format string
-   *fmt*. *offset* may be negative to count from the end of *data*. The return
-   value is a tuple of the unpacked values.
+    Unpack from the *data* starting at *offset* according to the format string
+    *fmt*. *offset* may be negative to count from the end of *data*. The return
+    value is a tuple of the unpacked values.

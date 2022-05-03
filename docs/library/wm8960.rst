@@ -17,8 +17,11 @@ connection depends on the interface used and the number of devices in the
 system. For the I2C interface, SCL and SDA have to be connected, and of course
 GND and Vcc.  The I2C default address is ``0x1A``.
 
+class :class:`WM8960`
+---------------------
+
 Constructor
------------
+~~~~~~~~~~~
 
 .. class:: WM8960(i2c, sample_rate, *, bits=16, swap=SWAP_NONE, route=ROUTE_PLAYBACK_RECORD, left_input=INPUT_MIC3, right_input=INPUT_MIC2, sysclk_source=SYSCLK_MCLK, mclk_freq=None, primary=False, adc_sync=SYNC_DAC, protocol=BUS_I2S, i2c_address=WM8960_I2C_ADDR)
 
@@ -66,120 +69,120 @@ Constructor
     it must be specified for proper operation.
 
 Tables of parameter constants
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. table:: **Swap Parameter**
-   :widths: auto
-   :align: left
+    :widths: auto
+    :align: left
 
-   ===== ====
-   Value Name
-   ===== ====
-   0     SWAP_NONE
-   1     SWAP_INPUT
-   2     SWAP_OUTPUT
-   ===== ====
+    ===== ====
+    Value Name
+    ===== ====
+    0     SWAP_NONE
+    1     SWAP_INPUT
+    2     SWAP_OUTPUT
+    ===== ====
 
 .. table:: **Protocol Parameter**
-   :widths: auto
-   :align: left
+    :widths: auto
+    :align: left
 
-   ===== ====
-   Value Name
-   ===== ====
-   2     BUS_I2S
-   1     BUS_LEFT_JUSTIFIED
-   0     BUS_RIGHT_JUSTIFIED
-   3     BUS_PCMA
-   19    BUS_PCMB
-   ===== ====
+    ===== ====
+    Value Name
+    ===== ====
+    2     BUS_I2S
+    1     BUS_LEFT_JUSTIFIED
+    0     BUS_RIGHT_JUSTIFIED
+    3     BUS_PCMA
+    19    BUS_PCMB
+    ===== ====
 
 .. table:: **Input Source Parameter**
-   :widths: auto
-   :align: left
+    :widths: auto
+    :align: left
 
-   ===== ============ ====
-   Value Name         Type
-   ===== ============ ====
-   0     INPUT_CLOSED
-   1     INPUT_MIC1   Single ended
-   2     INPUT_MIC2   Differential
-   3     INPUT_MIC3   Differential
-   4     INPUT_LINE2
-   5     INPUT_LINE3
-   ===== ============ ====
+    ===== ============ ====
+    Value Name         Type
+    ===== ============ ====
+    0     INPUT_CLOSED
+    1     INPUT_MIC1   Single ended
+    2     INPUT_MIC2   Differential
+    3     INPUT_MIC3   Differential
+    4     INPUT_LINE2
+    5     INPUT_LINE3
+    ===== ============ ====
 
 .. table:: **Route Parameter**
-   :widths: auto
-   :align: left
+    :widths: auto
+    :align: left
 
-   ===== ====
-   Value Name
-   ===== ====
-   0     ROUTE_BYPASS
-   1     ROUTE_PLAYBACK
-   2     ROUTE_PLAYBACK_RECORD
-   5     ROUTE_RECORD
-   ===== ====
+    ===== ====
+    Value Name
+    ===== ====
+    0     ROUTE_BYPASS
+    1     ROUTE_PLAYBACK
+    2     ROUTE_PLAYBACK_RECORD
+    5     ROUTE_RECORD
+    ===== ====
 
 .. table:: **Master Clock Source Parameter**
-   :widths: auto
-   :align: left
+    :widths: auto
+    :align: left
 
-   ===== ====
-   Value Name
-   ===== ====
-   0     SYSCLK_MCLK
-   1     SYSCLK_PLL
-   ===== ====
+    ===== ====
+    Value Name
+    ===== ====
+    0     SYSCLK_MCLK
+    1     SYSCLK_PLL
+    ===== ====
 
 .. table:: **Module Names**
-   :widths: auto
-   :align: left
+    :widths: auto
+    :align: left
 
-   ===== ====
-   Value Name
-   ===== ====
-   0     MODULE_ADC
-   1     MODULE_DAC
-   2     MODULE_VREF
-   3     MODULE_HEADPHONE
-   4     MODULE_MIC_BIAS
-   5     MODULE_MIC
-   6     MODULE_LINE_IN
-   7     MODULE_LINE_OUT
-   8     MODULE_SPEAKER
-   9     MODULE_OMIX
-   10    MODULE_MONO_OUT
-   ===== ====
+    ===== ====
+    Value Name
+    ===== ====
+    0     MODULE_ADC
+    1     MODULE_DAC
+    2     MODULE_VREF
+    3     MODULE_HEADPHONE
+    4     MODULE_MIC_BIAS
+    5     MODULE_MIC
+    6     MODULE_LINE_IN
+    7     MODULE_LINE_OUT
+    8     MODULE_SPEAKER
+    9     MODULE_OMIX
+    10    MODULE_MONO_OUT
+    ===== ====
 
 .. table:: **Play Channel Names**
-   :widths: auto
-   :align: left
+    :widths: auto
+    :align: left
 
-   ===== ====
-   Value Name
-   ===== ====
-   1     PLAY_HEADPHONE_LEFT
-   2     PLAY_HEADPHONE_RIGHT
-   4     PLAY_SPEAKER_LEFT
-   8     PLAY_SPEAKER_RIGHT
-   ===== ====
+    ===== ====
+    Value Name
+    ===== ====
+    1     PLAY_HEADPHONE_LEFT
+    2     PLAY_HEADPHONE_RIGHT
+    4     PLAY_SPEAKER_LEFT
+    8     PLAY_SPEAKER_RIGHT
+    ===== ====
 
 .. table:: **adc_sync Parameters**
-   :widths: auto
-   :align: left
+    :widths: auto
+    :align: left
 
-   ===== ====
-   Value Name
-   ===== ====
-   0     SYNC_ADC
-   1     SYNC_DAC
-   ===== ====
+    ===== ====
+    Value Name
+    ===== ====
+    0     SYNC_ADC
+    1     SYNC_DAC
+    ===== ====
 
 
 Methods
--------
+~~~~~~~
 
 In addition to initialization, the driver provides some useful methods for
 controlling its operation:
@@ -207,18 +210,18 @@ controlling its operation:
     For a list of suitable modules and db/step, see the table below.
 
 .. table:: **Module Names and dB steps**
-   :widths: auto
-   :align: center
+    :widths: auto
+    :align: center
 
-   ======= ====
-   dB/Step Name
-   ======= ====
-   1.28    MODULE_ADC
-   1.28    MODULE_DAC
-   0.8     MODULE_HEADPHONE
-   0.475   MODULE_LINE_IN
-   0.8     MODULE_SPEAKER
-   ======= ====
+    ======= ====
+    dB/Step Name
+    ======= ====
+    1.28    MODULE_ADC
+    1.28    MODULE_DAC
+    0.8     MODULE_HEADPHONE
+    0.475   MODULE_LINE_IN
+    0.8     MODULE_SPEAKER
+    ======= ====
 
 .. method:: WM8960.mute(module, mute, soft=True, ramp=wm8960.MUTE_FAST)
 

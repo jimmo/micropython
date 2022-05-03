@@ -2,7 +2,7 @@
 ========================================
 
 .. module:: bluetooth
-   :synopsis: Low-level Bluetooth radio functionality
+    :synopsis: Low-level Bluetooth radio functionality
 
 This module provides an interface to a Bluetooth controller on a board.
 Currently this supports Bluetooth Low Energy (BLE) in Central, Peripheral,
@@ -13,24 +13,26 @@ concurrently. Pairing (and bonding) is supported on some ports.
 This API is intended to match the low-level Bluetooth protocol and provide
 building-blocks for higher-level abstractions such as specific device types.
 
-.. note:: For most applications, we recommend using the higher-level
-          `aioble library <https://github.com/micropython/micropython-lib/tree/master/micropython/bluetooth/aioble>`_.
+.. note::
+    For most applications, we recommend using the higher-level
+    `aioble library <https://github.com/micropython/micropython-lib/tree/master/micropython/bluetooth/aioble>`_.
 
-.. note:: This module is still under development and its classes, functions,
-          methods and constants are subject to change.
+.. note::
+    This module is still under development and its classes, functions,
+    methods and constants are subject to change.
 
-class BLE
----------
+class :class:`BLE`
+------------------
 
 Constructor
------------
+~~~~~~~~~~~
 
 .. class:: BLE()
 
     Returns the singleton BLE object.
 
 Configuration
--------------
+~~~~~~~~~~~~~
 
 .. method:: BLE.active([active], /)
 
@@ -103,7 +105,7 @@ Configuration
       false (i.e. allow "Legacy Pairing").
 
 Event Handling
---------------
+~~~~~~~~~~~~~~
 
 .. method:: BLE.irq(handler, /)
 
@@ -301,7 +303,7 @@ program.
 
 
 Broadcaster Role (Advertiser)
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: BLE.gap_advertise(interval_us, adv_data=None, *, resp_data=None, connectable=True)
 
@@ -320,7 +322,7 @@ Broadcaster Role (Advertiser)
 
 
 Observer Role (Scanner)
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: BLE.gap_scan(duration_ms, interval_us=1280000, window_us=11250, active=False, /)
 
@@ -358,7 +360,7 @@ Observer Role (Scanner)
 
 
 Central Role
-------------
+~~~~~~~~~~~~
 
 A central device can connect to peripherals that it has discovered using the observer role (see :meth:`gap_scan<BLE.gap_scan>`) or with a known address.
 
@@ -386,7 +388,7 @@ A central device can connect to peripherals that it has discovered using the obs
 
 
 Peripheral Role
----------------
+~~~~~~~~~~~~~~~
 
 A peripheral device is expected to send connectable advertisements (see
 :meth:`gap_advertise<BLE.gap_advertise>`). It will usually be acting as a GATT
@@ -397,7 +399,7 @@ When a central connects, the ``_IRQ_CENTRAL_CONNECT`` event will be raised.
 
 
 Central & Peripheral Roles
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: BLE.gap_disconnect(conn_handle, /)
 
@@ -414,7 +416,7 @@ Central & Peripheral Roles
 
 
 GATT Server
------------
+~~~~~~~~~~~
 
 A GATT server has a set of registered services. Each service may contain
 characteristics, which each have a value. Characteristics can also contain
@@ -546,7 +548,7 @@ writes from a client to a given characteristic, use
     like the Nordic UART Service.
 
 GATT Client
------------
+~~~~~~~~~~~
 
 A GATT client can discover and read/write characteristics on a remote GATT server.
 
@@ -624,7 +626,7 @@ device name from the device information service).
 
 
 L2CAP connection-oriented-channels
-----------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     This feature allows for socket-like data exchange between two BLE devices.
     Once the devices are connected via GAP, either device can listen for the
@@ -707,7 +709,7 @@ L2CAP connection-oriented-channels
 
 
 Pairing and bonding
--------------------
+~~~~~~~~~~~~~~~~~~~
 
     Pairing allows a connection to be encrypted and authenticated via exchange
     of secrets (with optional MITM protection via passkey authentication).
@@ -747,12 +749,11 @@ Pairing and bonding
           and then respond with either ``0`` (cancel pairing), or ``1`` (accept pairing).
 
 
-class UUID
-----------
-
+class :class:`UUID`
+-------------------
 
 Constructor
------------
+~~~~~~~~~~~
 
 .. class:: UUID(value, /)
 

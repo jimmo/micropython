@@ -8,3 +8,21 @@
 .admonition-difference-to-cpython .admonition-title {
     margin: 4px;
 }
+
+/* Shrink default spacing around tabs so we can fit lots of port-specific tabs */
+.sphinx-tabs-tab {
+    padding-left: 0.5rem;
+    padding-top: 0.3rem;
+    padding-right: 0.5rem;
+    padding-bottom: 0.3rem;
+}
+
+/* Remove margin at the end of tab containers */
+.sphinx-tabs-panel :last-child {
+    margin-bottom: 0px;
+}
+
+/* Make reference links blue instead of black */
+.rst-content code.xref {
+    color: #2980b9;
+}

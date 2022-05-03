@@ -2,15 +2,15 @@
 ====================================================
 
 .. module:: collections
-   :synopsis: collection and container types
+    :synopsis: collection and container types
 
 |see_cpython_module| :mod:`python:collections`.
 
 This module implements advanced collection and container types to
 hold/accumulate various objects.
 
-Classes
--------
+class :class:`deque`
+--------------------
 
 .. class:: deque(iterable, maxlen[, flags])
 
@@ -39,6 +39,9 @@ Classes
         Remove and return an item from the left side of the deque.
         Raises IndexError if no items are present.
 
+function :func:`namedtuple`
+---------------------------
+
 .. function:: namedtuple(name, fields)
 
     This is factory function to create a new namedtuple type with a specific
@@ -57,10 +60,13 @@ Classes
         print(t1.name)
         assert t2.name == t2[1]
 
+class :class:`OrderedDict`
+--------------------------
+
 .. class:: OrderedDict(...)
 
-    ``dict`` type subclass which remembers and preserves the order of keys
-    added. When ordered dict is iterated over, keys/items are returned in
+    This is a ``dict`` type subclass which remembers and preserves the order of
+    keys added. When ordered dict is iterated over, keys/items are returned in
     the order they were added::
 
         from collections import OrderedDict

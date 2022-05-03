@@ -1,8 +1,8 @@
 :mod:`builtins` -- builtin functions and exceptions
 ===================================================
 
-All builtin functions and exceptions are described here. They are also
-available via ``builtins`` module.
+All builtin functions and exceptions are described here. They are also available
+via the :mod:`builtins` module.
 
 Functions and types
 -------------------
@@ -35,8 +35,8 @@ Functions and types
 
 .. function:: delattr(obj, name)
 
-   The argument *name* should be a string, and this function deletes the named
-   attribute from the object given by *obj*.
+    The argument *name* should be a string, and this function deletes the named
+    attribute from the object given by *obj*.
 
 .. class:: dict()
 
@@ -72,15 +72,15 @@ Functions and types
 
 .. class:: int()
 
-   .. classmethod:: from_bytes(bytes, byteorder)
+    .. classmethod:: from_bytes(bytes, byteorder)
 
-      In MicroPython, `byteorder` parameter must be positional (this is
-      compatible with CPython).
+        In MicroPython, the `byteorder` parameter must be positional (this is
+        compatible with CPython).
 
-   .. method:: to_bytes(size, byteorder)
+    .. method:: to_bytes(size, byteorder)
 
-      In MicroPython, `byteorder` parameter must be positional (this is
-      compatible with CPython).
+        In MicroPython, the `byteorder` parameter must be positional (this is
+        compatible with CPython).
 
 .. function:: isinstance()
 
@@ -132,7 +132,7 @@ Functions and types
 
 .. class:: slice()
 
-   The *slice* builtin is the type that slice objects have.
+    The *slice* builtin is the type that slice objects have.
 
 .. function:: sorted()
 

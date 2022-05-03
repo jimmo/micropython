@@ -43,7 +43,7 @@ Methods
       The minimum possible clock divider is one 65536th of the system clock: so
       at the default system clock frequency of 125MHz, the minimum value of
       *freq* is ``1908``. To run state machines at slower frequencies, you'll
-      need to reduce the system clock speed with `machine.freq()`.
+      need to reduce the system clock speed with :func:`machine.freq`.
     - *in_base* is the first pin to use for ``in()`` instructions.
     - *out_base* is the first pin to use for ``out()`` instructions.
     - *set_base* is the first pin to use for ``set()`` instructions.

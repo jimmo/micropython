@@ -14,17 +14,17 @@ a detailed description of the changes can be found in `What's New in Python
   +--------------------------------------------------------+---------------------------------------------------+---------------+
   | **Features**                                                                                               | **Status**    |
   +--------------------------------------------------------+---------------------------------------------------+---------------+
-  | `PEP 570 <https://www.python.org/dev/peps/pep-0570/>`_ | Positional-only arguments                         |               |
+  | `PEP 570 <https://peps.python.org/pep-0570/>`_         | Positional-only arguments                         |               |
   +--------------------------------------------------------+---------------------------------------------------+---------------+
   | `PEP 572 <https://www.python.org/dev/peps/pep-0572/>`_ | Assignment Expressions                            | Complete      |
   +--------------------------------------------------------+---------------------------------------------------+---------------+
-  | `PEP 574 <https://www.python.org/dev/peps/pep-0574/>`_ | Pickle protocol 5 with out-of-band data           |               |
+  | `PEP 574 <https://peps.python.org/pep-0574/>`_         | Pickle protocol 5 with out-of-band data           |               |
   +--------------------------------------------------------+---------------------------------------------------+---------------+
-  | `PEP 578 <https://www.python.org/dev/peps/pep-0578/>`_ | Runtime audit hooks                               |               |
+  | `PEP 578 <https://peps.python.org/pep-0578/>`_         | Runtime audit hooks                               |               |
   +--------------------------------------------------------+---------------------------------------------------+---------------+
-  | `PEP 587 <https://www.python.org/dev/peps/pep-0587/>`_ | Python Initialization Configuration               |               |
+  | `PEP 587 <https://peps.python.org/pep-0587/>`_         | Python Initialization Configuration               |               |
   +--------------------------------------------------------+---------------------------------------------------+---------------+
-  | `PEP 590 <https://www.python.org/dev/peps/pep-0590/>`_ | Vectorcall: a fast calling protocol for CPython   |               |
+  | `PEP 590 <https://peps.python.org/pep-0590/>`_         | Vectorcall: a fast calling protocol for CPython   |               |
   +--------------------------------------------------------+---------------------------------------------------+---------------+
   | **Miscellaneous**                                                                                                          |
   +------------------------------------------------------------------------------------------------------------+---------------+

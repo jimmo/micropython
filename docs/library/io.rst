@@ -2,21 +2,21 @@
 =================================
 
 .. module:: io
-   :synopsis: input/output streams
+    :synopsis: input/output streams
 
 |see_cpython_module| :mod:`python:io`.
 
 This module contains additional types of `stream` (file-like) objects
 and helper functions.
 
-Conceptual hierarchy
---------------------
+Introduction
+------------
 
 .. admonition:: Difference to CPython
-   :class: attention
+    :class: attention
 
-   Conceptual hierarchy of stream base classes is simplified in MicroPython,
-   as described in this section.
+    The hierarchy of stream base classes is simplified in MicroPython,
+    as described in this section.
 
 (Abstract) base stream classes, which serve as a foundation for behaviour
 of all the concrete classes, adhere to few dichotomies (pair-wise
@@ -74,8 +74,8 @@ Note that for efficiency, MicroPython doesn't provide abstract base
 classes corresponding to the hierarchy above, and it's not possible
 to implement, or subclass, a stream class in pure Python.
 
-Functions
----------
+function :func:`open`
+---------------------
 
 .. function:: open(name, mode='r', **kwargs)
 
@@ -83,18 +83,27 @@ Functions
     All ports (which provide access to file system) are required to support
     *mode* parameter, but support for other arguments vary by port.
 
-Classes
--------
+class :class:`FileIO`
+---------------------
 
 .. class:: FileIO(...)
 
     This is type of a file open in binary mode, e.g. using ``open(name, "rb")``.
     You should not instantiate this class directly.
 
+class :class:`TextIOWrapper`
+----------------------------
+
 .. class:: TextIOWrapper(...)
 
     This is type of a file open in text mode, e.g. using ``open(name, "rt")``.
     You should not instantiate this class directly.
+
+class :class:`StringIO`
+-----------------------
+
+class :class:`BytesIO`
+----------------------
 
 .. class:: StringIO([string])
 .. class:: BytesIO([string])
