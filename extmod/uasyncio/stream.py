@@ -120,20 +120,31 @@ class Server:
         await self.wait_closed()
 
     def close(self):
+        # Note: the _serve task must have already started by now due to the
+        # sleep in start_server, so this won't be clobbered at the start of
+        # _serve.
+        self._closed = True
         self.task.cancel()
 
     async def wait_closed(self):
         await self.task
 
     async def _serve(self, s, cb):
+        self._closed = False
         # Accept incoming connections
         while True:
             try:
                 yield core._io_queue.queue_read(s)
             except core.CancelledError:
-                # Shutdown server
+                # The server task was cancelled, shutdown server and close socket
                 s.close()
-                return
+                if self._closed:
+                    # If the server was explicitly closed, ignore the cancellation.
+                    return
+                else:
+                    # Otherwise e.g. the parent task was cancelled, propagate
+                    # cancellation.
+                    raise
             try:
                 s2, addr = s.accept()
             except:
@@ -149,7 +160,7 @@ class Server:
 async def start_server(cb, host, port, backlog=5):
     import usocket as socket
 
-    # Create and bind server socket.
+    # Create and bind server socket
     host = socket.getaddrinfo(host, port)[0]  # TODO this is blocking!
     s = socket.socket()
     s.setblocking(False)
@@ -160,6 +171,9 @@ async def start_server(cb, host, port, backlog=5):
     # Create and return server object and task.
     srv = Server()
     srv.task = core.create_task(srv._serve(s, cb))
+    # Ensure that the _serve task has been scheduled so that it gets to handle
+    # cancellation.
+    await core.sleep_ms(0)
     return srv
 
 
