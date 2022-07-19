@@ -144,6 +144,7 @@ class Task:
     def __next__(self):
         if not self.state:
             # Task finished, raise return value to caller so it can continue.
+            print("raising", self, self.data)
             raise self.data
         else:
             # Put calling task on waiting queue.

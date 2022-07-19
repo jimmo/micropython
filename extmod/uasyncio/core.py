@@ -179,6 +179,7 @@ def run_until_complete(main_task=None):
                 # had an exception and was not await'ed on.  Throwing into it now will
                 # raise StopIteration and the code below will catch this and run the
                 # call_exception_handler function.
+                print("a", t, t.data)
                 t.data = None
                 t.coro.throw(exc)
         except excs_all as er:
@@ -213,6 +214,7 @@ def run_until_complete(main_task=None):
                     # the exception in the meantime (this is handled by Task.throw).
                     _task_queue.push(t)
                 # Save return value of coro to pass up to caller.
+                print("b", t, t.data)
                 t.data = er
             elif t.state is None:
                 # Task is already finished and nothing await'ed on the task,

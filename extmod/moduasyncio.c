@@ -273,6 +273,7 @@ STATIC mp_obj_t task_getiter(mp_obj_t self_in, mp_obj_iter_buf_t *iter_buf) {
 STATIC mp_obj_t task_iternext(mp_obj_t self_in) {
     mp_obj_task_t *self = MP_OBJ_TO_PTR(self_in);
     if (TASK_IS_DONE(self)) {
+        mp_printf(&mp_plat_print, "c raising %p\n", self->data);
         // Task finished, raise return value to caller so it can continue.
         nlr_raise(self->data);
     } else {

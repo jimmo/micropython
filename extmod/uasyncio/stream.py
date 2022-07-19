@@ -2,6 +2,7 @@
 # MIT license; Copyright (c) 2019-2020 Damien P. George
 
 from . import core
+from . import Event
 
 
 class Stream:
@@ -131,10 +132,12 @@ class Server:
 
     async def _serve(self, s, cb):
         self._closed = False
+        ev = Event()
         # Accept incoming connections
         while True:
             try:
-                yield core._io_queue.queue_read(s)
+                #yield core._io_queue.queue_read(s)
+                await ev.wait()
             except core.CancelledError:
                 # The server task was cancelled, shutdown server and close socket
                 s.close()
