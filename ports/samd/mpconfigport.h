@@ -86,6 +86,7 @@
 #define MICROPY_PY_UBINASCII                (1)
 #define MICROPY_PY_UCTYPES                  (1)
 #define MICROPY_PY_UHEAPQ                   (1)
+#define MICROPY_PY_UOS_UNAME                (1)
 #define MICROPY_PY_URANDOM                  (1)
 #define MICROPY_PY_UZLIB                    (1)
 #define MICROPY_PY_UASYNCIO                 (1)
