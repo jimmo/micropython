@@ -41,6 +41,23 @@ STATIC mp_obj_t str_modulo_format(mp_obj_t pattern, size_t n_args, const mp_obj_
 STATIC mp_obj_t mp_obj_new_bytes_iterator(mp_obj_t str, mp_obj_iter_buf_t *iter_buf);
 STATIC NORETURN void bad_implicit_conversion(mp_obj_t self_in);
 
+STATIC void mp_check_compat_arg(const mp_obj_type_t *self_type, const mp_obj_t arg) {
+    const mp_obj_type_t *arg_type = mp_obj_get_type(arg);
+
+    #if MICROPY_PY_BUILTINS_BYTEARRAY
+    if (arg_type == &mp_type_bytearray) {
+        arg_type = &mp_type_bytes;
+    }
+    if (self_type == &mp_type_bytearray) {
+        self_type = &mp_type_bytes;
+    }
+    #endif
+
+    if (arg_type != self_type) {
+        bad_implicit_conversion(arg);
+    }
+}
+
 /******************************************************************************/
 /* str                                                                        */
 
@@ -452,6 +469,7 @@ STATIC mp_obj_t bytes_subscr(mp_obj_t self_in, mp_obj_t index, mp_obj_t value) {
 STATIC mp_obj_t str_join(mp_obj_t self_in, mp_obj_t arg) {
     mp_check_self(mp_obj_is_str_or_bytes(self_in));
     const mp_obj_type_t *self_type = mp_obj_get_type(self_in);
+    const mp_obj_type_t *ret_type = self_type;
 
     // get separation string
     GET_STR_DATA_LEN(self_in, sep_str, sep_len);
@@ -469,8 +487,15 @@ STATIC mp_obj_t str_join(mp_obj_t self_in, mp_obj_t arg) {
 
     // count required length
     size_t required_len = 0;
+    if (self_type == &mp_type_bytearray) {
+        self_type = &mp_type_bytes;
+    }
     for (size_t i = 0; i < seq_len; i++) {
-        if (mp_obj_get_type(seq_items[i]) != self_type) {
+        const mp_obj_type_t *seq_type = mp_obj_get_type(seq_items[i]);
+        if (seq_type == &mp_type_bytearray) {
+            seq_type = &mp_type_bytes;
+        }
+        if (seq_type != self_type) {
             mp_raise_TypeError(
                 MP_ERROR_TEXT("join expects a list of str/bytes objects consistent with self object"));
         }
@@ -496,7 +521,7 @@ STATIC mp_obj_t str_join(mp_obj_t self_in, mp_obj_t arg) {
     }
 
     // return joined string
-    return mp_obj_new_str_from_vstr(self_type, &vstr);
+    return mp_obj_new_str_from_vstr(ret_type, &vstr);
 }
 MP_DEFINE_CONST_FUN_OBJ_2(str_join_obj, str_join);
 
@@ -545,9 +570,7 @@ mp_obj_t mp_obj_str_split(size_t n_args, const mp_obj_t *args) {
 
     } else {
         // sep given
-        if (mp_obj_get_type(sep) != self_type) {
-            bad_implicit_conversion(sep);
-        }
+        mp_check_compat_arg(self_type, sep);
 
         size_t sep_len;
         const char *sep_str = mp_obj_str_get_data(sep, &sep_len);
@@ -699,9 +722,7 @@ STATIC mp_obj_t str_finder(size_t n_args, const mp_obj_t *args, int direction, b
     mp_check_self(mp_obj_is_str_or_bytes(args[0]));
 
     // check argument type
-    if (mp_obj_get_type(args[1]) != self_type) {
-        bad_implicit_conversion(args[1]);
-    }
+    mp_check_compat_arg(self_type, args[1]);
 
     GET_STR_DATA_LEN(args[0], haystack, haystack_len);
     GET_STR_DATA_LEN(args[1], needle, needle_len);
@@ -805,9 +826,7 @@ STATIC mp_obj_t str_uni_strip(int type, size_t n_args, const mp_obj_t *args) {
         chars_to_del = whitespace;
         chars_to_del_len = sizeof(whitespace) - 1;
     } else {
-        if (mp_obj_get_type(args[1]) != self_type) {
-            bad_implicit_conversion(args[1]);
-        }
+        mp_check_compat_arg(self_type, args[1]);
         GET_STR_DATA_LEN(args[1], s, l);
         chars_to_del = s;
         chars_to_del_len = l;
@@ -1633,13 +1652,8 @@ STATIC mp_obj_t str_replace(size_t n_args, const mp_obj_t *args) {
 
     const mp_obj_type_t *self_type = mp_obj_get_type(args[0]);
 
-    if (mp_obj_get_type(args[1]) != self_type) {
-        bad_implicit_conversion(args[1]);
-    }
-
-    if (mp_obj_get_type(args[2]) != self_type) {
-        bad_implicit_conversion(args[2]);
-    }
+    mp_check_compat_arg(self_type, args[1]);
+    mp_check_compat_arg(self_type, args[2]);
 
     // extract string data
 
@@ -1726,9 +1740,7 @@ STATIC mp_obj_t str_count(size_t n_args, const mp_obj_t *args) {
     mp_check_self(mp_obj_is_str_or_bytes(args[0]));
 
     // check argument type
-    if (mp_obj_get_type(args[1]) != self_type) {
-        bad_implicit_conversion(args[1]);
-    }
+    mp_check_compat_arg(self_type, args[1]);
 
     GET_STR_DATA_LEN(args[0], haystack, haystack_len);
     GET_STR_DATA_LEN(args[1], needle, needle_len);
@@ -1767,9 +1779,7 @@ MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(str_count_obj, 2, 4, str_count);
 STATIC mp_obj_t str_partitioner(mp_obj_t self_in, mp_obj_t arg, int direction) {
     mp_check_self(mp_obj_is_str_or_bytes(self_in));
     const mp_obj_type_t *self_type = mp_obj_get_type(self_in);
-    if (self_type != mp_obj_get_type(arg)) {
-        bad_implicit_conversion(arg);
-    }
+    mp_check_compat_arg(self_type, arg);
 
     GET_STR_DATA_LEN(self_in, str, str_len);
     GET_STR_DATA_LEN(arg, sep, sep_len);
@@ -1794,6 +1804,12 @@ STATIC mp_obj_t str_partitioner(mp_obj_t self_in, mp_obj_t arg, int direction) {
     } else {
         result[2] = self_in;
     }
+
+    #if MICROPY_PY_BUILTINS_BYTEARRAY
+    if (mp_obj_get_type(arg) != self_type) {
+        arg = mp_obj_new_str_of_type(self_type, sep, sep_len);
+    }
+    #endif
 
     const byte *position_ptr = find_subbytes(str, str_len, sep, sep_len, direction);
     if (position_ptr != NULL) {
@@ -2044,6 +2060,10 @@ mp_obj_t mp_obj_new_str_copy(const mp_obj_type_t *type, const byte *data, size_t
 mp_obj_t mp_obj_new_str_of_type(const mp_obj_type_t *type, const byte *data, size_t len) {
     if (type == &mp_type_str) {
         return mp_obj_new_str((const char *)data, len);
+    #if MICROPY_PY_BUILTINS_BYTEARRAY
+    } else if (type == &mp_type_bytearray) {
+        return mp_obj_new_bytearray(len, data);
+    #endif
     } else {
         return mp_obj_new_bytes(data, len);
     }
@@ -2067,6 +2087,12 @@ mp_obj_t mp_obj_new_str_from_vstr(const mp_obj_type_t *type, vstr_t *vstr) {
             return MP_OBJ_NEW_QSTR(q);
         }
     }
+    #if MICROPY_PY_BUILTINS_BYTEARRAY
+    const mp_obj_type_t *ret_type = type;
+    if (type == &mp_type_bytearray) {
+        type = &mp_type_bytes;
+    }
+    #endif
 
     // make a new str/bytes object
     mp_obj_str_t *o = mp_obj_malloc(mp_obj_str_t, type);
@@ -2080,6 +2106,11 @@ mp_obj_t mp_obj_new_str_from_vstr(const mp_obj_type_t *type, vstr_t *vstr) {
     ((byte *)o->data)[o->len] = '\0'; // add null byte
     vstr->buf = NULL;
     vstr->alloc = 0;
+    #if MICROPY_PY_BUILTINS_BYTEARRAY
+    if (ret_type == &mp_type_bytearray) {
+        return mp_obj_new_bytearray_by_ref(o->len, (byte *)o->data);
+    }
+    #endif
     return MP_OBJ_FROM_PTR(o);
 }
 

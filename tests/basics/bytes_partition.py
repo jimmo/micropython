@@ -33,3 +33,6 @@ except ValueError:
     print("Raised ValueError")
 else:
     print("Did not raise ValueError")
+
+print(bytearray(b"asdsf").partition(b"s"))
+print(bytearray(b"asdsf").rpartition(b"s"))

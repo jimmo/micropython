@@ -52,3 +52,5 @@ def t():
     return True
 
 print(b"0000".count(b'0', t()))
+
+print(bytearray(b"aaaa").count(b"a"))

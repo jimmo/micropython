@@ -11,3 +11,8 @@ print("foo".center(4))
 print("foo".center(5))
 print("foo".center(6))
 print("foo".center(20))
+
+print(b"foo".center(20))
+
+print(bytearray(b"foo").center(6))
+print(type(bytearray(b"foo").center(6)))
