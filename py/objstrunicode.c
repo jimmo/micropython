@@ -116,7 +116,11 @@ const byte *str_index_to_ptr(const mp_obj_type_t *type, const byte *self_data, s
     mp_obj_t index, bool is_slice) {
     // All str functions also handle bytes objects, and they call str_index_to_ptr(),
     // so it must handle bytes.
-    if (type == &mp_type_bytes) {
+    if (type == &mp_type_bytes 
+        #if MICROPY_PY_BUILTINS_BYTEARRAY
+        || type == &mp_type_bytearray
+        #endif
+    ) {
         // Taken from objstr.c:str_index_to_ptr()
         size_t index_val = mp_get_index(type, self_len, index, is_slice);
         return self_data + index_val;
