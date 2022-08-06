@@ -104,4 +104,14 @@ MP_DECLARE_CONST_FUN_OBJ_1(str_isupper_obj);
 MP_DECLARE_CONST_FUN_OBJ_1(str_islower_obj);
 MP_DECLARE_CONST_FUN_OBJ_VAR_BETWEEN(bytes_decode_obj);
 
+#if MICROPY_PY_ARRAY
+extern const mp_obj_dict_t array_locals_dict;
+#endif
+
+#if MICROPY_PY_BUILTINS_BYTEARRAY
+extern const mp_obj_dict_t bytearray_locals_dict;
+#endif
+
+extern const mp_obj_dict_t str_locals_dict;
+
 #endif // MICROPY_INCLUDED_PY_OBJSTR_H

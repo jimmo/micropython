@@ -381,7 +381,7 @@ STATIC mp_obj_t array_append(mp_obj_t self_in, mp_obj_t arg) {
     self->free--;
     return mp_const_none; // return None, as per CPython
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_2(array_append_obj, array_append);
+MP_DEFINE_CONST_FUN_OBJ_2(array_append_obj, array_append);
 
 STATIC mp_obj_t array_extend(mp_obj_t self_in, mp_obj_t arg_in) {
     // self is not a memoryview, so we don't need to use (& TYPECODE_MASK)
@@ -413,7 +413,7 @@ STATIC mp_obj_t array_extend(mp_obj_t self_in, mp_obj_t arg_in) {
 
     return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_2(array_extend_obj, array_extend);
+MP_DEFINE_CONST_FUN_OBJ_2(array_extend_obj, array_extend);
 #endif
 
 STATIC mp_obj_t array_subscr(mp_obj_t self_in, mp_obj_t index_in, mp_obj_t value) {
@@ -564,49 +564,6 @@ STATIC mp_int_t array_get_buffer(mp_obj_t o_in, mp_buffer_info_t *bufinfo, mp_ui
     return 0;
 }
 
-#if MICROPY_PY_BUILTINS_BYTEARRAY || MICROPY_PY_ARRAY
-STATIC const mp_rom_map_elem_t array_locals_dict_table[] = {
-    { MP_ROM_QSTR(MP_QSTR_append), MP_ROM_PTR(&array_append_obj) },
-    { MP_ROM_QSTR(MP_QSTR_extend), MP_ROM_PTR(&array_extend_obj) },
-    #if MICROPY_CPYTHON_COMPAT
-    { MP_ROM_QSTR(MP_QSTR_decode), MP_ROM_PTR(&bytes_decode_obj) },
-    #endif
-    { MP_ROM_QSTR(MP_QSTR_find), MP_ROM_PTR(&str_find_obj) },
-    { MP_ROM_QSTR(MP_QSTR_rfind), MP_ROM_PTR(&str_rfind_obj) },
-    { MP_ROM_QSTR(MP_QSTR_index), MP_ROM_PTR(&str_index_obj) },
-    { MP_ROM_QSTR(MP_QSTR_rindex), MP_ROM_PTR(&str_rindex_obj) },
-    { MP_ROM_QSTR(MP_QSTR_join), MP_ROM_PTR(&str_join_obj) },
-    { MP_ROM_QSTR(MP_QSTR_split), MP_ROM_PTR(&str_split_obj) },
-    { MP_ROM_QSTR(MP_QSTR_rsplit), MP_ROM_PTR(&str_rsplit_obj) },
-    { MP_ROM_QSTR(MP_QSTR_startswith), MP_ROM_PTR(&str_startswith_obj) },
-    { MP_ROM_QSTR(MP_QSTR_endswith), MP_ROM_PTR(&str_endswith_obj) },
-    { MP_ROM_QSTR(MP_QSTR_strip), MP_ROM_PTR(&str_strip_obj) },
-    { MP_ROM_QSTR(MP_QSTR_lstrip), MP_ROM_PTR(&str_lstrip_obj) },
-    { MP_ROM_QSTR(MP_QSTR_rstrip), MP_ROM_PTR(&str_rstrip_obj) },
-    { MP_ROM_QSTR(MP_QSTR_replace), MP_ROM_PTR(&str_replace_obj) },
-    #if MICROPY_PY_BUILTINS_STR_COUNT
-    { MP_ROM_QSTR(MP_QSTR_count), MP_ROM_PTR(&str_count_obj) },
-    #endif
-    #if MICROPY_PY_BUILTINS_STR_PARTITION
-    { MP_ROM_QSTR(MP_QSTR_partition), MP_ROM_PTR(&str_partition_obj) },
-    { MP_ROM_QSTR(MP_QSTR_rpartition), MP_ROM_PTR(&str_rpartition_obj) },
-    #endif
-    #if MICROPY_PY_BUILTINS_STR_CENTER
-    { MP_ROM_QSTR(MP_QSTR_center), MP_ROM_PTR(&str_center_obj) },
-    #endif
-    { MP_ROM_QSTR(MP_QSTR_lower), MP_ROM_PTR(&str_lower_obj) },
-    { MP_ROM_QSTR(MP_QSTR_upper), MP_ROM_PTR(&str_upper_obj) },
-    { MP_ROM_QSTR(MP_QSTR_isspace), MP_ROM_PTR(&str_isspace_obj) },
-    { MP_ROM_QSTR(MP_QSTR_isalpha), MP_ROM_PTR(&str_isalpha_obj) },
-    { MP_ROM_QSTR(MP_QSTR_isdigit), MP_ROM_PTR(&str_isdigit_obj) },
-    { MP_ROM_QSTR(MP_QSTR_isupper), MP_ROM_PTR(&str_isupper_obj) },
-    { MP_ROM_QSTR(MP_QSTR_islower), MP_ROM_PTR(&str_islower_obj) },
-
-};
-
-STATIC MP_DEFINE_CONST_DICT(array_locals_dict, array_locals_dict_table);
-#endif
-
 #if MICROPY_PY_ARRAY
 const mp_obj_type_t mp_type_array = {
     { &mp_type_type },
@@ -634,7 +591,7 @@ const mp_obj_type_t mp_type_bytearray = {
     .binary_op = array_binary_op,
     .subscr = array_subscr,
     .buffer_p = { .get_buffer = array_get_buffer },
-    .locals_dict = (mp_obj_dict_t *)&array_locals_dict,
+    .locals_dict = (mp_obj_dict_t *)&bytearray_locals_dict,
 };
 #endif
 

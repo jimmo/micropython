@@ -1956,17 +1956,18 @@ mp_int_t mp_obj_str_get_buffer(mp_obj_t self_in, mp_buffer_info_t *bufinfo, mp_u
     }
 }
 
-STATIC const mp_rom_map_elem_t str8_locals_dict_table[] = {
+#if MICROPY_PY_ARRAY || MICROPY_PY_BUILTINS_BYTEARRAY
+MP_DECLARE_CONST_FUN_OBJ_2(array_append_obj);
+MP_DECLARE_CONST_FUN_OBJ_2(array_extend_obj);
+#endif
+
+STATIC const mp_rom_map_elem_t array_bytearray_str_bytes_locals_table[] = {
+    #if MICROPY_PY_ARRAY || MICROPY_PY_BUILTINS_BYTEARRAY
+    { MP_ROM_QSTR(MP_QSTR_append), MP_ROM_PTR(&array_append_obj) },
+    { MP_ROM_QSTR(MP_QSTR_extend), MP_ROM_PTR(&array_extend_obj) },
+    #endif
     #if MICROPY_CPYTHON_COMPAT
     { MP_ROM_QSTR(MP_QSTR_decode), MP_ROM_PTR(&bytes_decode_obj) },
-    #if !MICROPY_PY_BUILTINS_STR_UNICODE
-    // If we have separate unicode type, then here we have methods only
-    // for bytes type, and it should not have encode() methods. Otherwise,
-    // we have non-compliant-but-practical bytestring type, which shares
-    // method table with bytes, so they both have encode() and decode()
-    // methods (which should do type checking at runtime).
-    { MP_ROM_QSTR(MP_QSTR_encode), MP_ROM_PTR(&str_encode_obj) },
-    #endif
     #endif
     { MP_ROM_QSTR(MP_QSTR_find), MP_ROM_PTR(&str_find_obj) },
     { MP_ROM_QSTR(MP_QSTR_rfind), MP_ROM_PTR(&str_rfind_obj) },
@@ -2002,9 +2003,33 @@ STATIC const mp_rom_map_elem_t str8_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_isdigit), MP_ROM_PTR(&str_isdigit_obj) },
     { MP_ROM_QSTR(MP_QSTR_isupper), MP_ROM_PTR(&str_isupper_obj) },
     { MP_ROM_QSTR(MP_QSTR_islower), MP_ROM_PTR(&str_islower_obj) },
+    #if MICROPY_CPYTHON_COMPAT
+    { MP_ROM_QSTR(MP_QSTR_encode), MP_ROM_PTR(&str_encode_obj) },
+    #endif
 };
 
-STATIC MP_DEFINE_CONST_DICT(str8_locals_dict, str8_locals_dict_table);
+#if MICROPY_CPYTHON_COMPAT
+#define TABLE_ENTRIES_COMPAT 1
+#else
+#define TABLE_ENTRIES_COMPAT 0
+#endif
+
+#if MICROPY_PY_ARRAY || MICROPY_PY_BUILTINS_BYTEARRAY
+#define TABLE_ENTRIES_ARRAY 2
+#else
+#define TABLE_ENTRIES_ARRAY 0
+#endif
+
+#if MICROPY_PY_ARRAY
+MP_DEFINE_CONST_DICT_WITH_SIZE(array_locals_dict, array_bytearray_str_bytes_locals_table, TABLE_ENTRIES_ARRAY);
+#endif
+
+#if MICROPY_PY_BUILTINS_BYTEARRAY
+MP_DEFINE_CONST_DICT_WITH_SIZE(bytearray_locals_dict, array_bytearray_str_bytes_locals_table, MP_ARRAY_SIZE(array_bytearray_str_bytes_locals_table) - TABLE_ENTRIES_COMPAT);
+#endif
+
+MP_DEFINE_CONST_DICT_WITH_SIZE(bytes_locals_dict, array_bytearray_str_bytes_locals_table + TABLE_ENTRIES_ARRAY, MP_ARRAY_SIZE(array_bytearray_str_bytes_locals_table) - (TABLE_ENTRIES_ARRAY + TABLE_ENTRIES_COMPAT));
+MP_DEFINE_CONST_DICT_WITH_SIZE(str_locals_dict, array_bytearray_str_bytes_locals_table + TABLE_ENTRIES_ARRAY + TABLE_ENTRIES_COMPAT, MP_ARRAY_SIZE(array_bytearray_str_bytes_locals_table) - (TABLE_ENTRIES_ARRAY + TABLE_ENTRIES_COMPAT));
 
 #if !MICROPY_PY_BUILTINS_STR_UNICODE
 STATIC mp_obj_t mp_obj_new_str_iterator(mp_obj_t str, mp_obj_iter_buf_t *iter_buf);
@@ -2018,9 +2043,10 @@ const mp_obj_type_t mp_type_str = {
     .subscr = bytes_subscr,
     .getiter = mp_obj_new_str_iterator,
     .buffer_p = { .get_buffer = mp_obj_str_get_buffer },
-    .locals_dict = (mp_obj_dict_t *)&str8_locals_dict,
+    .locals_dict = (mp_obj_dict_t *)&str_locals_dict,
 };
-#endif
+#endif // !MICROPY_PY_BUILTINS_STR_UNICODE
+
 
 // Reuses most of methods from str
 const mp_obj_type_t mp_type_bytes = {
@@ -2032,7 +2058,7 @@ const mp_obj_type_t mp_type_bytes = {
     .subscr = bytes_subscr,
     .getiter = mp_obj_new_bytes_iterator,
     .buffer_p = { .get_buffer = mp_obj_str_get_buffer },
-    .locals_dict = (mp_obj_dict_t *)&str8_locals_dict,
+    .locals_dict = (mp_obj_dict_t *)&bytes_locals_dict,
 };
 
 // The zero-length bytes object, with data that includes a null-terminating byte
@@ -2087,30 +2113,25 @@ mp_obj_t mp_obj_new_str_from_vstr(const mp_obj_type_t *type, vstr_t *vstr) {
             return MP_OBJ_NEW_QSTR(q);
         }
     }
-    #if MICROPY_PY_BUILTINS_BYTEARRAY
-    const mp_obj_type_t *ret_type = type;
-    if (type == &mp_type_bytearray) {
-        type = &mp_type_bytes;
-    }
-    #endif
 
-    // make a new str/bytes object
-    mp_obj_str_t *o = mp_obj_malloc(mp_obj_str_t, type);
-    o->len = vstr->len;
-    o->hash = qstr_compute_hash((byte *)vstr->buf, vstr->len);
+    byte *data;
     if (vstr->len + 1 == vstr->alloc) {
-        o->data = (byte *)vstr->buf;
+        data = (byte *)vstr->buf;
     } else {
-        o->data = (byte *)m_renew(char, vstr->buf, vstr->alloc, vstr->len + 1);
+        data = (byte *)m_renew(char, vstr->buf, vstr->alloc, vstr->len + 1);
     }
-    ((byte *)o->data)[o->len] = '\0'; // add null byte
+    data[vstr->len] = '\0'; // add null byte
     vstr->buf = NULL;
     vstr->alloc = 0;
     #if MICROPY_PY_BUILTINS_BYTEARRAY
-    if (ret_type == &mp_type_bytearray) {
-        return mp_obj_new_bytearray_by_ref(o->len, (byte *)o->data);
+    if (type == &mp_type_bytearray) {
+        return mp_obj_new_bytearray_by_ref(vstr->len, data);
     }
     #endif
+    mp_obj_str_t *o = mp_obj_malloc(mp_obj_str_t, type);
+    o->len = vstr->len;
+    o->hash = qstr_compute_hash(data, vstr->len);
+    o->data = data;
     return MP_OBJ_FROM_PTR(o);
 }
 
