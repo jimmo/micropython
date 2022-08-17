@@ -485,25 +485,25 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuf_line_obj, 6, 6, framebuf_lin
 #define ELLIPSE_MASK_Q3 (0x04)
 #define ELLIPSE_MASK_Q4 (0x08)
 
-STATIC void draw_ellipse_points(const mp_obj_framebuf_t *fb, mp_int_t cx, mp_int_t cy, mp_int_t x, mp_int_t y, mp_int_t col, mp_int_t mask) {
+STATIC void draw_ellipse_points(const mp_obj_framebuf_t *fb, mp_int_t cx, mp_int_t cy, mp_int_t x, mp_int_t y, mp_int_t col, mp_int_t mask, mp_int_t ex, mp_int_t ey) {
     if (mask & ELLIPSE_MASK_FILL) {
         if (mask & ELLIPSE_MASK_Q1) {
-            fill_rect(fb, cx, cy - y, x + 1, 1, col);
+            fill_rect(fb, cx, cy - y - ey, x + 1 + ex, 1, col);
         }
         if (mask & ELLIPSE_MASK_Q2) {
-            fill_rect(fb, cx - x, cy - y, x + 1, 1, col);
+            fill_rect(fb, cx - x - ex, cy - y - ey, x + 1 + ex, 1, col);
         }
         if (mask & ELLIPSE_MASK_Q3) {
-            fill_rect(fb, cx - x, cy + y, x + 1, 1, col);
+            fill_rect(fb, cx - x - ex, cy + y + ey, x + 1 + ex, 1, col);
         }
         if (mask & ELLIPSE_MASK_Q4) {
-            fill_rect(fb, cx, cy + y, x + 1, 1, col);
+            fill_rect(fb, cx, cy + y + ey, x + 1 + ex, 1, col);
         }
     } else {
-        setpixel_checked(fb, cx + x, cy - y, col, mask & ELLIPSE_MASK_Q1);
-        setpixel_checked(fb, cx - x, cy - y, col, mask & ELLIPSE_MASK_Q2);
-        setpixel_checked(fb, cx - x, cy + y, col, mask & ELLIPSE_MASK_Q3);
-        setpixel_checked(fb, cx + x, cy + y, col, mask & ELLIPSE_MASK_Q4);
+        setpixel_checked(fb, cx + x + ex, cy - y - ey, col, mask & ELLIPSE_MASK_Q1);
+        setpixel_checked(fb, cx - x - ex, cy - y - ey, col, mask & ELLIPSE_MASK_Q2);
+        setpixel_checked(fb, cx - x - ex, cy + y + ey, col, mask & ELLIPSE_MASK_Q3);
+        setpixel_checked(fb, cx + x + ex, cy + y + ey, col, mask & ELLIPSE_MASK_Q4);
     }
 }
 
@@ -517,6 +517,14 @@ STATIC mp_obj_t framebuf_ellipse(size_t n_args, const mp_obj_t *args_in) {
     } else {
         mask |= ELLIPSE_MASK_ALL;
     }
+    mp_int_t ex = 0;
+    mp_int_t ey = 0;
+    if (n_args > 8) {
+        ex = mp_obj_get_int(args_in[8]);
+    }
+    if (n_args > 9) {
+        ey = mp_obj_get_int(args_in[9]);
+    }
     mp_int_t two_asquare = 2 * args[2] * args[2];
     mp_int_t two_bsquare = 2 * args[3] * args[3];
     mp_int_t x = args[2];
@@ -527,7 +535,7 @@ STATIC mp_obj_t framebuf_ellipse(size_t n_args, const mp_obj_t *args_in) {
     mp_int_t stoppingx = two_bsquare * args[2];
     mp_int_t stoppingy = 0;
     while (stoppingx >= stoppingy) {   // 1st set of points,  y' > -1
-        draw_ellipse_points(self, args[0], args[1], x, y, args[4], mask);
+        draw_ellipse_points(self, args[0], args[1], x, y, args[4], mask, ex, ey);
         y += 1;
         stoppingy += two_asquare;
         ellipse_error += ychange;
@@ -548,7 +556,7 @@ STATIC mp_obj_t framebuf_ellipse(size_t n_args, const mp_obj_t *args_in) {
     stoppingx = 0;
     stoppingy = two_asquare * args[3];
     while (stoppingx <= stoppingy) {  // 2nd set of points, y' < -1
-        draw_ellipse_points(self, args[0], args[1], x, y, args[4], mask);
+        draw_ellipse_points(self, args[0], args[1], x, y, args[4], mask, ex, ey);
         x += 1;
         stoppingx += two_bsquare;
         ellipse_error += xchange;
@@ -560,9 +568,19 @@ STATIC mp_obj_t framebuf_ellipse(size_t n_args, const mp_obj_t *args_in) {
             ychange += two_asquare;
         }
     }
+    if (ex && ey) {
+        if (mask & ELLIPSE_MASK_FILL) {
+            fill_rect(self, args[0] - ex - args[2], args[1] - ey, (ex + args[2]) * 2 + 1, ey * 2, args[4]);
+        } else {
+            fill_rect(self, args[0] - ex, args[1] - ey - args[3], ex * 2, 1, args[4]);
+            fill_rect(self, args[0] - ex, args[1] + ey + args[3], ex * 2, 1, args[4]);
+            fill_rect(self, args[0] - ex - args[2], args[1] - ey, 1, ey * 2, args[4]);
+            fill_rect(self, args[0] + ex + args[2], args[1] - ey, 1, ey * 2, args[4]);
+        }
+    }
     return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuf_ellipse_obj, 6, 8, framebuf_ellipse);
+STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuf_ellipse_obj, 6, 10, framebuf_ellipse);
 
 #if MICROPY_PY_ARRAY && !MICROPY_ENABLE_DYNRUNTIME
 // TODO: poly needs mp_binary_get_size & mp_binary_get_val_array which aren't
