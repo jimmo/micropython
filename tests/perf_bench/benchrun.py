@@ -1,8 +1,5 @@
 def bm_run(N, M):
-    try:
-        from utime import ticks_us, ticks_diff
-    except ImportError:
-        import time
+    import time
 
         ticks_us = lambda: int(time.perf_counter() * 1000000)
         ticks_diff = lambda a, b: a - b

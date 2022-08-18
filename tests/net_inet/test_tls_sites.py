@@ -1,13 +1,8 @@
-try:
-    import usocket as _socket
-except:
-    import _socket
-try:
-    import ussl as ssl
-except:
-    import ssl
+import socket
+import ssl
 
-    # CPython only supports server_hostname with SSLContext
+# CPython only supports server_hostname with SSLContext
+if hasattr(ssl, "SSLContext"):
     ssl = ssl.SSLContext()
 
 
