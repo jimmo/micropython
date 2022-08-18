@@ -46,7 +46,7 @@
 
 /// \module os - basic "operating system" services
 ///
-/// The `os` module contains functions for filesystem access and `urandom`.
+/// The `os` module contains functions for filesystem access and `random`.
 ///
 /// The filesystem has `/` as the root directory, and the available physical
 /// drives are accessible from here.  They are currently:
@@ -109,7 +109,7 @@ STATIC mp_obj_t os_sync(void) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_0(os_sync_obj, os_sync);
 
-STATIC mp_obj_t os_urandom(mp_obj_t num) {
+STATIC mp_obj_t os_random(mp_obj_t num) {
     mp_int_t n = mp_obj_get_int(num);
     vstr_t vstr;
     vstr_init_len(&vstr, n);
@@ -118,7 +118,7 @@ STATIC mp_obj_t os_urandom(mp_obj_t num) {
     }
     return mp_obj_new_bytes_from_vstr(&vstr);
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_1(os_urandom_obj, os_urandom);
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(os_random_obj, os_random);
 
 STATIC mp_obj_t os_dupterm(uint n_args, const mp_obj_t *args) {
     if (n_args == 0) {
@@ -162,7 +162,7 @@ STATIC const mp_rom_map_elem_t os_module_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR_unlink),          MP_ROM_PTR(&mp_vfs_remove_obj) },     // unlink aliases to remove
 
     { MP_ROM_QSTR(MP_QSTR_sync),            MP_ROM_PTR(&os_sync_obj) },
-    { MP_ROM_QSTR(MP_QSTR_random),         MP_ROM_PTR(&os_urandom_obj) },
+    { MP_ROM_QSTR(MP_QSTR_random),         MP_ROM_PTR(&os_random_obj) },
 
     // MicroPython additions
     // removed: mkfs
