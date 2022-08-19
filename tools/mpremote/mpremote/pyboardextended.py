@@ -26,18 +26,18 @@ fs_hook_cmds = {
 }
 
 fs_hook_code = """\
-import uos, uio, ustruct, micropython
+import os, io, struct, micropython
 
 SEEK_SET = 0
 
 class RemoteCommand:
     def __init__(self):
-        import uselect, usys
+        import select, sys
         self.buf4 = bytearray(4)
-        self.fout = usys.stdout.buffer
-        self.fin = usys.stdin.buffer
-        self.poller = uselect.poll()
-        self.poller.register(self.fin, uselect.POLLIN)
+        self.fout = sys.stdout.buffer
+        self.fin = sys.stdin.buffer
+        self.poller = select.poll()
+        self.poller.register(self.fin, select.POLLIN)
 
     def poll_in(self):
         for _ in self.poller.ipoll(1000):
@@ -120,7 +120,7 @@ class RemoteCommand:
         self.fout.write(self.buf4, 1)
 
     def wr_s32(self, i):
-        ustruct.pack_into('<i', self.buf4, 0, i)
+        struct.pack_into('<i', self.buf4, 0, i)
         self.fout.write(self.buf4)
 
     def wr_bytes(self, b):
@@ -131,7 +131,7 @@ class RemoteCommand:
     wr_str = wr_bytes
 
 
-class RemoteFile(uio.IOBase):
+class RemoteFile(io.IOBase):
     def __init__(self, cmd, fd, is_text):
         self.cmd = cmd
         self.fd = fd
@@ -344,8 +344,8 @@ class RemoteFS:
 
 
 def __mount():
-    uos.mount(RemoteFS(RemoteCommand()), '/remote')
-    uos.chdir('/remote')
+    os.mount(RemoteFS(RemoteCommand()), '/remote')
+    os.chdir('/remote')
 """
 
 # Apply basic compression on hook code.
@@ -721,6 +721,6 @@ class PyboardExtended(Pyboard):
 
     def umount_local(self):
         if self.mounted:
-            self.exec_('uos.umount("/remote")')
+            self.exec_('os.umount("/remote")')
             self.mounted = False
             self.serial = self.serial.orig_serial

@@ -516,7 +516,7 @@ class Pyboard:
 
     def fs_ls(self, src):
         cmd = (
-            "import uos\nfor f in uos.ilistdir(%s):\n"
+            "import os\nfor f in os.ilistdir(%s):\n"
             " print('{:12} {}{}'.format(f[3]if len(f)>3 else 0,f[0],'/'if f[1]&0x4000 else ''))"
             % (("'%s'" % src) if src else "")
         )
@@ -639,13 +639,13 @@ class Pyboard:
         self.exec_("f.close()")
 
     def fs_mkdir(self, dir):
-        self.exec_("import uos\nuos.mkdir('%s')" % dir)
+        self.exec_("import os\nos.mkdir('%s')" % dir)
 
     def fs_rmdir(self, dir):
-        self.exec_("import uos\nuos.rmdir('%s')" % dir)
+        self.exec_("import os\nos.rmdir('%s')" % dir)
 
     def fs_rm(self, src):
-        self.exec_("import uos\nuos.remove('%s')" % src)
+        self.exec_("import os\nos.remove('%s')" % src)
 
     def fs_touch(self, src):
         self.exec_("f=open('%s','a')\nf.close()" % src)
@@ -733,9 +733,9 @@ def filesystem_command(pyb, args, progress_callback=None, verbose=False):
 
 
 _injected_import_hook_code = """\
-import uos, uio
+import os, io
 class _FS:
-  class File(uio.IOBase):
+  class File(io.IOBase):
     def __init__(self):
       self.off = 0
     def ioctl(self, request, arg):
@@ -752,10 +752,10 @@ class _FS:
       raise OSError(-2) # ENOENT
   def open(self, path, mode):
     return self.File()
-uos.mount(_FS(), '/_')
-uos.chdir('/_')
+os.mount(_FS(), '/_')
+os.chdir('/_')
 from _injected import *
-uos.umount('/_')
+os.umount('/_')
 del _injected_buf, _FS
 """
 

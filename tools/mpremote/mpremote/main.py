@@ -291,14 +291,14 @@ _BUILTIN_COMMAND_EXPANSIONS = {
     "rmdir": "fs rmdir",
     "df": [
         "exec",
-        "import uos\nprint('mount \\tsize \\tused \\tavail \\tuse%')\nfor _m in [''] + uos.listdir('/'):\n _s = uos.stat('/' + _m)\n if not _s[0] & 1 << 14: continue\n _s = uos.statvfs(_m)\n if _s[0]:\n  _size = _s[0] * _s[2]; _free = _s[0] * _s[3]; print(_m, _size, _size - _free, _free, int(100 * (_size - _free) / _size), sep='\\t')",
+        "import os\nprint('mount \\tsize \\tused \\tavail \\tuse%')\nfor _m in [''] + os.listdir('/'):\n _s = os.stat('/' + _m)\n if not _s[0] & 1 << 14: continue\n _s = os.statvfs(_m)\n if _s[0]:\n  _size = _s[0] * _s[2]; _free = _s[0] * _s[3]; print(_m, _size, _size - _free, _free, int(100 * (_size - _free) / _size), sep='\\t')",
     ],
     # Other shortcuts.
     "reset t_ms=100": {
         "command": [
             "exec",
             "--no-follow",
-            "import utime, machine; utime.sleep_ms(t_ms); machine.reset()",
+            "import time, machine; time.sleep_ms(t_ms); machine.reset()",
         ],
         "help": "reset the device after delay",
     },
@@ -306,7 +306,7 @@ _BUILTIN_COMMAND_EXPANSIONS = {
         "command": [
             "exec",
             "--no-follow",
-            "import utime, machine; utime.sleep_ms(t_ms); machine.bootloader()",
+            "import time, machine; time.sleep_ms(t_ms); machine.bootloader()",
         ],
         "help": "make the device enter its bootloader",
     },
