@@ -1,0 +1,13 @@
+# cmake file for Raspberry Pi Pico
+list(APPEND PICO_BOARD_HEADER_DIRS ${MICROPY_BOARD_DIR})
+
+if("${BOARD_VARIANT}" STREQUAL "foo")
+    set(FLASH_SIZE_MB 1)
+    set(PICO_FLASH_SIZE_BYTES ${FLASH_SIZE_MB}*1024*1024)
+endif()
+
+if(DEFINED PICO_FLASH_SIZE_BYTES)
+add_compile_definitions(
+    PICO_FLASH_SIZE_BYTES=${PICO_FLASH_SIZE_BYTES}
+)
+endif()

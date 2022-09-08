@@ -77,6 +77,14 @@ bi_decl(bi_program_feature_group_with_flags(BINARY_INFO_TAG_MICROPYTHON,
     BINARY_INFO_ID_MP_FROZEN, "frozen modules",
     BI_NAMED_GROUP_SEPARATE_COMMAS | BI_NAMED_GROUP_SORT_ALPHA));
 
+#if PICO_FLASH_SIZE_BYTES == 1*1024*1024
+#error "variant set"
+#endif
+
+#if PICO_FLASH_SIZE_BYTES == 2*1024*1024
+#error "default set"
+#endif
+
 int main(int argc, char **argv) {
     #if MICROPY_HW_ENABLE_UART_REPL
     bi_decl(bi_program_feature("UART REPL"))
