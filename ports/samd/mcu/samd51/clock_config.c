@@ -215,6 +215,8 @@ void init_clocks(uint32_t cpu_freq) {
 
     #if MICROPY_HW_XOSC32K
     // OSCILLATOR CONTROL
+    // Enable the clock for RTC
+    OSC32KCTRL->RTCCTRL.reg = OSC32KCTRL_RTCCTRL_RTCSEL_XOSC1K;
     // Setup XOSC32K
     OSC32KCTRL->INTFLAG.reg = OSC32KCTRL_INTFLAG_XOSC32KRDY | OSC32KCTRL_INTFLAG_XOSC32KFAIL;
     OSC32KCTRL->XOSC32K.bit.CGM = OSC32KCTRL_XOSC32K_CGM_HS_Val;
@@ -269,6 +271,9 @@ void init_clocks(uint32_t cpu_freq) {
     }
 
     #else // MICROPY_HW_XOSC32K
+
+    // Enable the clock for RTC
+    OSC32KCTRL->RTCCTRL.reg = OSC32KCTRL_RTCCTRL_RTCSEL_ULP1K;
 
     // Derive GCLK1 from DFLL48M at DPLL0_REF_FREQ as defined in mpconfigboard.h (e.g. 32768 Hz)
     GCLK->GENCTRL[1].reg = ((DFLL48M_FREQ + DPLLx_REF_FREQ / 2) / DPLLx_REF_FREQ) << GCLK_GENCTRL_DIV_Pos
