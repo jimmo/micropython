@@ -112,6 +112,7 @@
 #ifndef MICROPY_PY_UTIMEQ
 #define MICROPY_PY_UTIMEQ           (1)
 #endif
+#define MICROPY_PY_USOCKET_EXTENDED_STATE (MICROPY_PY_LWIP)
 #define MICROPY_PY_LWIP_SOCK_RAW    (MICROPY_PY_LWIP)
 #ifndef MICROPY_PY_MACHINE
 #define MICROPY_PY_MACHINE          (1)
@@ -176,26 +177,22 @@ extern const struct _mp_obj_module_t stm_module;
 #endif
 
 #if defined(MICROPY_HW_ETH_MDC)
-extern const struct _mp_obj_type_t network_lan_type;
-#define MICROPY_HW_NIC_ETH                  { MP_ROM_QSTR(MP_QSTR_LAN), MP_ROM_PTR(&network_lan_type) },
+extern const struct _mp_obj_type_t mp_network_nic_type_lan;
+#define MICROPY_HW_NIC_ETH                  { MP_ROM_QSTR(MP_QSTR_LAN), MP_ROM_PTR(&mp_network_nic_type_lan) },
 #else
 #define MICROPY_HW_NIC_ETH
 #endif
 
 #if MICROPY_PY_NETWORK_CYW43
-extern const struct _mp_obj_type_t mp_network_cyw43_type;
-#define MICROPY_HW_NIC_CYW43                { MP_ROM_QSTR(MP_QSTR_WLAN), MP_ROM_PTR(&mp_network_cyw43_type) },
+extern const struct _mp_obj_type_t mp_network_nic_type_cyw43;
+#define MICROPY_HW_NIC_CYW43                { MP_ROM_QSTR(MP_QSTR_WLAN), MP_ROM_PTR(&mp_network_nic_type_cyw43) },
 #else
 #define MICROPY_HW_NIC_CYW43
 #endif
 
 #if MICROPY_PY_NETWORK_WIZNET5K
-#if MICROPY_PY_LWIP
-extern const struct _mp_obj_type_t mod_network_nic_type_wiznet5k;
-#else
-extern const struct _mod_network_nic_type_t mod_network_nic_type_wiznet5k;
-#endif
-#define MICROPY_HW_NIC_WIZNET5K             { MP_ROM_QSTR(MP_QSTR_WIZNET5K), MP_ROM_PTR(&mod_network_nic_type_wiznet5k) },
+extern const struct _mp_obj_type_t mp_network_nic_type_wiznet5k;
+#define MICROPY_HW_NIC_WIZNET5K             { MP_ROM_QSTR(MP_QSTR_WIZNET5K), MP_ROM_PTR(&mp_network_nic_type_wiznet5k) },
 #else
 #define MICROPY_HW_NIC_WIZNET5K
 #endif
@@ -283,6 +280,7 @@ static inline mp_uint_t disable_irq(void) {
 
 // For regular code that wants to prevent "background tasks" from running.
 // These background tasks (LWIP, Bluetooth) run in PENDSV context.
+#include "irq.h"
 #define MICROPY_PY_PENDSV_ENTER   uint32_t atomic_state = raise_irq_pri(IRQ_PRI_PENDSV);
 #define MICROPY_PY_PENDSV_REENTER atomic_state = raise_irq_pri(IRQ_PRI_PENDSV);
 #define MICROPY_PY_PENDSV_EXIT    restore_irq_pri(atomic_state);

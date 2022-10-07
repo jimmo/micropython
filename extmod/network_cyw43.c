@@ -34,6 +34,7 @@
 
 #include "lwip/netif.h"
 #include "extmod/network_cyw43.h"
+#include "extmod/network_lwip.h"
 #include "modnetwork.h"
 
 #if MICROPY_PY_NETWORK_CYW43_USE_LIB_DRIVER
@@ -48,8 +49,8 @@ typedef struct _network_cyw43_obj_t {
     int itf;
 } network_cyw43_obj_t;
 
-STATIC const network_cyw43_obj_t network_cyw43_wl_sta = { { &mp_network_cyw43_type }, &cyw43_state, CYW43_ITF_STA };
-STATIC const network_cyw43_obj_t network_cyw43_wl_ap = { { &mp_network_cyw43_type }, &cyw43_state, CYW43_ITF_AP };
+STATIC const network_cyw43_obj_t network_cyw43_wl_sta = { { &mp_network_nic_type_cyw43 }, &cyw43_state, CYW43_ITF_STA };
+STATIC const network_cyw43_obj_t network_cyw43_wl_ap = { { &mp_network_nic_type_cyw43 }, &cyw43_state, CYW43_ITF_AP };
 
 STATIC void network_cyw43_print(const mp_print_t *print, mp_obj_t self_in, mp_print_kind_t kind) {
     network_cyw43_obj_t *self = MP_OBJ_TO_PTR(self_in);
@@ -81,11 +82,14 @@ STATIC void network_cyw43_print(const mp_print_t *print, mp_obj_t self_in, mp_pr
 
 STATIC mp_obj_t network_cyw43_make_new(const mp_obj_type_t *type, size_t n_args, size_t n_kw, const mp_obj_t *args) {
     mp_arg_check_num(n_args, n_kw, 0, 1, false);
-    if (n_args == 0 || mp_obj_get_int(args[0]) == MOD_NETWORK_STA_IF) {
-        return MP_OBJ_FROM_PTR(&network_cyw43_wl_sta);
+    mp_obj_t cyw43_obj;
+    if (n_args == 0 || mp_obj_get_int(args[0]) == MOD_NETWORK_WLAN_STA_IF) {
+        cyw43_obj = MP_OBJ_FROM_PTR(&network_cyw43_wl_sta);
     } else {
-        return MP_OBJ_FROM_PTR(&network_cyw43_wl_ap);
+        cyw43_obj = MP_OBJ_FROM_PTR(&network_cyw43_wl_ap);
     }
+    mod_network_register_nic(cyw43_obj);
+    return cyw43_obj;
 }
 
 STATIC mp_obj_t network_cyw43_send_ethernet(mp_obj_t self_in, mp_obj_t buf_in) {
@@ -496,11 +500,18 @@ STATIC const mp_rom_map_elem_t network_cyw43_locals_dict_table[] = {
 };
 STATIC MP_DEFINE_CONST_DICT(network_cyw43_locals_dict, network_cyw43_locals_dict_table);
 
+#if MICROPY_PY_LWIP_EXCLUSIVE
+#define CYW43_NIC_LWIP_PROTOCOL
+#else
+#define CYW43_NIC_LWIP_PROTOCOL protocol, &mp_network_nic_protocol_lwip,
+#endif
+
 MP_DEFINE_CONST_OBJ_TYPE(
-    mp_network_cyw43_type,
+    mp_network_nic_type_cyw43,
     MP_QSTR_CYW43,
     MP_TYPE_FLAG_NONE,
     make_new, network_cyw43_make_new,
+    CYW43_NIC_LWIP_PROTOCOL
     print, network_cyw43_print,
     locals_dict, &network_cyw43_locals_dict
     );

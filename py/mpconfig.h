@@ -1629,6 +1629,11 @@ typedef double mp_float_t;
 #define MICROPY_PY_USOCKET_LISTEN_BACKLOG_DEFAULT (2)
 #endif
 
+// Whether to provide support for raw sockets (socket.SOCK_RAW)
+#ifndef MICROPY_PY_USOCKET_RAW
+#define MICROPY_PY_USOCKET_RAW (1)
+#endif
+
 #ifndef MICROPY_PY_USSL
 #define MICROPY_PY_USSL (0)
 #endif

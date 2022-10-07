@@ -41,6 +41,7 @@
 #include "lib/littlefs/lfs2.h"
 #include "lib/littlefs/lfs2_util.h"
 #include "extmod/modnetwork.h"
+#include "extmod/network_lwip.h"
 #include "extmod/vfs.h"
 #include "extmod/vfs_fat.h"
 #include "extmod/vfs_lfs.h"

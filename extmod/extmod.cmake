@@ -15,7 +15,6 @@ set(MICROPY_SOURCE_EXTMOD
     ${MICROPY_EXTMOD_DIR}/machine_spi.c
     ${MICROPY_EXTMOD_DIR}/modbluetooth.c
     ${MICROPY_EXTMOD_DIR}/modframebuf.c
-    ${MICROPY_EXTMOD_DIR}/modlwip.c
     ${MICROPY_EXTMOD_DIR}/modnetwork.c
     ${MICROPY_EXTMOD_DIR}/modonewire.c
     ${MICROPY_EXTMOD_DIR}/moduasyncio.c
@@ -37,6 +36,7 @@ set(MICROPY_SOURCE_EXTMOD
     ${MICROPY_EXTMOD_DIR}/moduwebsocket.c
     ${MICROPY_EXTMOD_DIR}/moduzlib.c
     ${MICROPY_EXTMOD_DIR}/modwebrepl.c
+    ${MICROPY_EXTMOD_DIR}/network_lwip.c
     ${MICROPY_EXTMOD_DIR}/uos_dupterm.c
     ${MICROPY_EXTMOD_DIR}/utime_mphal.c
     ${MICROPY_EXTMOD_DIR}/vfs.c

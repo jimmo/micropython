@@ -154,7 +154,14 @@ typedef long mp_off_t;
 // Don't default sys.argv because we do that in main.
 #define MICROPY_PY_SYS_PATH_ARGV_DEFAULTS (0)
 
+#if MICROPY_PY_NETWORK
+#define MICROPY_PY_NETWORK_BSD (1)
+#include <sys/socket.h>
 #define MICROPY_PY_USOCKET_LISTEN_BACKLOG_DEFAULT (SOMAXCONN < 128 ? SOMAXCONN : 128)
+extern const struct _mp_obj_type_t mp_network_nic_type_bsd;
+#define MICROPY_PORT_NETWORK_INTERFACES \
+    { MP_ROM_QSTR(MP_QSTR_LAN), MP_ROM_PTR(&mp_network_nic_type_bsd) },
+#endif
 
 // Bare-metal ports don't have stderr. Printing debug to stderr may give tests
 // which check stdout a chance to pass, etc.

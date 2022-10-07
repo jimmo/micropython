@@ -120,7 +120,7 @@ typedef struct _wiznet5k_obj_t {
 #endif
 
 // Global object holding the Wiznet5k state
-STATIC wiznet5k_obj_t wiznet5k_obj;
+STATIC wiznet5k_obj_t wiznet5k_obj = {{&mp_network_nic_type_wiznet5k}};
 
 STATIC void wiz_cris_enter(void) {
     wiznet5k_obj.cris_state = MICROPY_BEGIN_ATOMIC_SECTION();
@@ -412,10 +412,9 @@ STATIC int wiznet5k_gethostbyname(mp_obj_t nic, const char *name, mp_uint_t len,
     }
 }
 
-STATIC int wiznet5k_socket_socket(mod_network_socket_obj_t *socket, int *_errno) {
+STATIC int wiznet5k_socket_socket(mod_network_socket_obj_t *socket) {
     if (socket->domain != MOD_NETWORK_AF_INET) {
-        *_errno = MP_EAFNOSUPPORT;
-        return -1;
+        return MP_EAFNOSUPPORT;
     }
 
     switch (socket->type) {
@@ -426,8 +425,7 @@ STATIC int wiznet5k_socket_socket(mod_network_socket_obj_t *socket, int *_errno)
             socket->type = Sn_MR_UDP;
             break;
         default:
-            *_errno = MP_EINVAL;
-            return -1;
+            return MP_EINVAL;
     }
 
     if (socket->fileno == -1) {
@@ -441,8 +439,7 @@ STATIC int wiznet5k_socket_socket(mod_network_socket_obj_t *socket, int *_errno)
         }
         if (socket->fileno == -1) {
             // too many open sockets
-            *_errno = MP_EMFILE;
-            return -1;
+            return MP_EMFILE;
         }
     }
 
@@ -464,13 +461,12 @@ STATIC void wiznet5k_socket_close(mod_network_socket_obj_t *socket) {
     }
 }
 
-STATIC int wiznet5k_socket_bind(mod_network_socket_obj_t *socket, byte *ip, mp_uint_t port, int *_errno) {
+STATIC int wiznet5k_socket_bind(mod_network_socket_obj_t *socket, byte *ip, mp_uint_t port) {
     // open the socket in server mode (if port != 0)
     mp_int_t ret = WIZCHIP_EXPORT(socket)(socket->fileno, socket->type, port, 0);
     if (ret < 0) {
         wiznet5k_socket_close(socket);
-        *_errno = -ret;
-        return -1;
+        return -ret; // TODO: what maps these to MP errno values?
     }
 
     // indicate that this socket has been opened
@@ -480,17 +476,16 @@ STATIC int wiznet5k_socket_bind(mod_network_socket_obj_t *socket, byte *ip, mp_u
     return 0;
 }
 
-STATIC int wiznet5k_socket_listen(mod_network_socket_obj_t *socket, mp_int_t backlog, int *_errno) {
+STATIC int wiznet5k_socket_listen(mod_network_socket_obj_t *socket, mp_int_t backlog) {
     mp_int_t ret = WIZCHIP_EXPORT(listen)(socket->fileno);
     if (ret < 0) {
         wiznet5k_socket_close(socket);
-        *_errno = -ret;
-        return -1;
+        return -ret;
     }
     return 0;
 }
 
-STATIC int wiznet5k_socket_accept(mod_network_socket_obj_t *socket, mod_network_socket_obj_t *socket2, byte *ip, mp_uint_t *port, int *_errno) {
+STATIC int wiznet5k_socket_accept(mod_network_socket_obj_t *socket, mod_network_socket_obj_t *socket2, byte *ip, mp_uint_t *port) {
     for (;;) {
         int sr = getSn_SR((uint8_t)socket->fileno);
         if (sr == SOCK_ESTABLISHED) {
@@ -505,119 +500,123 @@ STATIC int wiznet5k_socket_accept(mod_network_socket_obj_t *socket, mod_network_
             // TODO handle errors, especially no-more-sockets error
             socket->domain = MOD_NETWORK_AF_INET;
             socket->fileno = -1;
-            int _errno2;
-            if (wiznet5k_socket_socket(socket, &_errno2) != 0) {
-                // printf("(bad resocket %d)\n", _errno2);
-            } else if (wiznet5k_socket_bind(socket, NULL, *port, &_errno2) != 0) {
-                // printf("(bad rebind %d)\n", _errno2);
-            } else if (wiznet5k_socket_listen(socket, 0, &_errno2) != 0) {
-                // printf("(bad relisten %d)\n", _errno2);
+            int ret;
+            if ((ret = wiznet5k_socket_socket(socket))) {
+                // printf("(bad resocket %d)\n", ret);
+            } else if ((ret = wiznet5k_socket_bind(socket, NULL, *port))) {
+                // printf("(bad rebind %d)\n", ret);
+            } else if ((ret = wiznet5k_socket_listen(socket, 0))) {
+                // printf("(bad relisten %d)\n", ret);
             }
 
             return 0;
         }
         if (sr == SOCK_CLOSED || sr == SOCK_CLOSE_WAIT) {
             wiznet5k_socket_close(socket);
-            *_errno = MP_ENOTCONN; // ??
-            return -1;
+            return MP_ENOTCONN; // ??
         }
         mp_hal_delay_ms(1);
     }
 }
 
-STATIC int wiznet5k_socket_connect(mod_network_socket_obj_t *socket, byte *ip, mp_uint_t port, int *_errno) {
+STATIC int wiznet5k_socket_connect(mod_network_socket_obj_t *socket, byte *ip, mp_uint_t port) {
     // use "bind" function to open the socket in client mode
-    if (wiznet5k_socket_bind(socket, ip, 0, _errno) != 0) {
-        return -1;
+    int ret = wiznet5k_socket_bind(socket, ip, 0);
+    if (ret) {
+        return ret;
     }
 
     // now connect
     MP_THREAD_GIL_EXIT();
-    mp_int_t ret = WIZCHIP_EXPORT(connect)(socket->fileno, ip, port);
+    ret = WIZCHIP_EXPORT(connect)(socket->fileno, ip, port);
     MP_THREAD_GIL_ENTER();
 
     if (ret < 0) {
         wiznet5k_socket_close(socket);
-        *_errno = -ret;
-        return -1;
+        return -ret;
     }
 
     // success
     return 0;
 }
 
-STATIC mp_uint_t wiznet5k_socket_send(mod_network_socket_obj_t *socket, const byte *buf, mp_uint_t len, int *_errno) {
+STATIC int wiznet5k_socket_send(mod_network_socket_obj_t *socket, const byte *buf, mp_uint_t *len) {
     MP_THREAD_GIL_EXIT();
-    mp_int_t ret = WIZCHIP_EXPORT(send)(socket->fileno, (byte *)buf, len);
+    mp_int_t ret = WIZCHIP_EXPORT(send)(socket->fileno, (byte *)buf, *len);
+    MP_THREAD_GIL_ENTER();
+
+    // TODO convert Wiz errno's to POSIX ones (aha, see above).
+    if (ret < 0) {
+        wiznet5k_socket_close(socket);
+        return -ret;
+    }
+
+    *len = ret;
+    return 0;
+}
+
+STATIC int wiznet5k_socket_recv(mod_network_socket_obj_t *socket, byte *buf, mp_uint_t *len) {
+    MP_THREAD_GIL_EXIT();
+    mp_int_t ret = WIZCHIP_EXPORT(recv)(socket->fileno, buf, *len);
     MP_THREAD_GIL_ENTER();
 
     // TODO convert Wiz errno's to POSIX ones
     if (ret < 0) {
         wiznet5k_socket_close(socket);
-        *_errno = -ret;
-        return -1;
+        return -ret;
     }
-    return ret;
+
+    *len = ret;
+    return 0;
 }
 
-STATIC mp_uint_t wiznet5k_socket_recv(mod_network_socket_obj_t *socket, byte *buf, mp_uint_t len, int *_errno) {
-    MP_THREAD_GIL_EXIT();
-    mp_int_t ret = WIZCHIP_EXPORT(recv)(socket->fileno, buf, len);
-    MP_THREAD_GIL_ENTER();
+STATIC int wiznet5k_socket_sendto(mod_network_socket_obj_t *socket, const byte *buf, mp_uint_t *len, byte *ip, mp_uint_t port) {
+    mp_int_t ret;
 
-    // TODO convert Wiz errno's to POSIX ones
-    if (ret < 0) {
-        wiznet5k_socket_close(socket);
-        *_errno = -ret;
-        return -1;
-    }
-    return ret;
-}
-
-STATIC mp_uint_t wiznet5k_socket_sendto(mod_network_socket_obj_t *socket, const byte *buf, mp_uint_t len, byte *ip, mp_uint_t port, int *_errno) {
     if (socket->domain == 0) {
         // socket not opened; use "bind" function to open the socket in client mode
-        if (wiznet5k_socket_bind(socket, ip, 0, _errno) != 0) {
-            return -1;
+        ret = wiznet5k_socket_bind(socket, ip, 0);
+        if (ret) {
+            return ret;
         }
     }
 
     MP_THREAD_GIL_EXIT();
-    mp_int_t ret = WIZCHIP_EXPORT(sendto)(socket->fileno, (byte *)buf, len, ip, port);
+    ret = WIZCHIP_EXPORT(sendto)(socket->fileno, (byte *)buf, *len, ip, port);
     MP_THREAD_GIL_ENTER();
 
     if (ret < 0) {
         wiznet5k_socket_close(socket);
-        *_errno = -ret;
-        return -1;
+        return -ret;
     }
-    return ret;
+
+    *len = ret;
+    return 0;
 }
 
-STATIC mp_uint_t wiznet5k_socket_recvfrom(mod_network_socket_obj_t *socket, byte *buf, mp_uint_t len, byte *ip, mp_uint_t *port, int *_errno) {
+STATIC int wiznet5k_socket_recvfrom(mod_network_socket_obj_t *socket, byte *buf, mp_uint_t *len, byte *ip, mp_uint_t *port) {
     uint16_t port2;
     MP_THREAD_GIL_EXIT();
-    mp_int_t ret = WIZCHIP_EXPORT(recvfrom)(socket->fileno, buf, len, ip, &port2);
+    mp_int_t ret = WIZCHIP_EXPORT(recvfrom)(socket->fileno, buf, *len, ip, &port2);
     MP_THREAD_GIL_ENTER();
     *port = port2;
     if (ret < 0) {
         wiznet5k_socket_close(socket);
-        *_errno = -ret;
-        return -1;
+        return -ret;
     }
-    return ret;
+
+    *len = ret;
+    return 0;
 }
 
-STATIC int wiznet5k_socket_setsockopt(mod_network_socket_obj_t *socket, mp_uint_t level, mp_uint_t opt, const void *optval, mp_uint_t optlen, int *_errno) {
+STATIC int wiznet5k_socket_setsockopt(mod_network_socket_obj_t *socket, mp_uint_t level, mp_uint_t opt, const void *optval, mp_uint_t optlen) {
     // TODO
-    *_errno = MP_EINVAL;
-    return -1;
+    return MP_EINVAL;
 }
 
-STATIC int wiznet5k_socket_settimeout(mod_network_socket_obj_t *socket, mp_uint_t timeout_ms, int *_errno) {
+STATIC int wiznet5k_socket_settimeout(mod_network_socket_obj_t *socket, mp_uint_t timeout_ms) {
     // TODO
-    *_errno = MP_EINVAL;
-    return -1;
+    return MP_EINVAL;
 
     /*
     if (timeout_ms == 0) {
@@ -628,19 +627,18 @@ STATIC int wiznet5k_socket_settimeout(mod_network_socket_obj_t *socket, mp_uint_
     */
 }
 
-STATIC int wiznet5k_socket_ioctl(mod_network_socket_obj_t *socket, mp_uint_t request, mp_uint_t arg, int *_errno) {
+STATIC int wiznet5k_socket_ioctl(mod_network_socket_obj_t *socket, mp_uint_t request, mp_uint_t arg, mp_uint_t *result) {
+    *result = 0;
     if (request == MP_STREAM_POLL) {
-        int ret = 0;
         if (arg & MP_STREAM_POLL_RD && getSn_RX_RSR(socket->fileno) != 0) {
-            ret |= MP_STREAM_POLL_RD;
+            *result |= MP_STREAM_POLL_RD;
         }
         if (arg & MP_STREAM_POLL_WR && getSn_TX_FSR(socket->fileno) != 0) {
-            ret |= MP_STREAM_POLL_WR;
+            *result |= MP_STREAM_POLL_WR;
         }
-        return ret;
+        return 0;
     } else {
-        *_errno = MP_EINVAL;
-        return MP_STREAM_ERROR;
+        return MP_EINVAL;
     }
 }
 
@@ -741,8 +739,7 @@ STATIC mp_obj_t wiznet5k_make_new(const mp_obj_type_t *type, size_t n_args, size
     mp_hal_pin_output(cs);
     mp_hal_pin_output(rst);
 
-    // Init the wiznet5k object
-    wiznet5k_obj.base.type = (mp_obj_type_t *)&mod_network_nic_type_wiznet5k;
+    // Init the (singleton) wiznet5k object
     wiznet5k_obj.cris_state = 0;
     wiznet5k_obj.spi = spi;
     wiznet5k_obj.spi_transfer = ((mp_machine_spi_p_t *)MP_OBJ_TYPE_GET_SLOT(spi->type, protocol))->transfer;
@@ -1018,23 +1015,15 @@ STATIC MP_DEFINE_CONST_DICT(wiznet5k_locals_dict, wiznet5k_locals_dict_table);
 
 #if WIZNET5K_WITH_LWIP_STACK
 MP_DEFINE_CONST_OBJ_TYPE(
-    mod_network_nic_type_wiznet5k,
+    mp_network_nic_type_wiznet5k,
     MP_QSTR_WIZNET5K,
     MP_TYPE_FLAG_NONE,
     make_new, wiznet5k_make_new,
-    locals_dict, &wiznet5k_locals_dict
+    locals_dict, &wiznet5k_locals_dict,
+    protocol, &mp_network_nic_protocol_lwip
     );
 #else // WIZNET5K_PROVIDED_STACK
-STATIC MP_DEFINE_CONST_OBJ_FULL_TYPE(
-    mod_network_nic_type_wiznet5k_base,
-    MP_QSTR_WIZNET5K,
-    MP_TYPE_FLAG_NONE,
-    make_new, wiznet5k_make_new,
-    locals_dict, &wiznet5k_locals_dict
-    );
-
-const mod_network_nic_type_t mod_network_nic_type_wiznet5k = {
-    .base = mod_network_nic_type_wiznet5k_base,
+STATIC const mp_network_nic_p_t mp_network_nic_protocol_wiznet5k = {
     .gethostbyname = wiznet5k_gethostbyname,
     .socket = wiznet5k_socket_socket,
     .close = wiznet5k_socket_close,
@@ -1050,6 +1039,15 @@ const mod_network_nic_type_t mod_network_nic_type_wiznet5k = {
     .settimeout = wiznet5k_socket_settimeout,
     .ioctl = wiznet5k_socket_ioctl,
 };
+
+MP_DEFINE_CONST_OBJ_TYPE(
+    mp_network_nic_type_wiznet5k,
+    MP_QSTR_WIZNET5K,
+    MP_TYPE_FLAG_NONE,
+    make_new, wiznet5k_make_new,
+    locals_dict, &wiznet5k_locals_dict,
+    protocol, &mp_network_nic_protocol_wiznet5k
+    );
 #endif
 
 #endif // MICROPY_PY_NETWORK_WIZNET5K

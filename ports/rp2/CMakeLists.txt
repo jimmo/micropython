@@ -198,6 +198,7 @@ if (MICROPY_PY_LWIP)
     )
     target_compile_definitions(${MICROPY_TARGET} PRIVATE
         MICROPY_PY_LWIP=1
+        MICROPY_PY_LWIP_EXCLUSIVE=1
     )
 endif()
 
