@@ -13,7 +13,6 @@ SRC_EXTMOD_C += \
 	extmod/modbluetooth.c \
 	extmod/modbtree.c \
 	extmod/modframebuf.c \
-	extmod/modlwip.c \
 	extmod/modnetwork.c \
 	extmod/modonewire.c \
 	extmod/moduasyncio.c \
@@ -35,7 +34,9 @@ SRC_EXTMOD_C += \
 	extmod/moduwebsocket.c \
 	extmod/moduzlib.c \
 	extmod/modwebrepl.c \
+	extmod/network_bsd.c \
 	extmod/network_cyw43.c \
+	extmod/network_lwip.c \
 	extmod/network_ninaw10.c \
 	extmod/network_wiznet5k.c \
 	extmod/uos_dupterm.c \
@@ -217,6 +218,7 @@ GIT_SUBMODULES += lib/lwip
 LWIP_DIR = lib/lwip/src
 INC += -I$(TOP)/$(LWIP_DIR)/include
 CFLAGS_EXTMOD += -DMICROPY_PY_LWIP=1
+CFLAGS_EXTMOD += -DMICROPY_PY_LWIP_EXCLUSIVE=1
 $(BUILD)/$(LWIP_DIR)/core/ipv4/dhcp.o: CFLAGS += -Wno-address
 SRC_THIRDPARTY_C += shared/netutils/netutils.c
 SRC_THIRDPARTY_C += $(addprefix $(LWIP_DIR)/,\

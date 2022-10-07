@@ -123,8 +123,11 @@ endif
 ifeq ($(MICROPY_PY_TERMIOS),1)
 CFLAGS += -DMICROPY_PY_TERMIOS=1
 endif
+ifeq ($(MICROPY_PY_NETWORK),1)
+CFLAGS += -DMICROPY_PY_NETWORK=1
 ifeq ($(MICROPY_PY_SOCKET),1)
-CFLAGS += -DMICROPY_PY_SOCKET=1
+CFLAGS += -DMICROPY_PY_USOCKET=1
+endif
 endif
 ifeq ($(MICROPY_PY_THREAD),1)
 CFLAGS += -DMICROPY_PY_THREAD=1 -DMICROPY_PY_THREAD_GIL=0
@@ -207,7 +210,6 @@ SRC_C += \
 	mpbtstackport_usb.c \
 	mpnimbleport.c \
 	modtermios.c \
-	modusocket.c \
 	modffi.c \
 	modjni.c \
 	$(wildcard $(VARIANT_DIR)/*.c)
@@ -215,6 +217,7 @@ SRC_C += \
 SHARED_SRC_C += $(addprefix shared/,\
 	runtime/gchelper_generic.c \
 	timeutils/timeutils.c \
+	netutils/netutils.c \
 	$(SHARED_SRC_C_EXTRA) \
 	)
 

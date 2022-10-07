@@ -38,7 +38,7 @@ typedef struct _network_lan_obj_t {
     eth_t *eth;
 } network_lan_obj_t;
 
-STATIC const network_lan_obj_t network_lan_eth0 = { { &network_lan_type }, &eth_instance };
+STATIC const network_lan_obj_t network_lan_eth0 = { { &mp_network_nic_type_lan }, &eth_instance };
 
 STATIC void network_lan_print(const mp_print_t *print, mp_obj_t self_in, mp_print_kind_t kind) {
     network_lan_obj_t *self = MP_OBJ_TO_PTR(self_in);
@@ -86,8 +86,10 @@ STATIC mp_obj_t network_lan_isconnected(mp_obj_t self_in) {
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(network_lan_isconnected_obj, network_lan_isconnected);
 
 STATIC mp_obj_t network_lan_ifconfig(size_t n_args, const mp_obj_t *args) {
-    network_lan_obj_t *self = MP_OBJ_TO_PTR(args[0]);
-    return mod_network_nic_ifconfig(eth_netif(self->eth), n_args - 1, args + 1);
+    // network_lan_obj_t *self = MP_OBJ_TO_PTR(args[0]);
+    // return mod_network_nic_ifconfig(eth_netif(self->eth), n_args - 1, args + 1);
+    // TODO
+    return mp_const_none;
 }
 MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(network_lan_ifconfig_obj, 1, 2, network_lan_ifconfig);
 
@@ -159,7 +161,7 @@ STATIC const mp_rom_map_elem_t network_lan_locals_dict_table[] = {
 STATIC MP_DEFINE_CONST_DICT(network_lan_locals_dict, network_lan_locals_dict_table);
 
 MP_DEFINE_CONST_OBJ_TYPE(
-    network_lan_type,
+    mp_network_nic_type_lan,
     MP_QSTR_LAN,
     MP_TYPE_FLAG_NONE,
     make_new, network_lan_make_new,

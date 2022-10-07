@@ -49,6 +49,8 @@
 #include "py/mpthread.h"
 #include "extmod/misc.h"
 #include "extmod/moduplatform.h"
+#include "extmod/modnetwork.h"
+#include "extmod/network_bsd.h"
 #include "extmod/vfs.h"
 #include "extmod/vfs_posix.h"
 #include "genhdr/mpversion.h"
@@ -588,6 +590,11 @@ MP_NOINLINE int main_(int argc, char **argv) {
         mp_store_global(MP_QSTR_extra_coverage, MP_OBJ_FROM_PTR(&extra_coverage_obj));
         mp_store_global(MP_QSTR_extra_cpp_coverage, MP_OBJ_FROM_PTR(&extra_cpp_coverage_obj));
     }
+    #endif
+
+    #if MICROPY_PY_NETWORK
+    mod_network_init();
+    mod_network_register_nic(MP_OBJ_FROM_PTR(&mp_network_nic_bsd));
     #endif
 
     // Here is some example code to create a class and instance of that class.

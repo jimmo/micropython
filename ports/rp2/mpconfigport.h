@@ -149,9 +149,9 @@
 #endif
 
 #if MICROPY_PY_NETWORK_CYW43
-extern const struct _mp_obj_type_t mp_network_cyw43_type;
+extern const struct _mp_obj_type_t mp_network_nic_type_cyw43;
 #define MICROPY_HW_NIC_CYW43 \
-    { MP_ROM_QSTR(MP_QSTR_WLAN), MP_ROM_PTR(&mp_network_cyw43_type) }, \
+    { MP_ROM_QSTR(MP_QSTR_WLAN), MP_ROM_PTR(&mp_network_nic_type_cyw43) }, \
     { MP_ROM_QSTR(MP_QSTR_STAT_IDLE), MP_ROM_INT(CYW43_LINK_DOWN) }, \
     { MP_ROM_QSTR(MP_QSTR_STAT_CONNECTING), MP_ROM_INT(CYW43_LINK_JOIN) }, \
     { MP_ROM_QSTR(MP_QSTR_STAT_WRONG_PASSWORD), MP_ROM_INT(CYW43_LINK_BADAUTH) }, \
@@ -162,24 +162,26 @@ extern const struct _mp_obj_type_t mp_network_cyw43_type;
 #define MICROPY_HW_NIC_CYW43
 #endif
 
+#if MICROPY_PY_LWIP
+#ifndef MICROPY_PY_USOCKET_EXTENDED_STATE
+#define MICROPY_PY_USOCKET_EXTENDED_STATE   (1)
+#endif
+#endif
+
 #if MICROPY_PY_NETWORK_NINAW10
 // This Network interface requires the extended socket state.
 #ifndef MICROPY_PY_USOCKET_EXTENDED_STATE
 #define MICROPY_PY_USOCKET_EXTENDED_STATE   (1)
 #endif
-extern const struct _mod_network_nic_type_t mod_network_nic_type_nina;
-#define MICROPY_HW_NIC_NINAW10              { MP_ROM_QSTR(MP_QSTR_WLAN), MP_ROM_PTR(&mod_network_nic_type_nina) },
+extern const struct _mp_obj_type_t mp_network_nic_type_nina;
+#define MICROPY_HW_NIC_NINAW10              { MP_ROM_QSTR(MP_QSTR_WLAN), MP_ROM_PTR(&mp_network_nic_type_nina) },
 #else
 #define MICROPY_HW_NIC_NINAW10
 #endif
 
 #if MICROPY_PY_NETWORK_WIZNET5K
-#if MICROPY_PY_LWIP
-extern const struct _mp_obj_type_t mod_network_nic_type_wiznet5k;
-#else
-extern const struct _mod_network_nic_type_t mod_network_nic_type_wiznet5k;
-#endif
-#define MICROPY_HW_NIC_WIZNET5K             { MP_ROM_QSTR(MP_QSTR_WIZNET5K), MP_ROM_PTR(&mod_network_nic_type_wiznet5k) },
+extern const struct _mp_obj_type_t mp_network_nic_type_wiznet5k;
+#define MICROPY_HW_NIC_WIZNET5K             { MP_ROM_QSTR(MP_QSTR_WIZNET5K), MP_ROM_PTR(&mp_network_nic_type_wiznet5k) },
 #else
 #define MICROPY_HW_NIC_WIZNET5K
 #endif
