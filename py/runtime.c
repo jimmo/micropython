@@ -70,12 +70,9 @@ void mp_init(void) {
     MP_STATE_THREAD(mp_pending_exception) = MP_OBJ_NULL;
     #if MICROPY_ENABLE_SCHEDULER
     #if MICROPY_SCHEDULER_STATIC_NODES
-    if (MP_STATE_VM(sched_head) == NULL) {
-        // no pending callbacks to start with
-        MP_STATE_VM(sched_state) = MP_SCHED_IDLE;
-    } else {
+    if (MP_STATE_VM(sched_head) != NULL) {
         // pending callbacks are on the list, eg from before a soft reset
-        MP_STATE_VM(sched_state) = MP_SCHED_PENDING;
+        MP_STATE_MAIN_THREAD(mp_pending_exception) = MP_OBJ_SENTINEL;
     }
     #endif
     MP_STATE_VM(sched_idx) = 0;
