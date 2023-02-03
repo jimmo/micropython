@@ -322,3 +322,5 @@ static inline mp_uint_t disable_irq(void) {
 
 // Needed for MICROPY_PY_URANDOM_SEED_INIT_FUNC.
 uint32_t rng_get(void);
+
+#define MICROPY_QSTR_BYTES_IN_HASH (0)

@@ -244,10 +244,21 @@ mp_map_elem_t *MICROPY_WRAP_MP_MAP_LOOKUP(mp_map_lookup)(mp_map_t * map, mp_obj_
     // get hash of index, with fast path for common case of qstr
     mp_uint_t hash;
     if (mp_obj_is_qstr(index)) {
+        #if MICROPY_QSTR_BYTES_IN_HASH
         hash = qstr_hash(MP_OBJ_QSTR_VALUE(index));
+        #else
+        hash = MP_OBJ_QSTR_VALUE(index);
+        #endif
     } else {
         hash = MP_OBJ_SMALL_INT_VALUE(mp_unary_op(MP_UNARY_OP_HASH, index));
     }
+
+    bool stop_at_empty = true;
+    #if MICROPY_QSTR_BYTES_IN_HASH == 0
+    if (mp_obj_is_str(index)) {
+        stop_at_empty = mp_obj_is_qstr(index) && map->all_keys_are_qstrs;
+    }
+    #endif
 
     size_t pos = hash % map->alloc;
     size_t start_pos = pos;
@@ -255,20 +266,11 @@ mp_map_elem_t *MICROPY_WRAP_MP_MAP_LOOKUP(mp_map_lookup)(mp_map_t * map, mp_obj_
     for (;;) {
         mp_map_elem_t *slot = &map->table[pos];
         if (slot->key == MP_OBJ_NULL) {
-            // found NULL slot, so index is not in table
-            if (lookup_kind == MP_MAP_LOOKUP_ADD_IF_NOT_FOUND) {
-                map->used += 1;
-                if (avail_slot == NULL) {
-                    avail_slot = slot;
-                }
-                avail_slot->key = index;
-                avail_slot->value = MP_OBJ_NULL;
-                if (!mp_obj_is_qstr(index)) {
-                    map->all_keys_are_qstrs = 0;
-                }
-                return avail_slot;
-            } else {
-                return NULL;
+            if (avail_slot == NULL) {
+                avail_slot = slot;
+            }
+            if (stop_at_empty) {
+                goto search_over;
             }
         } else if (slot->key == MP_OBJ_SENTINEL) {
             // found deleted slot, remember for later
@@ -297,6 +299,7 @@ mp_map_elem_t *MICROPY_WRAP_MP_MAP_LOOKUP(mp_map_lookup)(mp_map_t * map, mp_obj_
         pos = (pos + 1) % map->alloc;
 
         if (pos == start_pos) {
+        search_over:
             // search got back to starting position, so index is not in table
             if (lookup_kind == MP_MAP_LOOKUP_ADD_IF_NOT_FOUND) {
                 if (avail_slot != NULL) {
