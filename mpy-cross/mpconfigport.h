@@ -30,13 +30,16 @@
 #define MICROPY_PERSISTENT_CODE_LOAD (0)
 #define MICROPY_PERSISTENT_CODE_SAVE (1)
 
-#ifndef MICROPY_PERSISTENT_CODE_SAVE_FILE
-#if defined(__i386__) || defined(__x86_64__) || defined(_WIN32) || defined(__unix__) || defined(__APPLE__)
-#define MICROPY_PERSISTENT_CODE_SAVE_FILE (1)
-#else
+#define MICROPY_NLR_SETJMP           (0)
+#define MICROPY_NLR_NUM_REGS         (0)
+
+// #ifndef MICROPY_PERSISTENT_CODE_SAVE_FILE
+// #if defined(__i386__) || defined(__x86_64__) || defined(_WIN32) || defined(__unix__) || defined(__APPLE__)
+// #define MICROPY_PERSISTENT_CODE_SAVE_FILE (1)
+// #else
 #define MICROPY_PERSISTENT_CODE_SAVE_FILE (0)
-#endif
-#endif
+// #endif
+// #endif
 
 #define MICROPY_EMIT_X64            (1)
 #define MICROPY_EMIT_X86            (1)
@@ -55,7 +58,7 @@
 #define MICROPY_COMP_TRIPLE_TUPLE_ASSIGN (1)
 #define MICROPY_COMP_RETURN_IF_EXPR (1)
 
-#define MICROPY_READER_POSIX        (1)
+//#define MICROPY_READER_POSIX        (1)
 #define MICROPY_ENABLE_RUNTIME      (0)
 #define MICROPY_ENABLE_GC           (1)
 #ifndef __EMSCRIPTEN__
