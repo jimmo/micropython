@@ -44,7 +44,9 @@ PYTHON_TRUTH = CPYTHON3
 INSTANCE_READ_TIMEOUT_S = 10
 
 APPEND_CODE_TEMPLATE = """
+import machine
 import sys
+import select
 class multitest:
     @staticmethod
     def flush():
@@ -69,8 +71,9 @@ class multitest:
     def wait(msg):
         msg = "BROADCAST " + msg
         while True:
-            if sys.stdin.readline().rstrip() == msg:
+            if select.select([sys.stdin], [], [], 0)[0] and sys.stdin.readline().rstrip() == msg:
                 return
+            machine.idle()
     @staticmethod
     def globals(**gs):
         for g in gs:
