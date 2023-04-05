@@ -212,9 +212,6 @@ int main(int argc, char **argv) {
         #endif
         gc_sweep_all();
         mp_deinit();
-        #ifdef mp_hal_network_clear_active
-        mp_hal_network_clear_active();
-        #endif
     }
 
     return 0;

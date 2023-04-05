@@ -300,9 +300,6 @@ STATIC mp_obj_t bluetooth_ble_active(size_t n_args, const mp_obj_t *args) {
         } else {
             mp_bluetooth_deinit();
         }
-        #ifdef mp_hal_network_set_active
-        mp_hal_network_set_active(MP_QSTR_BLE, mp_obj_is_true(args[1]));
-        #endif
     }
     // Return current state.
     return mp_obj_new_bool(mp_bluetooth_is_active());

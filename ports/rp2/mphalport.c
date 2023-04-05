@@ -223,3 +223,44 @@ void mp_hal_get_mac_ascii(int idx, size_t chr_off, size_t chr_len, char *dest) {
 uint32_t storage_read_blocks(uint8_t *dest, uint32_t block_num, uint32_t num_blocks) {
     panic_unsupported();
 }
+
+#if MICROPY_PY_BLUETOOTH_CYW43
+
+#include "extmod/modbluetooth.h"
+
+#define RP2_NETWORK_BLE 0x1
+#define RP2_NETWORK_STA 0x2
+#define RP2_NETWORK_AP  0x4
+
+static uint32_t rp2_active_network_flags = 0;
+
+void rp2_hal_network_check_allowed(qstr net) {
+    bool blocked = false;
+    if (net == MP_QSTR_BLE && (rp2_active_network_flags & ~RP2_NETWORK_BLE) != 0) {
+        blocked = true;
+    } else if ((net == MP_QSTR_STA_IF || net == MP_QSTR_AP_IF) && mp_bluetooth_is_active()) {
+        blocked = true;
+    }
+    if (blocked) {
+        mp_raise_ValueError(MP_ERROR_TEXT("Network blocked"));
+    }
+}
+
+void rp2_hal_network_set_active(qstr net, bool active) {
+    uint32_t net_flag = 0;
+    switch (net) {
+        case MP_QSTR_STA_IF:
+            net_flag = RP2_NETWORK_STA;
+            break;
+        case MP_QSTR_AP_IF:
+            net_flag = RP2_NETWORK_AP;
+            break;
+    }
+    if (active) {
+        rp2_active_network_flags |= net_flag;
+    } else {
+        rp2_active_network_flags &= ~net_flag;
+    }
+}
+
+#endif

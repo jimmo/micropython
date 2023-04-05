@@ -170,4 +170,12 @@ void mp_hal_get_mac(int idx, uint8_t buf[6]);
 void mp_hal_get_mac_ascii(int idx, size_t chr_off, size_t chr_len, char *dest);
 void mp_hal_generate_laa_mac(int idx, uint8_t buf[6]);
 
+#if MICROPY_PY_BLUETOOTH_CYW43
+// Prevent BT+Wifi being active at the same time
+#define mp_hal_network_check_allowed rp2_hal_network_check_allowed
+#define mp_hal_network_set_active rp2_hal_network_set_active
+void rp2_hal_network_check_allowed(size_t qstr);
+void rp2_hal_network_set_active(size_t qstr, bool active);
+#endif
+
 #endif // MICROPY_INCLUDED_RP2_MPHALPORT_H
