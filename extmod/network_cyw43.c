@@ -245,19 +245,8 @@ STATIC mp_obj_t network_cyw43_connect(size_t n_args, const mp_obj_t *pos_args, m
 
     network_cyw43_obj_t *self = MP_OBJ_TO_PTR(pos_args[0]);
     mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
-    if (self->itf == CYW43_ITF_STA) {
-        mp_arg_parse_all(n_args - 1, pos_args + 1, kw_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
-    }
+    mp_arg_parse_all(n_args - 1, pos_args + 1, kw_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
 
-    // set active if not done already
-    if (!cyw43_tcpip_link_status(self->cyw, self->itf)) {
-        network_cyw43_set_active(self, true);
-    }
-
-    // Nothing (more) to do for AP mode
-    if (self->itf == CYW43_ITF_AP) {
-        return mp_const_none;
-    }
     #ifdef mp_hal_network_check_allowed
     mp_hal_network_check_allowed(MP_QSTR_STA_IF);
     #endif
@@ -318,13 +307,6 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_KW(network_cyw43_connect_obj, 1, network_cyw43_co
 
 STATIC mp_obj_t network_cyw43_disconnect(mp_obj_t self_in) {
     network_cyw43_obj_t *self = MP_OBJ_TO_PTR(self_in);
-
-    // Disconnect for AP means active(False)
-    if (self->itf == CYW43_ITF_AP) {
-        network_cyw43_set_active(self, false);
-        return mp_const_none;
-    }
-
     cyw43_wifi_leave(self->cyw, self->itf);
     #ifdef mp_hal_network_set_active
     mp_hal_network_set_active(MP_QSTR_STA_IF, false);
