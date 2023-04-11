@@ -223,13 +223,16 @@ if(MICROPY_PY_BLUETOOTH)
 endif()
 
 if (MICROPY_PY_BLUETOOTH_CYW43)
-    target_link_libraries(${MICROPY_TARGET}
-        pico_btstack_hci_transport_cyw43
-    )
     target_compile_definitions(${MICROPY_TARGET} PRIVATE
-        CYW43_USE_BTSTACK=1
+        CYW43_ENABLE_BLUETOOTH=1
         MICROPY_PY_BLUETOOTH_CYW43=1
     )
+
+    if (MICROPY_BLUETOOTH_BTSTACK)
+        target_link_libraries(${MICROPY_TARGET}
+            pico_btstack_hci_transport_cyw43
+        )
+    endif()
 endif()
 
 if (MICROPY_BLUETOOTH_BTSTACK)
