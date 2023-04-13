@@ -33,6 +33,8 @@
 #include "hardware/structs/ioqspi.h"
 #include "hardware/structs/sio.h"
 
+#include "lib/cyw43-driver/src/cyw43.h"
+
 #if MICROPY_PY_NETWORK_CYW43
 #include "extmod/modnetwork.h"
 #endif
@@ -76,11 +78,41 @@ STATIC bool __no_inline_not_in_flash_func(bootsel_button)(void) {
     return button_state;
 }
 
+bool bt_ready = 1;
+
+void cyw43_bluetooth_hci_process(void) {
+    // mp_printf(&mp_plat_print, "hci process\n");
+    bt_ready = 1;
+}
+
 STATIC mp_obj_t rp2_bootsel_button(void) {
     return MP_OBJ_NEW_SMALL_INT(bootsel_button());
 }
 MP_DEFINE_CONST_FUN_OBJ_0(rp2_bootsel_button_obj, rp2_bootsel_button);
 
+STATIC mp_obj_t rp2_bt_read(void) {
+    uint8_t buf[2048];
+    uint32_t len = 0;
+    if (bt_ready) {
+        cyw43_bluetooth_hci_read(buf, 2048, &len);
+        bt_ready = 1;
+    }
+    return mp_obj_new_bytes(buf, len);
+}
+MP_DEFINE_CONST_FUN_OBJ_0(rp2_bt_read_obj, rp2_bt_read);
+
+STATIC mp_obj_t rp2_bt_write(mp_obj_t b) {
+    mp_buffer_info_t bufinfo;
+    mp_get_buffer_raise(b, &bufinfo, MP_BUFFER_READ);
+    return MP_OBJ_NEW_SMALL_INT(cyw43_bluetooth_hci_write(bufinfo.buf, bufinfo.len));
+}
+MP_DEFINE_CONST_FUN_OBJ_1(rp2_bt_write_obj, rp2_bt_write);
+
+STATIC mp_obj_t rp2_bt_init(void) {
+    cyw43_bluetooth_hci_init();
+    return mp_const_none;
+}
+MP_DEFINE_CONST_FUN_OBJ_0(rp2_bt_init_obj, rp2_bt_init);
 
 STATIC const mp_rom_map_elem_t rp2_module_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR___name__),            MP_ROM_QSTR(MP_QSTR_rp2) },
@@ -88,6 +120,9 @@ STATIC const mp_rom_map_elem_t rp2_module_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR_PIO),                 MP_ROM_PTR(&rp2_pio_type) },
     { MP_ROM_QSTR(MP_QSTR_StateMachine),        MP_ROM_PTR(&rp2_state_machine_type) },
     { MP_ROM_QSTR(MP_QSTR_bootsel_button),      MP_ROM_PTR(&rp2_bootsel_button_obj) },
+    { MP_ROM_QSTR(MP_QSTR_bt_read),      MP_ROM_PTR(&rp2_bt_read_obj) },
+    { MP_ROM_QSTR(MP_QSTR_bt_write),      MP_ROM_PTR(&rp2_bt_write_obj) },
+    { MP_ROM_QSTR(MP_QSTR_bt_init),      MP_ROM_PTR(&rp2_bt_init_obj) },
 
     #if MICROPY_PY_NETWORK_CYW43
     // Deprecated (use network.country instead).
