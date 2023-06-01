@@ -1,0 +1,21 @@
+[general]
+# Custom rules:
+# - verify title line
+# - author email address verification.
+# - body line length (with exceptions)
+extra-path=tools/gitlint_rules.py
+regex-style-search=true
+
+# Verify signed-off-by.
+contrib=contrib-body-requires-signed-off-by
+
+# title-min-length & title-trailing-punctuation & body-max-line-length & title-must-not-contain-word : Superseded by our custom rule.
+# body-is-missing: We allow empty messages (as long as it has a title).
+ignore=title-trailing-punctuation,title-min-length,body-max-line-length,title-must-not-contain-word,body-is-missing
+
+[title-max-length]
+line-length=72
+
+[ignore-by-title]
+regex=^WIP.*
+ignore=all
