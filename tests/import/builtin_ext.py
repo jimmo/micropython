@@ -1,3 +1,6 @@
+print("SKIP")
+raise SystemExit
+
 import sys
 
 print(sys, hasattr(sys, "__file__"))
