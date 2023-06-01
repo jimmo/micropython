@@ -367,6 +367,22 @@ mp_int_t mp_obj_int_get_checked(mp_const_obj_t self_in) {
     return MP_OBJ_SMALL_INT_VALUE(self_in);
 }
 
+#if MICROPY_PY_BUILTINS_INT_BIT_LENGTH
+STATIC mp_obj_t int_bit_length(mp_obj_t self_in) {
+    mp_int_t val = MP_OBJ_SMALL_INT_VALUE(self_in);
+    if (val < 0) {
+        val = -val;
+    }
+    mp_uint_t n = 0;
+    while (val) {
+        val >>= 1;
+        ++n;
+    }
+    return MP_OBJ_NEW_SMALL_INT(n);
+}
+MP_DEFINE_CONST_FUN_OBJ_1(int_bit_length_obj, int_bit_length);
+#endif
+
 #endif // MICROPY_LONGINT_IMPL == MICROPY_LONGINT_IMPL_NONE
 
 // This dispatcher function is expected to be independent of the implementation of long int
@@ -453,6 +469,9 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(int_to_bytes_obj, 3, 4, int_to_bytes)
 STATIC const mp_rom_map_elem_t int_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_from_bytes), MP_ROM_PTR(&int_from_bytes_obj) },
     { MP_ROM_QSTR(MP_QSTR_to_bytes), MP_ROM_PTR(&int_to_bytes_obj) },
+    #if MICROPY_PY_BUILTINS_INT_BIT_LENGTH
+    { MP_ROM_QSTR(MP_QSTR_bit_length), MP_ROM_PTR(&int_bit_length_obj) },
+    #endif
 };
 
 STATIC MP_DEFINE_CONST_DICT(int_locals_dict, int_locals_dict_table);

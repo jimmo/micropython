@@ -457,4 +457,25 @@ mp_float_t mp_obj_int_as_float_impl(mp_obj_t self_in) {
 }
 #endif
 
+#if MICROPY_PY_BUILTINS_INT_BIT_LENGTH
+STATIC mp_obj_t int_bit_length(mp_obj_t self_in) {
+    if (mp_obj_is_small_int(self_in)) {
+        mp_int_t val = MP_OBJ_SMALL_INT_VALUE(self_in);
+        if (val < 0) {
+            val = -val;
+        }
+        mp_uint_t n = 0;
+        while (val) {
+            val >>= 1;
+            ++n;
+        }
+        return MP_OBJ_NEW_SMALL_INT(n);
+    } else {
+        mp_obj_int_t *self = MP_OBJ_TO_PTR(self_in);
+        return MP_OBJ_NEW_SMALL_INT(mpz_bit_length_inpl(&self->mpz));
+    }
+}
+MP_DEFINE_CONST_FUN_OBJ_1(int_bit_length_obj, int_bit_length);
+#endif
+
 #endif

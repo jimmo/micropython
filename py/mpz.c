@@ -1390,6 +1390,21 @@ void mpz_pow3_inpl(mpz_t *dest, const mpz_t *lhs, const mpz_t *rhs, const mpz_t 
     mpz_free(n);
 }
 
+#if MICROPY_PY_BUILTINS_INT_BIT_LENGTH
+mp_uint_t mpz_bit_length_inpl(mpz_t *n) {
+    if (n->len == 0) {
+        return 0;
+    }
+    mpz_dig_t d = n->dig[n->len - 1];
+    mp_uint_t num_bits = 0;
+    while (d) {
+        d >>= 1;
+        ++num_bits;
+    }
+    return MPZ_DIG_SIZE * (n->len - 1) + num_bits;
+}
+#endif
+
 #if 0
 these functions are unused
 

@@ -1144,6 +1144,11 @@ typedef double mp_float_t;
 #define MICROPY_PY_BUILTINS_ROUND_INT (MICROPY_CONFIG_ROM_LEVEL_AT_LEAST_EXTRA_FEATURES)
 #endif
 
+// Whether to support int.bit_length(n)
+#ifndef MICROPY_PY_BUILTINS_INT_BIT_LENGTH
+#define MICROPY_PY_BUILTINS_INT_BIT_LENGTH (MICROPY_CONFIG_ROM_LEVEL_AT_LEAST_EXTRA_FEATURES)
+#endif
+
 // Whether to support complete set of special methods for user
 // classes, or only the most used ones. "Inplace" methods are
 // controlled by MICROPY_PY_ALL_INPLACE_SPECIAL_METHODS below.
