@@ -64,6 +64,15 @@
 #include "modespnow.h"
 #endif
 
+// Settings for memory-mapped location of SPIRAM.
+#if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
+#define IDF_TARGET_PSRAM_ADDR_START (SOC_EXTRAM_DATA_LOW)
+#define IDF_TARGET_PSRAM_SIZE (SOC_EXTRAM_DATA_SIZE)
+#elif CONFIG_IDF_TARGET_ESP32S3
+#define IDF_TARGET_PSRAM_ADDR_START (SOC_DROM_HIGH)
+#define IDF_TARGET_PSRAM_SIZE (SOC_EXTRAM_DATA_HIGH - IDF_TARGET_PSRAM_ADDR_START)
+#endif
+
 // MicroPython runs as a task under FreeRTOS
 #define MP_TASK_PRIORITY        (ESP_TASK_PRIO_MIN + 1)
 #define MP_TASK_STACK_SIZE      (16 * 1024)
@@ -100,28 +109,13 @@ void mp_task(void *pvParameter) {
         ESP_LOGE("esp_init", "can't create event loop: 0x%x\n", err);
     }
 
-    size_t mp_task_heap_size;
-    void *mp_task_heap = NULL;
-
-    #if CONFIG_SPIRAM_USE_MALLOC
-    // SPIRAM is issued using MALLOC, fallback to normal allocation rules
-    mp_task_heap = NULL;
-    #elif CONFIG_SPIRAM_USE_MEMMAP
-    // Try to use the entire external SPIRAM directly for the heap
-    size_t esp_spiram_size = esp_psram_get_size();
-    if (esp_spiram_size > 0) {
-        mp_task_heap = (void *)SOC_EXTRAM_DATA_LOW;
-        mp_task_heap_size = esp_spiram_size;
-    }
-    #endif
-
-    if (mp_task_heap == NULL) {
-        // Allocate the uPy heap using malloc and get the largest available region,
-        // limiting to 1/2 total available memory to leave memory for the OS.
-        size_t heap_total = heap_caps_get_total_size(MALLOC_CAP_8BIT);
-        mp_task_heap_size = MIN(heap_caps_get_largest_free_block(MALLOC_CAP_8BIT), heap_total / 2);
-        mp_task_heap = malloc(mp_task_heap_size);
-    }
+    // Allocate the uPy heap using malloc and get the largest available region,
+    // limiting to 1/2 total available memory to leave memory for the OS.
+    // When SPIRAM is enabled, this will allocate from SPIRAM.
+    uint32_t caps = MALLOC_CAP_8BIT;
+    size_t heap_total = heap_caps_get_total_size(caps);
+    size_t mp_task_heap_size = MIN(heap_caps_get_largest_free_block(caps), heap_total / 2);
+    void *mp_task_heap = heap_caps_malloc(mp_task_heap_size, caps);
 
 soft_reset:
     // initialise the stack pointer for the main thread
