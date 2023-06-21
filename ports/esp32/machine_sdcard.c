@@ -95,7 +95,7 @@ static const spi_bus_config_t spi_bus_defaults[2] = {
     {
         .miso_io_num = GPIO_NUM_2,
         .mosi_io_num = GPIO_NUM_15,
-        .sclk_io_num  = GPIO_NUM_14,
+        .sclk_io_num = GPIO_NUM_14,
         .data2_io_num = GPIO_NUM_NC,
         .data3_io_num = GPIO_NUM_NC,
         .data4_io_num = GPIO_NUM_NC,
@@ -108,25 +108,27 @@ static const spi_bus_config_t spi_bus_defaults[2] = {
     },
 };
 
+#if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
 static const uint8_t spi_dma_channel_defaults[2] = {
     2,
     1,
 };
+#endif
 
 static const sdspi_device_config_t spi_dev_defaults[2] = {
     {
-        #if CONFIG_IDF_TARGET_ESP32S3
-        .host_id = SPI2_HOST,
-        .gpio_cs = GPIO_NUM_34,
-        #else
+        #if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
         .host_id = VSPI_HOST,
         .gpio_cs = GPIO_NUM_5,
+        #else
+        .host_id = SPI3_HOST,
+        .gpio_cs = GPIO_NUM_34,
         #endif
         .gpio_cd = SDSPI_SLOT_NO_CD,
         .gpio_wp = SDSPI_SLOT_NO_WP,
         .gpio_int = SDSPI_SLOT_NO_INT,
     },
-    SDSPI_DEVICE_CONFIG_DEFAULT(),
+    SDSPI_DEVICE_CONFIG_DEFAULT(), // HSPI (ESP32/ESP32S2) / SPI2 (ESP32S3/ESP32C3)
 };
 
 STATIC gpio_num_t pin_or_int(const mp_obj_t arg) {
@@ -248,8 +250,9 @@ STATIC mp_obj_t machine_sdcard_make_new(const mp_obj_type_t *type, size_t n_args
     }
 
     if (is_spi) {
+        // Needs to match spi_dev_defaults above.
         #if CONFIG_IDF_TARGET_ESP32S3
-        self->host.slot = slot_num ? SPI3_HOST : SPI2_HOST;
+        self->host.slot = slot_num ? SPI2_HOST : SPI3_HOST;
         #else
         self->host.slot = slot_num ? HSPI_HOST : VSPI_HOST;
         #endif
@@ -265,7 +268,11 @@ STATIC mp_obj_t machine_sdcard_make_new(const mp_obj_type_t *type, size_t n_args
         DEBUG_printf("  Setting up SPI slot configuration");
         spi_host_device_t spi_host_id = self->host.slot;
         spi_bus_config_t bus_config = spi_bus_defaults[slot_num];
+        #if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
         spi_dma_chan_t dma_channel = spi_dma_channel_defaults[slot_num];
+        #else
+        spi_dma_chan_t dma_channel = SPI_DMA_CH_AUTO;
+        #endif
         sdspi_device_config_t dev_config = spi_dev_defaults[slot_num];
 
         SET_CONFIG_PIN(bus_config, miso_io_num, ARG_miso);
