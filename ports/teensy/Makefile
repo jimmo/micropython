@@ -205,9 +205,6 @@ $(BUILD)/%.hex: $(BUILD)/%.elf
 
 # List of sources for qstr extraction
 SRC_QSTR += $(SRC_C) $(STM_SRC_C) $(SHARED_SRC_C) $(GEN_PINS_SRC)
-# Append any auto-generated sources that are needed by sources listed in
-# SRC_QSTR
-SRC_QSTR_AUTO_DEPS +=
 
 # Making OBJ use an order-only depenedency on the generated pins.h file
 # has the side effect of making the pins.h file before we actually compile
