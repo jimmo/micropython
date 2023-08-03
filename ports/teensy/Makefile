@@ -22,9 +22,6 @@ ifeq ($(MEMZIP_DIR),)
 MEMZIP_DIR = memzip_files
 endif
 
-$(BUILD)/memzip-files.o: $(BUILD)/memzip-files.c
-	$(call compile_c)
-
 $(BUILD)/memzip-files.c: $(shell find ${MEMZIP_DIR} -type f)
 	@$(ECHO) "Creating $@"
 	$(Q)$(PYTHON) $(MAKE_MEMZIP) --zip-file $(BUILD)/memzip-files.zip --c-file $@ $(MEMZIP_DIR)
@@ -226,9 +223,6 @@ $(OBJ): | $(HEADER_BUILD)/pins.h
 $(BUILD)/%_gen.c $(HEADER_BUILD)/%.h $(HEADER_BUILD)/%_af_const.h $(BUILD)/%_qstr.h: teensy_%.csv $(MAKE_PINS) $(AF_FILE) $(PREFIX_FILE) | $(HEADER_BUILD)
 	$(ECHO) "Create $@"
 	$(Q)$(PYTHON) $(MAKE_PINS) --board $(BOARD_PINS) --af $(AF_FILE) --prefix $(PREFIX_FILE) --hdr $(GEN_PINS_HDR) --qstr $(GEN_PINS_QSTR) --af-const $(GEN_PINS_AF_CONST) --af-py $(GEN_PINS_AF_PY) > $(GEN_PINS_SRC)
-
-$(GEN_PINS_SRC:.c=.o): $(GEN_PINS_SRC)
-	$(call compile_c)
 
 $(BUILD)/%.pp: $(BUILD)/%.c
 	$(ECHO) "PreProcess $<"
