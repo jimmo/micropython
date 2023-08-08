@@ -80,7 +80,7 @@
 #define cyw43_hal_ticks_us              mp_hal_ticks_us
 #define cyw43_hal_ticks_ms              mp_hal_ticks_ms
 
-#define cyw43_hal_pin_obj_t             mp_hal_pin_obj_t
+#define cyw43_hal_machine_pin_obj_t             mp_hal_pin_obj_t
 #define cyw43_hal_pin_config            mp_hal_pin_config
 #define cyw43_hal_pin_read              mp_hal_pin_read
 #define cyw43_hal_pin_low               mp_hal_pin_low
@@ -116,7 +116,7 @@ static inline void cyw43_delay_ms(uint32_t ms) {
     }
 }
 
-static inline void cyw43_hal_pin_config_irq_falling(cyw43_hal_pin_obj_t pin, int enable) {
+static inline void cyw43_hal_pin_config_irq_falling(cyw43_hal_machine_pin_obj_t pin, int enable) {
     if (enable) {
         extint_set(pin, GPIO_MODE_IT_FALLING);
     }

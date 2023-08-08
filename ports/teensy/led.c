@@ -11,7 +11,7 @@
 typedef struct _pyb_led_obj_t {
     mp_obj_base_t base;
     mp_uint_t led_id;
-    const pin_obj_t *led_pin;
+    const machine_pin_obj_t *led_pin;
 } pyb_led_obj_t;
 
 STATIC const pyb_led_obj_t pyb_led_obj[] = {
@@ -39,7 +39,7 @@ void led_init(void) {
 
     /* Turn off LEDs and initialize */
     for (int led = 0; led < NUM_LEDS; led++) {
-        const pin_obj_t *led_pin = pyb_led_obj[led].led_pin;
+        const machine_pin_obj_t *led_pin = pyb_led_obj[led].led_pin;
         MICROPY_HW_LED_OFF(led_pin);
         GPIO_InitStructure.Pin = led_pin->pin_mask;
         HAL_GPIO_Init(led_pin->gpio, &GPIO_InitStructure);
@@ -50,7 +50,7 @@ void led_state(pyb_led_t led, int state) {
     if (led < 1 || led > NUM_LEDS) {
         return;
     }
-    const pin_obj_t *led_pin = pyb_led_obj[led - 1].led_pin;
+    const machine_pin_obj_t *led_pin = pyb_led_obj[led - 1].led_pin;
     // printf("led_state(%d,%d)\n", led, state);
     if (state == 0) {
         // turn LED off
@@ -65,7 +65,7 @@ void led_toggle(pyb_led_t led) {
     if (led < 1 || led > NUM_LEDS) {
         return;
     }
-    const pin_obj_t *led_pin = pyb_led_obj[led - 1].led_pin;
+    const machine_pin_obj_t *led_pin = pyb_led_obj[led - 1].led_pin;
     GPIO_TypeDef *gpio = led_pin->gpio;
 
     // We don't know if we're turning the LED on or off, but we don't really

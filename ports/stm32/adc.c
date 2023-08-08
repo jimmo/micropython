@@ -515,7 +515,7 @@ STATIC mp_obj_t adc_make_new(const mp_obj_type_t *type, size_t n_args, size_t n_
     if (mp_obj_is_int(pin_obj)) {
         channel = adc_get_internal_channel(mp_obj_get_int(pin_obj));
     } else {
-        const pin_obj_t *pin = pin_find(pin_obj);
+        const machine_pin_obj_t *pin = pin_find(pin_obj);
         if ((pin->adc_num & PIN_ADC_MASK) == 0) {
             // No ADC function on the given pin.
             mp_raise_msg_varg(&mp_type_ValueError, MP_ERROR_TEXT("Pin(%q) doesn't have ADC capabilities"), pin->name);
@@ -529,7 +529,7 @@ STATIC mp_obj_t adc_make_new(const mp_obj_type_t *type, size_t n_args, size_t n_
 
     // If this channel corresponds to a pin then configure the pin in ADC mode.
     if (channel < MP_ARRAY_SIZE(pin_adc_table)) {
-        const pin_obj_t *pin = pin_adc_table[channel];
+        const machine_pin_obj_t *pin = pin_adc_table[channel];
         if (pin != NULL) {
             mp_hal_pin_config(pin, MP_HAL_PIN_MODE_ADC, MP_HAL_PIN_PULL_NONE, 0);
         }
@@ -823,7 +823,7 @@ void adc_init_all(pyb_adc_all_obj_t *adc_all, uint32_t resolution, uint32_t en_m
         // only initialise those channels that are selected with the en_mask
         if (en_mask & (1 << channel)) {
             // If this channel corresponds to a pin then configure the pin in ADC mode.
-            const pin_obj_t *pin = pin_adcall_table[channel];
+            const machine_pin_obj_t *pin = pin_adcall_table[channel];
             if (pin) {
                 mp_hal_pin_config(pin, MP_HAL_PIN_MODE_ADC, MP_HAL_PIN_PULL_NONE, 0);
             }

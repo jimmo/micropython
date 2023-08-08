@@ -509,7 +509,7 @@ STATIC mp_obj_t pyb_timer_channel(size_t n_args, const mp_obj_t *args, mp_map_t 
         if (!mp_obj_is_type(pin_obj, &pin_type)) {
             mp_raise_ValueError(MP_ERROR_TEXT("pin argument needs to be be a Pin type"));
         }
-        const pin_obj_t *pin = pin_obj;
+        const machine_pin_obj_t *pin = pin_obj;
         const pin_af_obj_t *af = pin_find_af(pin, AF_FN_FTM, self->tim_id);
         if (af == NULL) {
             mp_raise_msg_varg(&mp_type_ValueError, MP_ERROR_TEXT("pin %s doesn't have an af for TIM%d"), qstr_str(pin->name), self->tim_id);

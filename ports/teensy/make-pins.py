@@ -165,7 +165,7 @@ class Pin(object):
         print("};", file=out_source)
         print("", file=out_source)
         print(
-            "const pin_obj_t pin_{:s} = PIN({:s}, {:d}, {:d}, {:s}, {:s}, {:d});".format(
+            "const machine_pin_obj_t pin_{:s} = PIN({:s}, {:d}, {:d}, {:s}, {:s}, {:d});".format(
                 self.cpu_pin_name(),
                 self.port_letter(),
                 self.pin,
@@ -179,7 +179,9 @@ class Pin(object):
         print("", file=out_source)
 
     def print_header(self, out_header):
-        print("extern const pin_obj_t pin_{:s};".format(self.cpu_pin_name()), file=out_header)
+        print(
+            "extern const machine_pin_obj_t pin_{:s};".format(self.cpu_pin_name()), file=out_header
+        )
         if self.alt_fn_count > 0:
             print(
                 "extern const pin_af_obj_t pin_{:s}_af[];".format(self.cpu_pin_name()),
@@ -239,7 +241,9 @@ class Pins(object):
 
     def print_named(self, label, named_pins, out_source):
         print(
-            "STATIC const mp_rom_map_elem_t pin_{:s}_pins_locals_dict_table[] = {{".format(label),
+            "STATIC const mp_rom_map_elem_t machine_pin_{:s}_pins_locals_dict_table[] = {{".format(
+                label
+            ),
             file=out_source,
         )
         for named_pin in named_pins:
@@ -253,7 +257,7 @@ class Pins(object):
                 )
         print("};", file=out_source)
         print(
-            "MP_DEFINE_CONST_DICT(pin_{:s}_pins_locals_dict, pin_{:s}_pins_locals_dict_table);".format(
+            "MP_DEFINE_CONST_DICT(machine_pin_{:s}_pins_locals_dict, machine_pin_{:s}_pins_locals_dict_table);".format(
                 label, label
             ),
             file=out_source,
@@ -270,7 +274,9 @@ class Pins(object):
 
     def print_adc(self, adc_num, out_source):
         print("", file=out_source)
-        print("const pin_obj_t * const pin_adc{:d}[] = {{".format(adc_num), file=out_source)
+        print(
+            "const machine_pin_obj_t * const pin_adc{:d}[] = {{".format(adc_num), file=out_source
+        )
         for channel in range(16):
             adc_found = False
             for named_pin in self.cpu_pins:
@@ -294,9 +300,9 @@ class Pins(object):
             pin = named_pin.pin()
             if pin.is_board_pin():
                 pin.print_header(out_header)
-        print("extern const pin_obj_t * const pin_adc1[];", file=out_header)
-        print("extern const pin_obj_t * const pin_adc2[];", file=out_header)
-        print("extern const pin_obj_t * const pin_adc3[];", file=out_header)
+        print("extern const machine_pin_obj_t * const pin_adc1[];", file=out_header)
+        print("extern const machine_pin_obj_t * const pin_adc2[];", file=out_header)
+        print("extern const machine_pin_obj_t * const pin_adc3[];", file=out_header)
 
     def print_af_hdr(self, out_af_const):
         af_hdr_set = set([])

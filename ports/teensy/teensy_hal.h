@@ -120,8 +120,8 @@ void mp_hal_gpio_clock_enable(GPIO_TypeDef *gpio);
 
 void HAL_GPIO_Init(GPIO_TypeDef *GPIOx, GPIO_InitTypeDef *init);
 
-struct _pin_obj_t;
-#define mp_hal_pin_obj_t const struct _pin_obj_t *
+struct _machine_pin_obj_t;
+#define mp_hal_pin_obj_t const struct _machine_pin_obj_t *
 #define mp_hal_pin_high(p) (((p)->gpio->PSOR) = (p)->pin_mask)
 #define mp_hal_pin_low(p)  (((p)->gpio->PCOR) = (p)->pin_mask)
 #define mp_hal_pin_read(p) (((p)->gpio->PDIR >> (p)->pin) & 1)
