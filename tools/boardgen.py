@@ -25,6 +25,8 @@ class Pin:
         # A hidden pin is one that is in pins.csv with a "-" prefix and will
         # be still available to C but not Python.
         self._hidden = False
+        # Reference to the PinGenerator instance.
+        self._generator = None
 
     # The name of the pin to use in MP_QSTR_{} or pin_{}. Defaults to the cpu name.
     def name(self):
@@ -110,6 +112,7 @@ class PinGenerator:
         pin = self._pin_type(cpu_pin_name)
         pin._available = available
         self._pins.append(pin)
+        pin._generator = self
         return pin
 
     # Iterate just the available pins (i.e. ones in pins.csv).
@@ -167,11 +170,14 @@ class PinGenerator:
         with open(filename, "r") as csvfile:
             rows = csv.reader(csvfile)
             for linenum, row in enumerate(rows):
-                if linenum < header_rows:
-                    continue
                 try:
                     # Skip empty lines, and lines starting with "#".
                     if len(row) == 0 or row[0].startswith("#"):
+                        continue
+
+                    # Consume `header_rows` non-blank/comment rows at the start.
+                    if header_rows:
+                        header_rows -= 1
                         continue
 
                     # Lines must be pairs of names.
