@@ -70,6 +70,13 @@
 #define MP_BLUETOOTH_DEFAULT_ATTR_LEN (20)
 #endif
 
+// A port should override this if it runs the host stack with a smaller stack
+// size. This number should be whatever stack is available at the point the
+// modbluetooth callbacks are invoked.
+#ifndef MICROPY_PY_BLUETOOTH_SYNC_EVENT_STACK_SIZE
+#define MICROPY_PY_BLUETOOTH_SYNC_EVENT_STACK_SIZE 4096 - 1024
+#endif
+
 #define MP_BLUETOOTH_CCCD_LEN (2)
 
 // Advertisement packet lengths
