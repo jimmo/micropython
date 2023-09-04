@@ -233,7 +233,9 @@ static inline unsigned long mp_random_seed_init(void) {
     do { \
         extern void mp_handle_pending(bool); \
         mp_handle_pending(true); \
+        MP_THREAD_GIL_EXIT(); \
         usleep(500); /* equivalent to mp_hal_delay_us(500) */ \
+        MP_THREAD_GIL_ENTER(); \
     } while (0);
 #endif
 
