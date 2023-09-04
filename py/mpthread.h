@@ -59,4 +59,11 @@ void mp_thread_mutex_unlock(mp_thread_mutex_t *mutex);
 #define MP_THREAD_GIL_EXIT()
 #endif
 
+#if MICROPY_PY_THREAD && MICROPY_PY_THREAD_RTOS
+typedef void (*mp_run_on_thread_function_t)(void *arg);
+void mp_thread_run_on_mp_thread(const mp_run_on_thread_function_t fn, void *arg);
+#else
+#define mp_thread_run_on_mp_thread(fn, arg) fn(arg)
+#endif
+
 #endif // MICROPY_INCLUDED_PY_MPTHREAD_H
