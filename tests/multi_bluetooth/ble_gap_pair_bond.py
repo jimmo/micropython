@@ -19,6 +19,7 @@ _IRQ_PERIPHERAL_DISCONNECT = const(8)
 _IRQ_GATTC_CHARACTERISTIC_RESULT = const(11)
 _IRQ_GATTC_CHARACTERISTIC_DONE = const(12)
 _IRQ_GATTC_READ_RESULT = const(15)
+_IRQ_GATTC_READ_DONE = const(16)
 _IRQ_ENCRYPTION_UPDATE = const(28)
 _IRQ_SET_SECRET = const(30)
 
@@ -124,6 +125,7 @@ def instance1():
         print("gattc_read")
         ble.gattc_read(conn_handle, value_handle)
         wait_for_event(_IRQ_GATTC_READ_RESULT, TIMEOUT_MS)
+        wait_for_event(_IRQ_GATTC_READ_DONE, TIMEOUT_MS)
 
         # Disconnect from the peripheral.
         print("gap_disconnect:", ble.gap_disconnect(conn_handle))
