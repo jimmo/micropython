@@ -296,29 +296,72 @@ void ble_npl_event_set_arg(struct ble_npl_event *ev, void *arg) {
 /******************************************************************************/
 // MUTEX
 
+#define BLE_NPL_MUTEX_NO_OWNER ((mp_uint_t)-1)
+
 ble_npl_error_t ble_npl_mutex_init(struct ble_npl_mutex *mu) {
     DEBUG_MUTEX_printf("ble_npl_mutex_init(%p)\n", mu);
-    mu->locked = 0;
+    mp_thread_mutex_init(&mu->mutex);
+    mu->owner = BLE_NPL_MUTEX_NO_OWNER;
+    mu->depth = 0;
     return BLE_NPL_OK;
 }
 
 ble_npl_error_t ble_npl_mutex_pend(struct ble_npl_mutex *mu, ble_npl_time_t timeout) {
-    DEBUG_MUTEX_printf("ble_npl_mutex_pend(%p, %u) locked=%u\n", mu, (uint)timeout, (uint)mu->locked);
+    DEBUG_MUTEX_printf("ble_npl_mutex_pend(%p, %u, %u, %u, %u)\n", mu, (uint)timeout, mu->owner, mp_thread_get_id(), mu->depth);
+    os_sr_t sr;
+    OS_ENTER_CRITICAL(sr);
+    // B
 
-    // All NimBLE code is executed by the scheduler (and is therefore
-    // implicitly mutexed) so this mutex implementation is a no-op.
+    // This check might sometimes see that mu->owner is not set (because A(1),
+    // B(2), C(1) is a plausible ordering for threads 1 and 2). However, it
+    // will still behave correctly as the only case that matters is the
+    // recursive lock, and A(1), B(1), C(1) is not possible.
+    if (mu->owner == mp_thread_get_id()) {
+        ++mu->depth;
+        DEBUG_MUTEX_printf("--> recursive lock\n");
+        OS_EXIT_CRITICAL(sr);
+        return BLE_NPL_OK;
+    }
+    OS_EXIT_CRITICAL(sr);
 
-    ++mu->locked;
+    DEBUG_MUTEX_printf("--> lock\n");
+    if (!mp_thread_mutex_lock(&mu->mutex, 1)) {
+        printf("FAILED TO LOCK\n");
+        assert(0);
+    }
+    // A
+
+    OS_ENTER_CRITICAL(sr);
+    // C
+    mu->owner = mp_thread_get_id();
+    mu->depth = 1;
+    OS_EXIT_CRITICAL(sr);
 
     return BLE_NPL_OK;
 }
 
 ble_npl_error_t ble_npl_mutex_release(struct ble_npl_mutex *mu) {
-    DEBUG_MUTEX_printf("ble_npl_mutex_release(%p) locked=%u\n", mu, (uint)mu->locked);
-    assert(mu->locked > 0);
+    DEBUG_MUTEX_printf("ble_npl_mutex_release(%p, %u, %u, %u)\n", mu, mu->owner, mp_thread_get_id(), mu->depth);
 
-    --mu->locked;
+    os_sr_t sr;
+    OS_ENTER_CRITICAL(sr);
+    if (mu->owner == mp_thread_get_id()) {
+        --mu->depth;
+        if (mu->depth > 0) {
+            DEBUG_MUTEX_printf("--> recursive unlock\n");
+            OS_EXIT_CRITICAL(sr);
+            return BLE_NPL_OK;
+        }
+    }
+    mu->owner = BLE_NPL_MUTEX_NO_OWNER;
+    OS_EXIT_CRITICAL(sr);
 
+    // It's not possible for A and C to run concurrently with here. If B runs,
+    // then a thread might see that the owner is not set (fine), but it cannot
+    // see that _it_ is the owner.
+
+    DEBUG_MUTEX_printf("--> unlock\n");
+    mp_thread_mutex_unlock(&mu->mutex);
     return BLE_NPL_OK;
 }
 
@@ -327,12 +370,12 @@ ble_npl_error_t ble_npl_mutex_release(struct ble_npl_mutex *mu) {
 
 ble_npl_error_t ble_npl_sem_init(struct ble_npl_sem *sem, uint16_t tokens) {
     DEBUG_SEM_printf("ble_npl_sem_init(%p, %u)\n", sem, (uint)tokens);
-    sem->count = tokens;
+    mp_thread_sem_init(&sem->sem, tokens);
     return BLE_NPL_OK;
 }
 
 ble_npl_error_t ble_npl_sem_pend(struct ble_npl_sem *sem, ble_npl_time_t timeout) {
-    DEBUG_SEM_printf("ble_npl_sem_pend(%p, %u) count=%u\n", sem, (uint)timeout, (uint)sem->count);
+    DEBUG_SEM_printf("ble_npl_sem_pend(%p, %u) tokens=%u\n", sem, (uint)timeout, (uint)ble_npl_sem_get_count(sem));
 
     // This is only called by NimBLE in ble_hs_hci_cmd_tx to synchronously
     // wait for an HCI ACK. The corresponding ble_npl_sem_release is called
@@ -340,36 +383,32 @@ ble_npl_error_t ble_npl_sem_pend(struct ble_npl_sem *sem, ble_npl_time_t timeout
     // extmod/nimble/hal/hal_uart.c). So this loop needs to run only the HCI
     // UART processing but not run any events.
 
-    if (sem->count == 0) {
-        uint32_t t0 = mp_hal_ticks_ms();
-        while (sem->count == 0 && mp_hal_ticks_ms() - t0 < timeout) {
-            if (sem->count != 0) {
-                break;
-            }
+    uint32_t t0 = mp_hal_ticks_ms();
 
-            mp_bluetooth_nimble_hci_uart_wfi();
+    while (true) {
+        if (mp_thread_sem_wait(&sem->sem, false)) {
+            return BLE_NPL_OK;
         }
 
-        if (sem->count == 0) {
-            DEBUG_SEM_printf("ble_npl_sem_pend: semaphore timeout\n");
+        if (mp_hal_ticks_ms() - t0 > timeout) {
             return BLE_NPL_TIMEOUT;
         }
 
-        DEBUG_SEM_printf("ble_npl_sem_pend: acquired in %u ms\n", (int)(mp_hal_ticks_ms() - t0));
+        mp_bluetooth_nimble_hci_uart_wfi();
     }
-    sem->count -= 1;
+
     return BLE_NPL_OK;
 }
 
 ble_npl_error_t ble_npl_sem_release(struct ble_npl_sem *sem) {
     DEBUG_SEM_printf("ble_npl_sem_release(%p)\n", sem);
-    sem->count += 1;
+    mp_thread_sem_post(&sem->sem);
     return BLE_NPL_OK;
 }
 
 uint16_t ble_npl_sem_get_count(struct ble_npl_sem *sem) {
     DEBUG_SEM_printf("ble_npl_sem_get_count(%p)\n", sem);
-    return sem->count;
+    return mp_thread_sem_value(&sem->sem);
 }
 
 /******************************************************************************/
@@ -502,17 +541,12 @@ void ble_npl_time_delay(ble_npl_time_t ticks) {
 
 // This is used anywhere NimBLE modifies global data structures.
 
-// Currently all NimBLE code is invoked by the scheduler so there is no
-// concurrency. In the future we may wish to make HCI UART processing happen
-// asynchronously (e.g. on RX IRQ), so the port can implement these macros
-// accordingly.
-
 uint32_t ble_npl_hw_enter_critical(void) {
     DEBUG_CRIT_printf("ble_npl_hw_enter_critical()\n");
-    return 0;
+    return MICROPY_BEGIN_ATOMIC_SECTION();
 }
 
 void ble_npl_hw_exit_critical(uint32_t atomic_state) {
-    (void)atomic_state;
     DEBUG_CRIT_printf("ble_npl_hw_exit_critical(%u)\n", (uint)atomic_state);
+    MICROPY_END_ATOMIC_SECTION(atomic_state);
 }
