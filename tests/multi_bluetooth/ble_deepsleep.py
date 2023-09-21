@@ -42,6 +42,9 @@ def wait_for_event(event, timeout_ms):
 
 # Acting in peripheral role.
 def instance0():
+    if not hasattr(machine, "deepsleep"):
+        multitest.skip()
+
     multitest.globals(BDADDR=ble.config("mac"))
     print("gap_advertise")
     ble.gap_advertise(20_000, b"\x02\x01\x06\x04\tMPY")
@@ -71,6 +74,9 @@ def instance0_resume():
 
 # Acting in central role.
 def instance1():
+    if not hasattr(machine, "deepsleep"):
+        multitest.skip()
+
     multitest.next()
     try:
         # Connect to peripheral and then disconnect.
