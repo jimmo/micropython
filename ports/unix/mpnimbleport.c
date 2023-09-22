@@ -33,7 +33,7 @@
 #include "nimble/nimble_npl.h"
 
 #include "extmod/nimble/modbluetooth_nimble.h"
-#include "extmod/nimble/hal/hal_uart.h"
+#include "extmod/nimble/transport/uart_ll.h"
 
 #define DEBUG_printf(...) // printf(__VA_ARGS__)
 

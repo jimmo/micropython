@@ -29,7 +29,6 @@
 #include "py/runtime.h"
 #include "nimble/ble.h"
 #include "nimble/nimble_npl.h"
-#include "extmod/nimble/hal/hal_uart.h"
 
 #include "extmod/modbluetooth.h"
 #include "extmod/nimble/modbluetooth_nimble.h"
