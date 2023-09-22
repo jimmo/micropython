@@ -177,9 +177,9 @@ int nimble_sprintf(char *str, const char *fmt, ...) {
 /******************************************************************************/
 // EVENTQ
 
-struct ble_npl_eventq *global_eventq = NULL;
+struct ble_npl_eventq* g_eventq_dflt;
 
-// This must not be called recursively or concurrently with the UART handler.
+// Run all events in the default queue.
 void mp_bluetooth_nimble_os_eventq_run_all(void) {
     if (mp_bluetooth_nimble_ble_state == MP_BLUETOOTH_NIMBLE_BLE_STATE_OFF) {
         return;
@@ -187,31 +187,20 @@ void mp_bluetooth_nimble_os_eventq_run_all(void) {
 
     // Keep running while there are pending events.
     while (true) {
-        struct ble_npl_event *ev = NULL;
-
         os_sr_t sr;
         OS_ENTER_CRITICAL(sr);
-        // Search all queues for an event.
-        for (struct ble_npl_eventq *evq = global_eventq; evq != NULL; evq = evq->nextq) {
-            ev = evq->head;
-            if (ev) {
-                // Remove this event from the queue.
-                evq->head = ev->next;
-                if (ev->next) {
-                    ev->next->prev = NULL;
-                    ev->next = NULL;
-                }
-                ev->prev = NULL;
-
-                ev->pending = false;
-
-                // Stop searching and execute this event.
-                break;
-            }
+        struct ble_npl_event *ev = NULL;
+        if (g_eventq_dflt->head) {
+            ev = g_eventq_dflt->head;
+            // Remove this event from the queue.
+            g_eventq_dflt->head = ev->next;
+            // Mark it as executed.
+            ev->pending = false;
         }
         OS_EXIT_CRITICAL(sr);
 
         if (!ev) {
+            // Queue is empty.
             break;
         }
 
@@ -233,12 +222,9 @@ void ble_npl_eventq_init(struct ble_npl_eventq *evq) {
     DEBUG_EVENT_printf("ble_npl_eventq_init(%p)\n", evq);
     os_sr_t sr;
     OS_ENTER_CRITICAL(sr);
+    assert(g_eventq_dflt == NULL);
+    g_eventq_dflt = evq;
     evq->head = NULL;
-    struct ble_npl_eventq **evq2;
-    for (evq2 = &global_eventq; *evq2 != NULL; evq2 = &(*evq2)->nextq) {
-    }
-    *evq2 = evq;
-    evq->nextq = NULL;
     OS_EXIT_CRITICAL(sr);
 }
 
@@ -248,10 +234,11 @@ void ble_npl_eventq_put(struct ble_npl_eventq *evq, struct ble_npl_event *ev) {
     OS_ENTER_CRITICAL(sr);
     ev->next = NULL;
     ev->pending = true;
+
     if (evq->head == NULL) {
+        DEBUG_EVENT_printf("  --> set head\n");
         // Empty list, make this the first item.
         evq->head = ev;
-        ev->prev = NULL;
     } else {
         // Find the tail of this list.
         struct ble_npl_event *tail = evq->head;
@@ -263,9 +250,9 @@ void ble_npl_eventq_put(struct ble_npl_eventq *evq, struct ble_npl_event *ev) {
                 break;
             }
             if (tail->next == NULL) {
+                DEBUG_EVENT_printf("  --> added to tail\n");
                 // Found the end of the list, add this event as the tail.
                 tail->next = ev;
-                ev->prev = tail;
                 break;
             }
             DEBUG_EVENT_printf("  --> %p\n", tail->next);

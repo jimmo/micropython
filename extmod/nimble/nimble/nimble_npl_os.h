@@ -62,13 +62,11 @@ struct ble_npl_event {
     ble_npl_event_fn *fn;
     void *arg;
     bool pending;
-    struct ble_npl_event *prev;
     struct ble_npl_event *next;
 };
 
 struct ble_npl_eventq {
     struct ble_npl_event *head;
-    struct ble_npl_eventq *nextq;
 };
 
 struct ble_npl_callout {
