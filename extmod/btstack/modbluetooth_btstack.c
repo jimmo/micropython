@@ -27,6 +27,7 @@
 #include "py/runtime.h"
 #include "py/mperrno.h"
 #include "py/mphal.h"
+#include "py/mpthread.h"
 
 #if MICROPY_PY_BLUETOOTH && MICROPY_BLUETOOTH_BTSTACK
 
@@ -193,6 +194,48 @@ STATIC bool controller_static_addr_available = false;
 STATIC const uint8_t read_static_address_command_complete_prefix[] = { 0x0e, 0x1b, 0x01, 0x09, 0xfc };
 #endif
 
+STATIC void handle_le_connection_complete_on_mp_thread(void *arg) {
+    uint8_t *packet = arg;
+
+    uint16_t conn_handle = hci_subevent_le_connection_complete_get_connection_handle(packet);
+    uint8_t addr_type = hci_subevent_le_connection_complete_get_peer_address_type(packet);
+    bd_addr_t addr;
+    hci_subevent_le_connection_complete_get_peer_address(packet, addr);
+    uint16_t irq_event;
+    if (hci_subevent_le_connection_complete_get_role(packet) == 0) {
+        // Master role.
+        irq_event = MP_BLUETOOTH_IRQ_PERIPHERAL_CONNECT;
+    } else {
+        // Slave role.
+        irq_event = MP_BLUETOOTH_IRQ_CENTRAL_CONNECT;
+    }
+    #if MICROPY_PY_BLUETOOTH_ENABLE_GATT_CLIENT
+    create_active_connection(conn_handle);
+    #endif
+    mp_bluetooth_gap_on_connected_disconnected(irq_event, conn_handle, addr_type, addr);
+}
+
+STATIC void handle_disconnection_complete_on_mp_thread(void *arg) {
+    uint8_t *packet = arg;
+
+    DEBUG_printf("  --> hci disconnect complete\n");
+    uint16_t conn_handle = hci_event_disconnection_complete_get_connection_handle(packet);
+    const hci_connection_t *conn = hci_connection_for_handle(conn_handle);
+    uint16_t irq_event;
+    if (conn == NULL || conn->role == 0) {
+        // Master role.
+        irq_event = MP_BLUETOOTH_IRQ_PERIPHERAL_DISCONNECT;
+    } else {
+        // Slave role.
+        irq_event = MP_BLUETOOTH_IRQ_CENTRAL_DISCONNECT;
+    }
+    uint8_t addr[6] = {0};
+    mp_bluetooth_gap_on_connected_disconnected(irq_event, conn_handle, 0xff, addr);
+    #if MICROPY_PY_BLUETOOTH_ENABLE_GATT_CLIENT
+    remove_active_connection(conn_handle);
+    #endif
+}
+
 STATIC void btstack_packet_handler_generic(uint8_t packet_type, uint16_t channel, uint8_t *packet, uint16_t size) {
     (void)channel;
     (void)size;
@@ -207,22 +250,7 @@ STATIC void btstack_packet_handler_generic(uint8_t packet_type, uint16_t channel
         DEBUG_printf("  --> hci le meta\n");
         switch (hci_event_le_meta_get_subevent_code(packet)) {
             case HCI_SUBEVENT_LE_CONNECTION_COMPLETE: {
-                uint16_t conn_handle = hci_subevent_le_connection_complete_get_connection_handle(packet);
-                uint8_t addr_type = hci_subevent_le_connection_complete_get_peer_address_type(packet);
-                bd_addr_t addr;
-                hci_subevent_le_connection_complete_get_peer_address(packet, addr);
-                uint16_t irq_event;
-                if (hci_subevent_le_connection_complete_get_role(packet) == 0) {
-                    // Master role.
-                    irq_event = MP_BLUETOOTH_IRQ_PERIPHERAL_CONNECT;
-                } else {
-                    // Slave role.
-                    irq_event = MP_BLUETOOTH_IRQ_CENTRAL_CONNECT;
-                }
-                #if MICROPY_PY_BLUETOOTH_ENABLE_GATT_CLIENT
-                create_active_connection(conn_handle);
-                #endif
-                mp_bluetooth_gap_on_connected_disconnected(irq_event, conn_handle, addr_type, addr);
+                mp_thread_run_on_mp_thread(&handle_le_connection_complete_on_mp_thread, packet, MICROPY_PY_BLUETOOTH_SYNC_EVENT_STACK_SIZE);
                 break;
             }
             case HCI_SUBEVENT_LE_CONNECTION_UPDATE_COMPLETE: {
@@ -302,22 +330,7 @@ STATIC void btstack_packet_handler_generic(uint8_t packet_type, uint16_t channel
             desc->sm_actual_encryption_key_size);
         #endif // MICROPY_PY_BLUETOOTH_ENABLE_PAIRING_BONDING
     } else if (event_type == HCI_EVENT_DISCONNECTION_COMPLETE) {
-        DEBUG_printf("  --> hci disconnect complete\n");
-        uint16_t conn_handle = hci_event_disconnection_complete_get_connection_handle(packet);
-        const hci_connection_t *conn = hci_connection_for_handle(conn_handle);
-        uint16_t irq_event;
-        if (conn == NULL || conn->role == 0) {
-            // Master role.
-            irq_event = MP_BLUETOOTH_IRQ_PERIPHERAL_DISCONNECT;
-        } else {
-            // Slave role.
-            irq_event = MP_BLUETOOTH_IRQ_CENTRAL_DISCONNECT;
-        }
-        uint8_t addr[6] = {0};
-        mp_bluetooth_gap_on_connected_disconnected(irq_event, conn_handle, 0xff, addr);
-        #if MICROPY_PY_BLUETOOTH_ENABLE_GATT_CLIENT
-        remove_active_connection(conn_handle);
-        #endif
+        mp_thread_run_on_mp_thread(&handle_disconnection_complete_on_mp_thread, packet, MICROPY_PY_BLUETOOTH_SYNC_EVENT_STACK_SIZE);
     #if MICROPY_PY_BLUETOOTH_ENABLE_CENTRAL_MODE
     } else if (event_type == GAP_EVENT_ADVERTISING_REPORT) {
         DEBUG_printf("  --> gap advertising report\n");
@@ -1129,7 +1142,6 @@ typedef struct {
 // Called in response to a gatts_notify/indicate being unable to complete, which then calls
 // att_server_request_to_send_notification.
 STATIC void btstack_notify_indicate_ready_handler(void *context) {
-    MICROPY_PY_BLUETOOTH_ENTER
     notify_indicate_pending_op_t *pending_op = (notify_indicate_pending_op_t *)context;
     DEBUG_printf("btstack_notify_indicate_ready_handler gatts_op=%d conn_handle=%d value_handle=%d len=%lu\n", pending_op->gatts_op, pending_op->conn_handle, pending_op->value_handle, pending_op->value_len);
     int err = ERROR_CODE_SUCCESS;
@@ -1145,7 +1157,6 @@ STATIC void btstack_notify_indicate_ready_handler(void *context) {
     }
     assert(err == ERROR_CODE_SUCCESS);
     (void)err;
-    MICROPY_PY_BLUETOOTH_EXIT
     m_tracked_free(pending_op);
 }
 
@@ -1172,7 +1183,6 @@ int mp_bluetooth_gatts_notify_indicate(uint16_t conn_handle, uint16_t value_hand
     int err = ERROR_CODE_UNKNOWN_HCI_COMMAND;
 
     // Attempt to send immediately. If it succeeds, btstack will copy the buffer.
-    MICROPY_PY_BLUETOOTH_ENTER
     switch (gatts_op) {
         case MP_BLUETOOTH_GATTS_OP_NOTIFY:
             err = att_server_notify(conn_handle, value_handle, value, value_len);
@@ -1183,7 +1193,6 @@ int mp_bluetooth_gatts_notify_indicate(uint16_t conn_handle, uint16_t value_hand
             err = att_server_indicate(conn_handle, value_handle, value, value_len);
             break;
     }
-    MICROPY_PY_BLUETOOTH_EXIT
 
     if (err == BTSTACK_ACL_BUFFERS_FULL || err == ATT_HANDLE_VALUE_INDICATION_IN_PROGRESS) {
         DEBUG_printf("mp_bluetooth_gatts_notify_indicate: ACL buffer full / indication in progress, scheduling callback\n");
@@ -1198,7 +1207,6 @@ int mp_bluetooth_gatts_notify_indicate(uint16_t conn_handle, uint16_t value_hand
         pending_op->value_len = value_len;
         memcpy(pending_op->value, value, value_len);
 
-        MICROPY_PY_BLUETOOTH_ENTER
         switch (gatts_op) {
             case MP_BLUETOOTH_GATTS_OP_NOTIFY:
                 err = att_server_request_to_send_notification(&pending_op->btstack_registration, conn_handle);
@@ -1207,7 +1215,6 @@ int mp_bluetooth_gatts_notify_indicate(uint16_t conn_handle, uint16_t value_hand
                 err = att_server_request_to_send_indication(&pending_op->btstack_registration, conn_handle);
                 break;
         }
-        MICROPY_PY_BLUETOOTH_EXIT
 
         if (err != ERROR_CODE_SUCCESS) {
             m_tracked_free(pending_op);

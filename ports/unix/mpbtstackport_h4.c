@@ -40,6 +40,8 @@
 
 #include "mpbtstackport.h"
 
+// In H4 mode we use mpbthciport.c + mpbtstackport_common.c + mpbtstackport_h4.c (this file).
+
 #define DEBUG_printf(...) // printf(__VA_ARGS__)
 
 STATIC hci_transport_config_uart_t hci_transport_config_uart = {
@@ -51,10 +53,21 @@ STATIC hci_transport_config_uart_t hci_transport_config_uart = {
     .parity = BTSTACK_UART_PARITY_OFF,
 };
 
-void mp_bluetooth_hci_poll_h4(void) {
-    if (mp_bluetooth_btstack_state == MP_BLUETOOTH_BTSTACK_STATE_STARTING || mp_bluetooth_btstack_state == MP_BLUETOOTH_BTSTACK_STATE_ACTIVE) {
-        mp_bluetooth_btstack_hci_uart_process();
+bool mp_bluetooth_run_hci_uart(void) {
+    if (!mp_bluetooth_hci_active()) {
+        return false;
     }
+
+    if (mp_bluetooth_btstack_state == MP_BLUETOOTH_BTSTACK_STATE_STARTING || mp_bluetooth_btstack_state == MP_BLUETOOTH_BTSTACK_STATE_ACTIVE || mp_bluetooth_btstack_state == MP_BLUETOOTH_BTSTACK_STATE_HALTING) {
+        // Pretend like we're running in IRQ context (i.e. other things can't be running at the same time).
+        // mp_uint_t atomic_state = MICROPY_BEGIN_ATOMIC_SECTION();
+        mp_bluetooth_btstack_hci_uart_process();
+        // MICROPY_END_ATOMIC_SECTION(atomic_state);
+
+        return true;
+    }
+
+    return true;
 }
 
 void mp_bluetooth_btstack_port_init_h4(void) {
