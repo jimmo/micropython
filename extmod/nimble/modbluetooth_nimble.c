@@ -270,8 +270,6 @@ STATIC void set_random_address(bool nrpa) {
 #if MICROPY_PY_BLUETOOTH_ENABLE_PAIRING_BONDING
 // For ble_hs_pvcy_set_our_irk
 #include "nimble/host/src/ble_hs_pvcy_priv.h"
-// For ble_hs_hci_util_rand
-#include "nimble/host/src/ble_hs_hci_priv.h"
 // For ble_hs_misc_restore_irks
 #include "nimble/host/src/ble_hs_priv.h"
 
@@ -299,7 +297,7 @@ STATIC int load_irk(void) {
     } else {
         DEBUG_printf("load_irk: Generating new IRK.\n");
         uint8_t rand_irk[16];
-        rc = ble_hs_hci_util_rand(rand_irk, 16);
+        rc = ble_hs_hci_rand(rand_irk, 16);
         if (rc) {
             return rc;
         }
@@ -531,12 +529,12 @@ STATIC int central_gap_event_cb(struct ble_gap_event *event, void *arg) {
 // TODO: In the future if a port ever needs to customise these functions
 // then investigate using MP_WEAK or splitting them out to another .c file.
 
-#include "transport/uart/ble_hci_uart.h"
+#include "nimble/transport.h"
 
 void mp_bluetooth_nimble_port_hci_init(void) {
     DEBUG_printf("mp_bluetooth_nimble_port_hci_init (nimble default)\n");
-    // This calls mp_bluetooth_hci_uart_init (via ble_hci_uart_init --> hal_uart_config --> mp_bluetooth_hci_uart_init).
-    ble_hci_uart_init();
+    // This calls mp_bluetooth_hci_uart_init (via ble_transport_hs_init --> hal_uart_config --> mp_bluetooth_hci_uart_init).
+    ble_transport_ll_init();
     mp_bluetooth_hci_controller_init();
 }
 
@@ -618,19 +616,19 @@ int mp_bluetooth_init(void) {
     MP_STATE_PORT(bluetooth_nimble_memory) = NULL;
     #endif
 
-    // Allow port (ESP32) to override NimBLE's HCI init.
-    // Otherwise default implementation above calls ble_hci_uart_init().
-    mp_bluetooth_nimble_port_hci_init();
-
-    // Static initialization is complete, can start processing events.
-    mp_bluetooth_nimble_ble_state = MP_BLUETOOTH_NIMBLE_BLE_STATE_WAITING_FOR_SYNC;
-
     // Initialise NimBLE memory and data structures.
     DEBUG_printf("mp_bluetooth_init: nimble_port_init\n");
     nimble_port_init();
 
+    // Allow port (ESP32) to override NimBLE's HCI init.
+    // Otherwise default implementation above calls ble_transport_hs_init().
+    mp_bluetooth_nimble_port_hci_init();
+
     // Make sure that the HCI UART and event handling task is running.
     mp_bluetooth_nimble_port_start();
+
+    // Static initialization is complete, can start processing events.
+    mp_bluetooth_nimble_ble_state = MP_BLUETOOTH_NIMBLE_BLE_STATE_WAITING_FOR_SYNC;
 
     // Run the scheduler while we wait for stack startup.
     // On non-ringbuffer builds (NimBLE on STM32/Unix) this will also poll the UART and run the event queue.
@@ -1619,7 +1617,7 @@ STATIC int l2cap_channel_event(struct ble_l2cap_event *event, void *arg) {
             // Because we're not yet ready to grant new credits to the channel, we can't call
             // ble_l2cap_recv_ready yet, so instead we just give it a new mbuf. This requires
             // ble_l2cap_priv.h for the definition of chan->chan (i.e. struct ble_l2cap_chan).
-            chan->chan->coc_rx.sdu = sdu_rx;
+            chan->chan->coc_rx.sdus[chan->chan->coc_rx.current_sdu_idx] = sdu_rx;
 
             ble_l2cap_get_chan_info(event->receive.chan, &info);
 
@@ -1633,7 +1631,7 @@ STATIC int l2cap_channel_event(struct ble_l2cap_event *event, void *arg) {
             // more credits. If the IRQ handler doesn't consume all available data
             // then rx_pending will be still set.
             if (!chan->rx_pending) {
-                struct os_mbuf *sdu_rx = chan->chan->coc_rx.sdu;
+                struct os_mbuf *sdu_rx = chan->chan->coc_rx.sdus[chan->chan->coc_rx.current_sdu_idx];
                 assert(sdu_rx);
                 if (sdu_rx) {
                     ble_l2cap_recv_ready(chan->chan, sdu_rx);
@@ -1857,7 +1855,7 @@ int mp_bluetooth_l2cap_recvinto(uint16_t conn_handle, uint16_t cid, uint8_t *buf
                     // We've already given the channel a new mbuf in l2cap_channel_event above, so
                     // re-use that mbuf in the call to ble_l2cap_recv_ready. This will just
                     // give the channel more credits.
-                    struct os_mbuf *sdu_rx = chan->chan->coc_rx.sdu;
+                    struct os_mbuf *sdu_rx = chan->chan->coc_rx.sdus[chan->chan->coc_rx.current_sdu_idx];
                     assert(sdu_rx);
                     if (sdu_rx) {
                         ble_l2cap_recv_ready(chan->chan, sdu_rx);
@@ -1910,13 +1908,11 @@ STATIC int ble_secret_store_read(int obj_type, const union ble_store_key *key, u
                 // <type=peer,addr,*> (single)
                 // Find the entry for this specific peer.
                 assert(key->sec.idx == 0);
-                assert(!key->sec.ediv_rand_present);
                 key_data = (const uint8_t *)&key->sec.peer_addr;
                 key_data_len = sizeof(ble_addr_t);
             } else {
                 // <type=peer,*> (with index)
                 // Iterate all known peers.
-                assert(!key->sec.ediv_rand_present);
                 key_data = NULL;
                 key_data_len = 0;
             }
@@ -1927,7 +1923,6 @@ STATIC int ble_secret_store_read(int obj_type, const union ble_store_key *key, u
             // Find our secret for this remote device, matching this ediv/rand key.
             assert(ble_addr_cmp(&key->sec.peer_addr, BLE_ADDR_ANY)); // Must have address.
             assert(key->sec.idx == 0);
-            assert(key->sec.ediv_rand_present);
             key_data = (const uint8_t *)&key->sec.peer_addr;
             key_data_len = sizeof(ble_addr_t);
             break;
@@ -1957,10 +1952,6 @@ STATIC int ble_secret_store_read(int obj_type, const union ble_store_key *key, u
 
     DEBUG_printf("ble_secret_store_read: found secret\n");
 
-    if (obj_type == BLE_STORE_OBJ_TYPE_OUR_SEC) {
-        // TODO: Verify ediv_rand matches.
-    }
-
     return 0;
 }
 
@@ -1976,7 +1967,6 @@ STATIC int ble_secret_store_write(int obj_type, const union ble_store_value *val
             ble_store_key_from_value_sec(&key_sec, value_sec);
 
             assert(ble_addr_cmp(&key_sec.peer_addr, BLE_ADDR_ANY)); // Must have address.
-            assert(key_sec.ediv_rand_present);
 
             if (!mp_bluetooth_gap_on_set_secret(obj_type, (const uint8_t *)&key_sec.peer_addr, sizeof(ble_addr_t), (const uint8_t *)value_sec, sizeof(struct ble_store_value_sec))) {
                 DEBUG_printf("Failed to write key: type=%d\n", obj_type);
@@ -2006,7 +1996,6 @@ STATIC int ble_secret_store_delete(int obj_type, const union ble_store_key *key)
             // <type=peer,addr,*>
 
             assert(ble_addr_cmp(&key->sec.peer_addr, BLE_ADDR_ANY)); // Must have address.
-            // ediv_rand is optional (will not be present for delete).
 
             if (!mp_bluetooth_gap_on_set_secret(obj_type, (const uint8_t *)&key->sec.peer_addr, sizeof(ble_addr_t), NULL, 0)) {
                 DEBUG_printf("Failed to delete key: type=%d\n", obj_type);
