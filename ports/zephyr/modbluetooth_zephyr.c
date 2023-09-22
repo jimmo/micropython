@@ -190,8 +190,9 @@ void mp_bluetooth_get_current_address(uint8_t *addr_type, uint8_t *addr) {
     *addr_type = le_addr.type;
 }
 
-void mp_bluetooth_set_address_mode(uint8_t addr_mode) {
+int mp_bluetooth_set_address_mode(uint8_t addr_mode) {
     // TODO: implement
+    return 0;
 }
 
 size_t mp_bluetooth_gap_get_device_name(const uint8_t **buf) {

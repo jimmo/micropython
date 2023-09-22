@@ -288,7 +288,7 @@ STATIC mp_obj_t bluetooth_ble_config(size_t n_args, const mp_obj_t *args, mp_map
                     }
                     case MP_QSTR_addr_mode: {
                         mp_int_t addr_mode = mp_obj_get_int(e->value);
-                        mp_bluetooth_set_address_mode(addr_mode);
+                        bluetooth_handle_errno(mp_bluetooth_set_address_mode(addr_mode));
                         break;
                     }
                     #if MICROPY_PY_BLUETOOTH_ENABLE_PAIRING_BONDING
@@ -929,6 +929,8 @@ STATIC void invoke_irq_handler_protected(void *args_in) {
         return;
     }
 
+    mp_uint_t prev_thread_id = mp_bluetooth_set_thread();
+
     nlr_buf_t nlr;
     if (nlr_push(&nlr) == 0) {
         mp_obj_array_t mv_addr;
@@ -1013,6 +1015,8 @@ STATIC void invoke_irq_handler_protected(void *args_in) {
         // Disable the BLE IRQ handler.
         o->irq_handler = mp_const_none;
     }
+
+    mp_bluetooth_restore_thread(prev_thread_id);
 }
 
 STATIC mp_obj_t invoke_irq_handler(uint16_t event,

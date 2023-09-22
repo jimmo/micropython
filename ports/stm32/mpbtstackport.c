@@ -80,16 +80,12 @@ static bool mp_btstack_runloop_remove_timer(btstack_timer_source_t *tim) {
     return btstack_linked_list_remove(&mp_btstack_runloop_timers, (btstack_linked_item_t *)tim);
 }
 
-static void mp_btstack_runloop_execute(void) {
-    // Should not be called.
-}
-
-static void mp_btstack_runloop_dump_timer(void) {
-    // Not implemented/needed.
-}
-
 static uint32_t mp_btstack_runloop_get_time_ms(void) {
     return mp_hal_ticks_ms();
+}
+
+static void mp_btstack_runloop_poll_data_sources_from_irq(void) {
+    mp_bluetooth_hci_poll_now();
 }
 
 static const btstack_run_loop_t mp_btstack_runloop_stm32 = {
@@ -101,9 +97,12 @@ static const btstack_run_loop_t mp_btstack_runloop_stm32 = {
     &mp_btstack_runloop_set_timer,
     &mp_btstack_runloop_add_timer,
     &mp_btstack_runloop_remove_timer,
-    &mp_btstack_runloop_execute,
-    &mp_btstack_runloop_dump_timer,
+    NULL, // execute
+    NULL, // dump_timer
     &mp_btstack_runloop_get_time_ms,
+    &mp_btstack_runloop_poll_data_sources_from_irq,
+    NULL, // execute_on_main_thread
+    NULL, // trigger_exit
 };
 
 STATIC const hci_transport_config_uart_t hci_transport_config_uart = {
@@ -114,14 +113,16 @@ STATIC const hci_transport_config_uart_t hci_transport_config_uart = {
     NULL,
 };
 
-void mp_bluetooth_hci_poll(void) {
-    if (mp_bluetooth_btstack_state == MP_BLUETOOTH_BTSTACK_STATE_OFF) {
-        return;
-    }
-
-    // Process UART data.
+bool mp_bluetooth_run_hci_uart(void) {
     if (mp_bluetooth_btstack_state != MP_BLUETOOTH_BTSTACK_STATE_HALTING) {
         mp_bluetooth_btstack_hci_uart_process();
+    }
+    return true;
+}
+
+bool mp_bluetooth_run_host_stack(void) {
+    if (mp_bluetooth_btstack_state == MP_BLUETOOTH_BTSTACK_STATE_OFF) {
+        return true;
     }
 
     // Process any BTstack timers.
@@ -136,6 +137,8 @@ void mp_bluetooth_hci_poll(void) {
         btstack_linked_list_pop(&mp_btstack_runloop_timers);
         tim->process(tim);
     }
+
+    return true;
 }
 
 void mp_bluetooth_btstack_port_init(void) {

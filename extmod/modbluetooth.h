@@ -297,7 +297,7 @@ bool mp_bluetooth_is_active(void);
 void mp_bluetooth_get_current_address(uint8_t *addr_type, uint8_t *addr);
 
 // Sets the addressing mode to use.
-void mp_bluetooth_set_address_mode(uint8_t addr_mode);
+int mp_bluetooth_set_address_mode(uint8_t addr_mode);
 
 #if MICROPY_PY_BLUETOOTH_ENABLE_PAIRING_BONDING
 // Set bonding flag in pairing requests (i.e. persist security keys).
@@ -401,6 +401,9 @@ int mp_bluetooth_l2cap_recvinto(uint16_t conn_handle, uint16_t cid, uint8_t *buf
 #if MICROPY_PY_BLUETOOTH_ENABLE_HCI_CMD
 int mp_bluetooth_hci_cmd(uint16_t ogf, uint16_t ocf, const uint8_t *req, size_t req_len, uint8_t *resp, size_t resp_len, uint8_t *status);
 #endif // MICROPY_PY_BLUETOOTH_ENABLE_HCI_CMD
+
+mp_uint_t mp_bluetooth_set_thread(void);
+void mp_bluetooth_restore_thread(mp_uint_t thread_id);
 
 /////////////////////////////////////////////////////////////////////////////
 // API implemented by modbluetooth (called by port-specific implementations):

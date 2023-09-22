@@ -41,21 +41,20 @@
 
 #include "mpbtstackport.h"
 
-// Called by the UART polling thread in mpbthciport.c, or by the USB polling thread in mpbtstackport_usb.c.
-bool mp_bluetooth_hci_poll(void) {
-    if (mp_bluetooth_btstack_state == MP_BLUETOOTH_BTSTACK_STATE_STARTING || mp_bluetooth_btstack_state == MP_BLUETOOTH_BTSTACK_STATE_ACTIVE || mp_bluetooth_btstack_state == MP_BLUETOOTH_BTSTACK_STATE_HALTING) {
-        // Pretend like we're running in IRQ context (i.e. other things can't be running at the same time).
-        mp_uint_t atomic_state = MICROPY_BEGIN_ATOMIC_SECTION();
-        #if MICROPY_BLUETOOTH_BTSTACK_H4
-        mp_bluetooth_hci_poll_h4();
-        #endif
-        btstack_run_loop_embedded_execute_once();
-        MICROPY_END_ATOMIC_SECTION(atomic_state);
+mp_thread_mutex_t btstack_mutex;
 
-        return true;
+bool mp_bluetooth_run_host_stack(void) {
+    if (!mp_bluetooth_hci_active()) {
+        return false;
     }
 
-    return false;
+    mp_bluetooth_btstack_enter();
+    if (mp_bluetooth_btstack_state == MP_BLUETOOTH_BTSTACK_STATE_STARTING || mp_bluetooth_btstack_state == MP_BLUETOOTH_BTSTACK_STATE_ACTIVE || mp_bluetooth_btstack_state == MP_BLUETOOTH_BTSTACK_STATE_HALTING) {
+        btstack_run_loop_embedded_execute_once();
+    }
+    mp_bluetooth_btstack_exit();
+
+    return true;
 }
 
 bool mp_bluetooth_hci_active(void) {
@@ -80,6 +79,8 @@ uint32_t hal_time_ms(void) {
 }
 
 void mp_bluetooth_btstack_port_init(void) {
+    mp_thread_mutex_init(&btstack_mutex);
+
     btstack_run_loop_init(btstack_run_loop_embedded_get_instance());
 
     // hci_dump_init(hci_dump_embedded_stdout_get_instance());

@@ -46,8 +46,7 @@
 // Implements a btstack btstack_uart_block_t on top of the mphciuart.h
 // interface to an HCI UART provided by the port.
 
-// We pass the bytes directly to the UART during a send, but then notify btstack in the next poll.
-STATIC bool send_done;
+// Callback to tell btstack that we've finished transmitting a block.
 STATIC void (*send_handler)(void);
 
 // btstack issues a read of len bytes, and gives us a buffer to asynchronously fill up.
@@ -60,7 +59,6 @@ STATIC bool init_success = false;
 STATIC int btstack_uart_init(const btstack_uart_config_t *uart_config) {
     (void)uart_config;
 
-    send_done = false;
     recv_len = 0;
     recv_idx = 0;
     recv_handler = NULL;
@@ -128,7 +126,12 @@ STATIC void btstack_uart_send_block(const uint8_t *buf, uint16_t len) {
     #endif
 
     mp_bluetooth_hci_uart_write(buf, len);
-    send_done = true;
+
+    // mp_bluetooth_hci_uart_write is synchronous, so we can tell btstack
+    // immediately that block is sent.
+    if (send_handler) {
+        send_handler();
+    }
 }
 
 STATIC int btstack_uart_get_supported_sleep_modes(void) {
@@ -169,14 +172,6 @@ const btstack_uart_block_t mp_bluetooth_btstack_hci_uart_block = {
 
 void mp_bluetooth_btstack_hci_uart_process(void) {
     bool host_wake = mp_bluetooth_hci_controller_woken();
-
-    if (send_done) {
-        // If we'd done a TX in the last interval, notify btstack that it's complete.
-        send_done = false;
-        if (send_handler) {
-            send_handler();
-        }
-    }
 
     // Append any new bytes to the recv buffer, notifying bstack if we've got
     // the number of bytes it was looking for.

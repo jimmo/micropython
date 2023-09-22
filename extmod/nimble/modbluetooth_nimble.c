@@ -729,12 +729,12 @@ void mp_bluetooth_get_current_address(uint8_t *addr_type, uint8_t *addr) {
     reverse_addr_byte_order(addr, addr_le);
 }
 
-void mp_bluetooth_set_address_mode(uint8_t addr_mode) {
+int mp_bluetooth_set_address_mode(uint8_t addr_mode) {
     switch (addr_mode) {
         case MP_BLUETOOTH_ADDRESS_MODE_PUBLIC:
             if (!has_public_address()) {
                 // No public address available.
-                mp_raise_OSError(MP_EINVAL);
+                return MP_EINVAL;
             }
             nimble_address_mode = BLE_OWN_ADDR_PUBLIC;
             break;
@@ -759,6 +759,8 @@ void mp_bluetooth_set_address_mode(uint8_t addr_mode) {
             nimble_address_mode = BLE_OWN_ADDR_RANDOM;
             break;
     }
+
+    return 0;
 }
 
 #if MICROPY_PY_BLUETOOTH_ENABLE_PAIRING_BONDING
@@ -1894,6 +1896,14 @@ int mp_bluetooth_hci_cmd(uint16_t ogf, uint16_t ocf, const uint8_t *req, size_t 
 }
 
 #endif // MICROPY_PY_BLUETOOTH_ENABLE_HCI_CMD
+
+mp_uint_t mp_bluetooth_set_thread(void) {
+    return 0;
+}
+
+void mp_bluetooth_restore_thread(mp_uint_t thread_id) {
+    (void)thread_id;
+}
 
 #if MICROPY_PY_BLUETOOTH_ENABLE_PAIRING_BONDING
 

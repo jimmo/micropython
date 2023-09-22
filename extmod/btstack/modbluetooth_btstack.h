@@ -34,6 +34,12 @@
 #include "lib/btstack/src/btstack.h"
 
 typedef struct _mp_bluetooth_btstack_root_pointers_t {
+    #if MICROPY_PY_THREAD
+    mp_thread_mutex_t mutex;
+    mp_uint_t mutex_owner;
+    size_t mutex_depth;
+    #endif
+
     // This stores both the advertising data and the scan response data, concatenated together.
     uint8_t *adv_data;
     // Total length of both.
@@ -64,6 +70,19 @@ extern volatile int mp_bluetooth_btstack_state;
 void mp_bluetooth_btstack_port_init(void);
 void mp_bluetooth_btstack_port_deinit(void);
 void mp_bluetooth_btstack_port_start(void);
+
+// btstack is single-threaded and has no internal locking, so we need to
+// ensure that any code from the Python bindings does not run concurrently
+// with the background tasks.
+#if MICROPY_PY_THREAD
+void mp_bluetooth_btstack_enter(void);
+void mp_bluetooth_btstack_exit(void);
+#else
+static inline void mp_bluetooth_btstack_enter(void) {
+}
+static inline void mp_bluetooth_btstack_exit(void) {
+}
+#endif
 
 #endif // MICROPY_PY_BLUETOOTH && MICROPY_BLUETOOTH_BTSTACK
 

@@ -43,6 +43,8 @@
 
 #include "mpbtstackport.h"
 
+// In USB mode we use mpbtstackport_common.c + mpbtstackport_usb.c (this file) (and not mpbthciport.c).
+
 #if !MICROPY_PY_THREAD
 #error Unix btstack requires MICROPY_PY_THREAD
 #endif
@@ -95,7 +97,7 @@ STATIC void *btstack_thread(void *arg) {
     // Or, if a timeout results in it being set to TIMEOUT.
 
     while (true) {
-        if (!mp_bluetooth_hci_poll()) {
+        if (!mp_bluetooth_run_host_stack()) {
             break;
         }
 
