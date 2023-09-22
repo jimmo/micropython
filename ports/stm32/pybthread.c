@@ -32,9 +32,6 @@
 
 #if MICROPY_PY_THREAD
 
-#define PYB_MUTEX_UNLOCKED ((void *)0)
-#define PYB_MUTEX_LOCKED ((void *)1)
-
 // These macros are used when we only need to protect against a thread
 // switch; other interrupts are still allowed to proceed.
 #define RAISE_IRQ_PRI() raise_irq_pri(IRQ_PRI_PENDSV)
@@ -173,14 +170,16 @@ void *pyb_thread_next(void *sp) {
 }
 
 void pyb_mutex_init(pyb_mutex_t *m) {
-    *m = PYB_MUTEX_UNLOCKED;
+    m->thread = NULL; // no owner
 }
 
 int pyb_mutex_lock(pyb_mutex_t *m, int wait) {
     uint32_t irq_state = RAISE_IRQ_PRI();
-    if (*m == PYB_MUTEX_UNLOCKED) {
-        // mutex is available
-        *m = PYB_MUTEX_LOCKED;
+    if (m->thread == NULL) {
+        // mutex has no owner (unlocked), lock it
+        m->thread = pyb_thread_cur;
+        // no waiters
+        pyb_thread_cur->queue_next = NULL;
         RESTORE_IRQ_PRI(irq_state);
     } else {
         // mutex is locked
@@ -188,16 +187,25 @@ int pyb_mutex_lock(pyb_mutex_t *m, int wait) {
             RESTORE_IRQ_PRI(irq_state);
             return 0; // failed to lock mutex
         }
-        if (*m == PYB_MUTEX_LOCKED) {
-            *m = pyb_thread_cur;
+
+        // current owner cannot recursively acquire
+        assert(m->thread != pyb_thread_cur);
+
+        if (m->thread->queue_next == NULL) {
+            // nobody is waiting, mark us as the first waiter
+            m->thread->queue_next = pyb_thread_cur;
         } else {
-            for (pyb_thread_t *n = *m;; n = n->queue_next) {
+            // at least one other thread is waiting, queue up this thread
+            // behind the last one
+            for (pyb_thread_t *n = m->thread->queue_next; ; n = n->queue_next) {
                 if (n->queue_next == NULL) {
                     n->queue_next = pyb_thread_cur;
                     break;
                 }
             }
         }
+
+        // we are the end of the waiting queue
         pyb_thread_cur->queue_next = NULL;
         // take current thread off the run list
         pyb_thread_remove_from_runable(pyb_thread_cur);
@@ -211,22 +219,21 @@ int pyb_mutex_lock(pyb_mutex_t *m, int wait) {
 
 void pyb_mutex_unlock(pyb_mutex_t *m) {
     uint32_t irq_state = RAISE_IRQ_PRI();
-    if (*m == PYB_MUTEX_LOCKED) {
-        // no threads are blocked on the mutex
-        *m = PYB_MUTEX_UNLOCKED;
-    } else {
-        // at least one thread is blocked on this mutex
-        pyb_thread_t *th = *m;
-        if (th->queue_next == NULL) {
-            // no other threads are blocked
-            *m = PYB_MUTEX_LOCKED;
-        } else {
-            // at least one other thread is still blocked
-            *m = th->queue_next;
-        }
-        // put unblocked thread on runable list
+
+    // ensure thread is currently owned (locked)
+    assert(m->thread != NULL);
+
+    // get the thread (if any) that is blocked
+    pyb_thread_t *th = m->thread->queue_next;
+
+    // mark that thread as the owner (or NULL, which will unlock)
+    m->thread = th;
+
+    if (th) {
+        // place new owner on runable list
         pyb_thread_add_to_runable(th);
     }
+
     RESTORE_IRQ_PRI(irq_state);
 }
 

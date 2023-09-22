@@ -41,7 +41,11 @@ typedef struct _pyb_thread_t {
     struct _pyb_thread_t *queue_next;
 } pyb_thread_t;
 
-typedef pyb_thread_t *pyb_mutex_t;
+typedef struct {
+    // this is the current owner of the lock (or NULL if unlocked)
+    // pending waiters are a linked list on this thread's queue_next
+    pyb_thread_t *thread;
+} pyb_mutex_t;
 
 extern volatile int pyb_thread_enabled;
 extern pyb_thread_t *volatile pyb_thread_all;
