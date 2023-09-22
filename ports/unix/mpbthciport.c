@@ -57,7 +57,7 @@ uint8_t mp_bluetooth_hci_cmd_buf[4 + 256];
 STATIC int uart_fd = -1;
 
 // Must be provided by the stack bindings (e.g. mpnimbleport.c or mpbtstackport.c).
-extern bool mp_bluetooth_hci_poll(void);
+extern bool mp_bluetooth_run_host_stack(void);
 
 // For synchronous mode, we run all BLE stack code inside a scheduled task.
 // This task is scheduled periodically (every 1ms) by a background thread.
@@ -73,7 +73,7 @@ STATIC mp_obj_t run_events_scheduled_task(mp_obj_t none_in) {
     mp_uint_t atomic_state = MICROPY_BEGIN_ATOMIC_SECTION();
     events_task_is_scheduled = false;
     MICROPY_END_ATOMIC_SECTION(atomic_state);
-    mp_bluetooth_hci_poll();
+    mp_bluetooth_run_host_stack();
     return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(run_events_scheduled_task_obj, run_events_scheduled_task);

@@ -38,8 +38,8 @@
 #define DEBUG_printf(...) // printf(__VA_ARGS__)
 
 // Called by the UART polling thread in mpbthciport.c.
-bool mp_bluetooth_hci_poll(void) {
-    // DEBUG_printf("mp_bluetooth_hci_poll (unix nimble) %d\n", mp_bluetooth_nimble_ble_state);
+bool mp_bluetooth_run_host_stack(void) {
+    DEBUG_printf("mp_bluetooth_run_host_stack (unix nimble) %d\n", mp_bluetooth_nimble_ble_state);
 
     if (mp_bluetooth_nimble_ble_state == MP_BLUETOOTH_NIMBLE_BLE_STATE_OFF) {
         DEBUG_printf("mp_bluetooth_hci_poll (unix nimble) -- shutdown\n");
@@ -47,14 +47,11 @@ bool mp_bluetooth_hci_poll(void) {
     }
 
     if (mp_bluetooth_nimble_ble_state >= MP_BLUETOOTH_NIMBLE_BLE_STATE_WAITING_FOR_SYNC) {
-        // Run any timers.
-        mp_bluetooth_nimble_os_callout_process();
+        // Get the LL transport to process any incoming UART data.
+        mp_bluetooth_nimble_hci_uart_process();
 
-        // Process incoming UART data, and run events as they are generated.
-        mp_bluetooth_nimble_hci_uart_process(true);
-
-        // Run any remaining events (e.g. if there was no UART data).
-        mp_bluetooth_nimble_os_eventq_run_all();
+        // Run any timers and pending events in the queue.
+        mp_bluetooth_nimble_run_host_stack();
     }
 
     return true;
@@ -68,7 +65,7 @@ bool mp_bluetooth_hci_active(void) {
 void mp_bluetooth_nimble_hci_uart_wfi(void) {
     // This is called while NimBLE is waiting in ble_npl_sem_pend, i.e. waiting for an HCI ACK.
     // Do not need to run events here, only processing incoming HCI data.
-    mp_bluetooth_nimble_hci_uart_process(false);
+    mp_bluetooth_nimble_hci_uart_process();
 }
 
 #endif // MICROPY_PY_BLUETOOTH && MICROPY_BLUETOOTH_NIMBLE

@@ -100,7 +100,7 @@ STATIC void mp_bluetooth_hci_uart_char_cb(uint8_t chr) {
     hal_uart_rx_cb(hal_uart_rx_arg, chr);
 }
 
-void mp_bluetooth_nimble_hci_uart_process(bool run_events) {
+void mp_bluetooth_nimble_hci_uart_process() {
     bool host_wake = mp_bluetooth_hci_controller_woken();
 
     for (;;) {
@@ -115,12 +115,6 @@ void mp_bluetooth_nimble_hci_uart_process(bool run_events) {
             break;
         }
         #endif
-
-        // Incoming data may result in events being enqueued. If we're in
-        // scheduler context then we can run those events immediately.
-        if (run_events) {
-            mp_bluetooth_nimble_os_eventq_run_all();
-        }
     }
 
     if (host_wake) {
