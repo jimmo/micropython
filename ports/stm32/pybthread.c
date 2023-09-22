@@ -180,6 +180,10 @@ int pyb_mutex_lock(pyb_mutex_t *m, int wait) {
         m->thread = pyb_thread_cur;
         // no waiters
         pyb_thread_cur->queue_next = NULL;
+        assert(m->recursive <= 1);
+        if (m->recursive) {
+            ++m->recursive;
+        }
         RESTORE_IRQ_PRI(irq_state);
     } else {
         // mutex is locked
@@ -188,8 +192,16 @@ int pyb_mutex_lock(pyb_mutex_t *m, int wait) {
             return 0; // failed to lock mutex
         }
 
-        // current owner cannot recursively acquire
-        assert(m->thread != pyb_thread_cur);
+        if (m->thread == pyb_thread_cur) {
+            // we are the current holder of the lock
+            // only allowed to lock if it's recursive
+            assert(m->recursive);
+            if (m->recursive) {
+                ++m->recursive;
+                RESTORE_IRQ_PRI(irq_state);
+                return 1;
+            }
+        }
 
         if (m->thread->queue_next == NULL) {
             // nobody is waiting, mark us as the first waiter
@@ -204,7 +216,6 @@ int pyb_mutex_lock(pyb_mutex_t *m, int wait) {
                 }
             }
         }
-
         // we are the end of the waiting queue
         pyb_thread_cur->queue_next = NULL;
         // take current thread off the run list
@@ -223,6 +234,25 @@ void pyb_mutex_unlock(pyb_mutex_t *m) {
     // ensure thread is currently owned (locked)
     assert(m->thread != NULL);
 
+    if (m->recursive) {
+        // assert it's actually held
+        assert(m->recursive > 1);
+
+        // if a lock is recursively held more than once, then only the owner may unlock it
+        assert(m->recursive == 2 || m->thread == pyb_thread_cur);
+
+        // owner is unlocking
+        --m->recursive;
+
+        if (m->recursive > 1) {
+            // still hold an "outer" lock
+            goto done;
+        }
+    }
+
+    // either non-recursive, or recursive lock that just got unlocked
+    assert(m->recursive <= 1);
+
     // get the thread (if any) that is blocked
     pyb_thread_t *th = m->thread->queue_next;
 
@@ -230,7 +260,13 @@ void pyb_mutex_unlock(pyb_mutex_t *m) {
     m->thread = th;
 
     if (th) {
-        // place new owner on runable list
+        // increment the recusive count for the new owner
+        if (m->recursive) {
+            assert(m->recursive == 1);
+            ++m->recursive;
+        }
+
+        // and place on runable list
         pyb_thread_add_to_runable(th);
     }
 

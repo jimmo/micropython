@@ -44,6 +44,11 @@ static inline void mp_thread_mutex_init(mp_thread_mutex_t *m) {
     pyb_mutex_init(m);
 }
 
+static inline void mp_thread_mutex_init_recursive(mp_thread_mutex_t *m) {
+    pyb_mutex_init(m);
+    m->recursive = 1;
+}
+
 static inline int mp_thread_mutex_lock(mp_thread_mutex_t *m, int wait) {
     return pyb_mutex_lock(m, wait);
 }

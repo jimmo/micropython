@@ -45,6 +45,10 @@ typedef struct {
     // this is the current owner of the lock (or NULL if unlocked)
     // pending waiters are a linked list on this thread's queue_next
     pyb_thread_t *thread;
+    // 0: non-recursive (could be locked or unlocked)
+    // 1: recursive, unlocked
+    // N: same owner holds this N-1 times
+    size_t recursive;
 } pyb_mutex_t;
 
 extern volatile int pyb_thread_enabled;
