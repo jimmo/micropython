@@ -180,10 +180,8 @@ int nimble_sprintf(char *str, const char *fmt, ...) {
 struct ble_npl_eventq* g_eventq_dflt;
 
 // Run all events in the default queue.
-void mp_bluetooth_nimble_os_eventq_run_all(void) {
-    if (mp_bluetooth_nimble_ble_state == MP_BLUETOOTH_NIMBLE_BLE_STATE_OFF) {
-        return;
-    }
+STATIC void ble_npl_run_default_queue(void) {
+    DEBUG_EVENT_printf("mp_bluetooth_nimble_npl_run_default_queue(%p, %p)\n", g_eventq_dflt, g_eventq_dflt->head);
 
     // Keep running while there are pending events.
     while (true) {
@@ -403,7 +401,7 @@ uint16_t ble_npl_sem_get_count(struct ble_npl_sem *sem) {
 
 static struct ble_npl_callout *global_callout = NULL;
 
-void mp_bluetooth_nimble_os_callout_process(void) {
+STATIC void ble_npl_run_callouts(void) {
     os_sr_t sr;
     OS_ENTER_CRITICAL(sr);
     uint32_t tnow = mp_hal_ticks_ms();
@@ -536,4 +534,15 @@ uint32_t ble_npl_hw_enter_critical(void) {
 void ble_npl_hw_exit_critical(uint32_t atomic_state) {
     DEBUG_CRIT_printf("ble_npl_hw_exit_critical(%u)\n", (uint)atomic_state);
     MICROPY_END_ATOMIC_SECTION(atomic_state);
+}
+
+/******************************************************************************/
+
+void mp_bluetooth_nimble_run_host_stack(void) {
+    if (mp_bluetooth_nimble_ble_state == MP_BLUETOOTH_NIMBLE_BLE_STATE_OFF) {
+        return;
+    }
+
+    ble_npl_run_callouts();
+    ble_npl_run_default_queue();
 }

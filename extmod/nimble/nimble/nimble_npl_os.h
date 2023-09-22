@@ -89,8 +89,7 @@ struct ble_npl_sem {
 
 // --- Called by the MicroPython port -----------------------------------------
 
-void mp_bluetooth_nimble_os_eventq_run_all(void);
-void mp_bluetooth_nimble_os_callout_process(void);
+void mp_bluetooth_nimble_run_host_stack(void);
 
 // --- Must be provided by the MicroPython port -------------------------------
 
