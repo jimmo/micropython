@@ -31,6 +31,7 @@
 #include "py/mpconfig.h"
 #include "py/mperrno.h"
 #include "py/mphal.h"
+#include "py/mpthread.h"
 #include "extmod/modnetwork.h"
 #include "extint.h"
 #include "pendsv.h"

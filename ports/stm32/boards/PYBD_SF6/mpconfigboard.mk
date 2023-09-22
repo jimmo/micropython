@@ -18,3 +18,6 @@ MICROPY_VFS_LFS2 = 1
 
 # PYBD-specific frozen modules
 FROZEN_MANIFEST ?= boards/PYBD_SF2/manifest.py
+
+
+CFLAGS += -DMICROPY_PY_THREAD=1
