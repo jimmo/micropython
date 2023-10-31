@@ -38,17 +38,18 @@ typedef struct _mp_reader_vfs_t {
     mp_obj_t file;
     uint16_t len;
     uint16_t pos;
-    byte buf[24];
+    uint8_t bufsize;
+    byte buf[];
 } mp_reader_vfs_t;
 
 STATIC mp_uint_t mp_reader_vfs_readbyte(void *data) {
     mp_reader_vfs_t *reader = (mp_reader_vfs_t *)data;
     if (reader->pos >= reader->len) {
-        if (reader->len < sizeof(reader->buf)) {
+        if (reader->len < reader->bufsize) {
             return MP_READER_EOF;
         } else {
             int errcode;
-            reader->len = mp_stream_rw(reader->file, reader->buf, sizeof(reader->buf),
+            reader->len = mp_stream_rw(reader->file, reader->buf, reader->bufsize,
                 &errcode, MP_STREAM_RW_READ | MP_STREAM_RW_ONCE);
             if (errcode != 0) {
                 // TODO handle errors properly
@@ -70,14 +71,24 @@ STATIC void mp_reader_vfs_close(void *data) {
 }
 
 void mp_reader_new_file(mp_reader_t *reader, qstr filename) {
-    mp_reader_vfs_t *rf = m_new_obj(mp_reader_vfs_t);
     mp_obj_t args[2] = {
         MP_OBJ_NEW_QSTR(filename),
         MP_OBJ_NEW_QSTR(MP_QSTR_rb),
     };
-    rf->file = mp_vfs_open(MP_ARRAY_SIZE(args), &args[0], (mp_map_t *)&mp_const_empty_map);
-    int errcode;
-    rf->len = mp_stream_rw(rf->file, rf->buf, sizeof(rf->buf), &errcode, MP_STREAM_RW_READ | MP_STREAM_RW_ONCE);
+    mp_obj_t file = mp_vfs_open(MP_ARRAY_SIZE(args), &args[0], (mp_map_t *)&mp_const_empty_map);
+
+    const mp_stream_p_t *stream_p = mp_get_stream(file);
+    int errcode = 0;
+    mp_uint_t bufsize = stream_p->ioctl(file, MP_STREAM_GET_BUFFER_SIZE, 0, &errcode);
+    if (bufsize < 7 || bufsize > 255) {
+        // ioctl returns unsigned -1 ( MP_STREAM_ERROR) on error, which is >255, so will set to default.
+        bufsize = MICROPY_READER_VFS_DEFAULT_BUFFER_SIZE;
+    }
+
+    mp_reader_vfs_t *rf = m_new_obj_var(mp_reader_vfs_t, byte, bufsize);
+    rf->file = file;
+    rf->bufsize = bufsize;
+    rf->len = mp_stream_rw(rf->file, rf->buf, rf->bufsize, &errcode, MP_STREAM_RW_READ | MP_STREAM_RW_ONCE);
     if (errcode != 0) {
         mp_raise_OSError(errcode);
     }
