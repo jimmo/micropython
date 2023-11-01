@@ -753,6 +753,8 @@ class RemoteFile(io.IOBase):
             machine.mem32[arg] = self.seek(machine.mem32[arg], machine.mem32[arg + 4])
         elif request == 4:  # CLOSE
             self.close()
+        elif request == 11:  # BUFSIZE
+            return 255
         return 0
 
     def flush(self):
