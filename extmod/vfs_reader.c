@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "py/runtime.h"
 #include "py/stream.h"
@@ -34,34 +35,37 @@
 
 #if MICROPY_READER_VFS
 
+#define MICROPY_READER_VFS_DEFAULT_BUFFER_SIZE (2 * MICROPY_BYTES_PER_GC_BLOCK - offsetof(mp_reader_vfs_t, buf))
+#define MICROPY_READER_VFS_MIN_BUFFER_SIZE (MICROPY_BYTES_PER_GC_BLOCK - offsetof(mp_reader_vfs_t, buf))
+#define MICROPY_READER_VFS_MAX_BUFFER_SIZE (65536)
+
 typedef struct _mp_reader_vfs_t {
     mp_obj_t file;
-    uint16_t len;
-    uint16_t pos;
-    uint8_t bufsize;
+    uint16_t bufpos;
+    uint16_t buflen;
+    uint16_t bufsize;
     byte buf[];
 } mp_reader_vfs_t;
 
 STATIC mp_uint_t mp_reader_vfs_readbyte(void *data) {
     mp_reader_vfs_t *reader = (mp_reader_vfs_t *)data;
-    if (reader->pos >= reader->len) {
-        if (reader->len < reader->bufsize) {
+    if (reader->bufpos >= reader->buflen) {
+        if (reader->buflen < reader->bufsize) {
             return MP_READER_EOF;
         } else {
             int errcode;
-            reader->len = mp_stream_rw(reader->file, reader->buf, reader->bufsize,
-                &errcode, MP_STREAM_RW_READ | MP_STREAM_RW_ONCE);
+            reader->buflen = mp_stream_rw(reader->file, reader->buf, reader->bufsize, &errcode, MP_STREAM_RW_READ | MP_STREAM_RW_ONCE);
             if (errcode != 0) {
                 // TODO handle errors properly
                 return MP_READER_EOF;
             }
-            if (reader->len == 0) {
+            if (reader->buflen == 0) {
                 return MP_READER_EOF;
             }
-            reader->pos = 0;
+            reader->bufpos = 0;
         }
     }
-    return reader->buf[reader->pos++];
+    return reader->buf[reader->bufpos++];
 }
 
 STATIC void mp_reader_vfs_close(void *data) {
@@ -80,19 +84,20 @@ void mp_reader_new_file(mp_reader_t *reader, qstr filename) {
     const mp_stream_p_t *stream_p = mp_get_stream(file);
     int errcode = 0;
     mp_uint_t bufsize = stream_p->ioctl(file, MP_STREAM_GET_BUFFER_SIZE, 0, &errcode);
-    if (bufsize < 7 || bufsize > 255) {
-        // ioctl returns unsigned -1 ( MP_STREAM_ERROR) on error, which is >255, so will set to default.
+    if (bufsize == MP_STREAM_ERROR) {
         bufsize = MICROPY_READER_VFS_DEFAULT_BUFFER_SIZE;
+    } else {
+        bufsize = MIN(MICROPY_READER_VFS_MAX_BUFFER_SIZE, MAX(MICROPY_READER_VFS_MIN_BUFFER_SIZE, bufsize));
     }
 
-    mp_reader_vfs_t *rf = m_new_obj_var(mp_reader_vfs_t, byte, bufsize);
+    mp_reader_vfs_t *rf = m_new_obj_var(mp_reader_vfs_t, buf, byte, bufsize);
     rf->file = file;
     rf->bufsize = bufsize;
-    rf->len = mp_stream_rw(rf->file, rf->buf, rf->bufsize, &errcode, MP_STREAM_RW_READ | MP_STREAM_RW_ONCE);
+    rf->buflen = mp_stream_rw(rf->file, rf->buf, rf->bufsize, &errcode, MP_STREAM_RW_READ | MP_STREAM_RW_ONCE);
     if (errcode != 0) {
         mp_raise_OSError(errcode);
     }
-    rf->pos = 0;
+    rf->bufpos = 0;
     reader->data = rf;
     reader->readbyte = mp_reader_vfs_readbyte;
     reader->close = mp_reader_vfs_close;
