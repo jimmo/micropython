@@ -417,6 +417,10 @@ endif
 
 endif # MICROPY_PY_BLUETOOTH
 
+ifeq ($(MICROPY_PY_OPENAMP),1)
+SRC_C += metal/metal_port.c
+endif
+
 # SRC_O should be placed first to work around this LTO bug with binutils <2.35:
 # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83967
 OBJ += $(addprefix $(BUILD)/, $(SRC_O))
