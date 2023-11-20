@@ -419,7 +419,7 @@ endif # MICROPY_PY_BLUETOOTH
 
 ifeq ($(MICROPY_PY_OPENAMP),1)
 SRC_C += metal/metal_port.c
-ifeq ($(MICROPY_PY_OPENAMP_PROC),1)
+ifeq ($(MICROPY_PY_OPENAMP_RPROC),1)
 SRC_C += mprprocport.c
 endif
 endif

@@ -14,10 +14,10 @@ MEMORY
     SRAM4 (xrw)     : ORIGIN = 0x38000000, LENGTH = 64K     /* SRAM4 D3    */
     FLASH (rx)      : ORIGIN = 0x08000000, LENGTH = 2048K   /* Total available flash */
     FLASH_EXT (rx)  : ORIGIN = 0x90000000, LENGTH = 16384K  /* 16MBs external QSPI flash */
-    FLASH_FS (r)    : ORIGIN = 0x08020000, LENGTH = 128K    /* sector  1 -> Flash storage */
-    FLASH_TEXT (rx) : ORIGIN = 0x08040000, LENGTH = 1792K   /* Sector  0 -> Arduino Bootloader
-                                                               Sector  1 -> Reserved for CM4/FS
-                                                               Sectors 2 -> 15 firmware */
+    FLASH_FS (r)    : ORIGIN = 0x08020000, LENGTH = 128K    /* 0x08000000 -> 0x08020000 Arduino Bootloader */
+    FLASH_TEXT (rx) : ORIGIN = 0x08040000, LENGTH = 1280K   /* 0x08020000 -> 0x08040000 Flash filesystem storage */
+                                                            /* 0x08040000 -> 0x08180000 CM7 firmware */
+                                                            /* 0x08180000 -> 0x08200000 CM4 firmware */
 }
 
 /* produce a link error if there is not this amount of RAM for these sections */
@@ -43,5 +43,8 @@ _micropy_hw_internal_flash_storage_ram_cache_end = ORIGIN(DTCM) + LENGTH(DTCM);
 /* Location of filesystem flash storage */
 _micropy_hw_internal_flash_storage_start = ORIGIN(FLASH_FS);
 _micropy_hw_internal_flash_storage_end = ORIGIN(FLASH_FS) + LENGTH(FLASH_FS);
+
+_openamp_shm_region_start = ORIGIN(SRAM4);
+_openamp_shm_region_end = ORIGIN(SRAM4) + LENGTH(SRAM4);
 
 INCLUDE common_blifs.ld
