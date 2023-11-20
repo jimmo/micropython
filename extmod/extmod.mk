@@ -30,6 +30,7 @@ SRC_EXTMOD_C += \
 	extmod/modmachine.c \
 	extmod/modnetwork.c \
 	extmod/modonewire.c \
+	extmod/modopenamp.c \
 	extmod/modos.c \
 	extmod/modplatform.c\
 	extmod/modrandom.c \
@@ -512,3 +513,54 @@ include $(TOP)/extmod/btstack/btstack.mk
 endif
 
 endif
+
+################################################################################
+# openamp
+
+ifeq ($(MICROPY_PY_OPENAMP),1)
+OPENAMP_DIR = lib/open-amp
+LIBMETAL_DIR = lib/libmetal
+GIT_SUBMODULES += $(LIBMETAL_DIR) $(OPENAMP_DIR)
+
+INC += -I$(TOP)/$(OPENAMP_DIR)
+CFLAGS += -DMICROPY_PY_OPENAMP=1
+
+CFLAGS_THIRDPARTY += \
+    -I$(TOP)/$(LIBMETAL_DIR) \
+    -I$(TOP)/$(OPENAMP_DIR) \
+    -I$(TOP)/$(OPENAMP_DIR)/lib/include/ \
+    -DMETAL_INTERNAL \
+    -DVIRTIO_DRIVER_ONLY \
+    -DNO_ATOMIC_64_SUPPORT \
+    -DRPMSG_BUFFER_SIZE=512 \
+
+# Libmetal's source files.
+SRC_THIRDPARTY_C += $(addprefix $(LIBMETAL_DIR)/metal/,\
+	device.c \
+	dma.c \
+	init.c \
+	io.c \
+	irq.c \
+	log.c \
+	shmem.c \
+	softirq.c \
+	version.c \
+	device.c \
+	system/micropython/condition.c \
+	system/micropython/device.c \
+	system/micropython/io.c \
+	system/micropython/irq.c \
+	system/micropython/shmem.c \
+	system/micropython/time.c \
+	)
+
+
+# OpenAMP's source files.
+SRC_THIRDPARTY_C += $(addprefix $(OPENAMP_DIR)/lib/,\
+	rpmsg/rpmsg.c \
+	rpmsg/rpmsg_virtio.c \
+	virtio/virtio.c \
+	virtio/virtqueue.c \
+	virtio_mmio/virtio_mmio_drv.c \
+	)
+endif # MICROPY_PY_OPENAMP
