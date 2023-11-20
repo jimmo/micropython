@@ -31,6 +31,8 @@ SRC_EXTMOD_C += \
 	extmod/modnetwork.c \
 	extmod/modonewire.c \
 	extmod/modopenamp.c \
+	extmod/modopenamp_rproc.c \
+	extmod/modopenamp_rproc_store.c \
 	extmod/modos.c \
 	extmod/modplatform.c\
 	extmod/modrandom.c \
@@ -525,6 +527,12 @@ GIT_SUBMODULES += $(LIBMETAL_DIR) $(OPENAMP_DIR)
 INC += -I$(TOP)/$(OPENAMP_DIR)
 CFLAGS += -DMICROPY_PY_OPENAMP=1
 
+ifeq ($(MICROPY_PY_OPENAMP_RPROC),1)
+MICROPY_PY_OPENAMP_RPROC_STORE_ENABLE ?= 1
+CFLAGS += -DMICROPY_PY_OPENAMP_RPROC=1
+CFLAGS += -DMICROPY_PY_OPENAMP_RPROC_STORE_ENABLE=$(MICROPY_PY_OPENAMP_RPROC_STORE_ENABLE)
+endif
+
 CFLAGS_THIRDPARTY += \
     -I$(TOP)/$(LIBMETAL_DIR) \
     -I$(TOP)/$(OPENAMP_DIR) \
@@ -563,4 +571,15 @@ SRC_THIRDPARTY_C += $(addprefix $(OPENAMP_DIR)/lib/,\
 	virtio/virtqueue.c \
 	virtio_mmio/virtio_mmio_drv.c \
 	)
+
+# OpenAMP's remoteproc source files.
+ifeq ($(MICROPY_PY_OPENAMP_RPROC),1)
+SRC_THIRDPARTY_C += $(addprefix $(OPENAMP_DIR)/lib/remoteproc/,\
+	elf_loader.c \
+	remoteproc.c \
+	remoteproc_virtio.c \
+	rsc_table_parser.c \
+	)
+endif # MICROPY_PY_OPENAMP_RPROC
+
 endif # MICROPY_PY_OPENAMP

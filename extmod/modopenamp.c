@@ -80,6 +80,10 @@ static const char openamp_trace_buf[128];
 
 #define debug_printf(...)       // mp_printf(&mp_plat_print, __VA_ARGS__)
 
+#if MICROPY_PY_OPENAMP_RPROC
+extern mp_obj_type_t rproc_type;
+#endif
+
 static struct metal_device shm_device = {
     .name = METAL_SHM_NAME,
     // The number of IO regions is fixed and must match the number and
@@ -380,6 +384,9 @@ STATIC const mp_rom_map_elem_t globals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_RPMSG_ADDR_ANY), MP_ROM_INT(RPMSG_ADDR_ANY) },
     { MP_ROM_QSTR(MP_QSTR_init), MP_ROM_PTR(&openamp_init_obj) },
     { MP_ROM_QSTR(MP_QSTR_RPMsg), MP_ROM_PTR(&rpmsg_type) },
+    #if MICROPY_PY_OPENAMP_RPROC
+    { MP_ROM_QSTR(MP_QSTR_RProc), MP_ROM_PTR(&rproc_type) },
+    #endif
 };
 STATIC MP_DEFINE_CONST_DICT(globals_dict, globals_dict_table);
 
