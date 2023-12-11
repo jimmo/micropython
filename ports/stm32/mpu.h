@@ -73,6 +73,18 @@
         | MPU_REGION_ENABLE << MPU_RASR_ENABLE_Pos \
     )
 
+#define MPU_REGION_SHARED_NCACHE(size) ( \
+    MPU_INSTRUCTION_ACCESS_DISABLE << MPU_RASR_XN_Pos \
+        | MPU_REGION_FULL_ACCESS << MPU_RASR_AP_Pos \
+        | MPU_TEX_LEVEL1 << MPU_RASR_TEX_Pos \
+        | MPU_ACCESS_SHAREABLE << MPU_RASR_S_Pos \
+        | MPU_ACCESS_NOT_CACHEABLE << MPU_RASR_C_Pos \
+        | MPU_ACCESS_NOT_BUFFERABLE << MPU_RASR_B_Pos \
+        | 0x00 << MPU_RASR_SRD_Pos \
+        | (size) << MPU_RASR_SIZE_Pos \
+        | MPU_REGION_ENABLE << MPU_RASR_ENABLE_Pos \
+    )
+
 static inline void mpu_init(void) {
     MPU->CTRL = MPU_PRIVILEGED_DEFAULT | MPU_CTRL_ENABLE_Msk;
     SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;
