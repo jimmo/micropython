@@ -28,6 +28,7 @@
 
 #include "py/mperrno.h"
 #include "py/mphal.h"
+
 #include "mpu.h"
 
 #include "metal/sys.h"
@@ -62,10 +63,6 @@ int metal_sys_init(const struct metal_init_params *params) {
     return 0;
 }
 
-void metal_sys_assert(bool cond) {
-    assert(cond);
-}
-
 void metal_sys_finish(void) {
     HAL_NVIC_DisableIRQ(HSEM1_IRQn);
     HAL_HSEM_DeactivateNotification(__HAL_HSEM_SEMID_TO_MASK(METAL_HSEM_MASTER_ID));
@@ -79,14 +76,6 @@ unsigned int sys_irq_save_disable(void) {
 
 void sys_irq_restore_enable(unsigned int state) {
     enable_irq(state);
-}
-
-void sys_irq_enable(unsigned int vector) {
-    metal_unused(vector);
-}
-
-void sys_irq_disable(unsigned int vector) {
-    metal_unused(vector);
 }
 
 void *metal_machine_io_mem_map(void *va, metal_phys_addr_t pa,
@@ -103,11 +92,6 @@ void metal_machine_cache_flush(void *addr, unsigned int len) {
 
 void metal_machine_cache_invalidate(void *addr, unsigned int len) {
     SCB_InvalidateDCache_by_Addr(addr, len);
-}
-
-int __metal_sleep_usec(unsigned int usec) {
-    mp_hal_delay_us(usec);
-    return 0;
 }
 
 int metal_rproc_notify(void *priv, uint32_t id) {

@@ -37,7 +37,6 @@
 #include "metal/sys.h"
 #include "metal/device.h"
 #include "metal/utilities.h"
-#include "metal/metal_port.h"
 
 #include "openamp/open_amp.h"
 #include "openamp/remoteproc.h"

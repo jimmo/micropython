@@ -417,10 +417,14 @@ endif
 
 endif # MICROPY_PY_BLUETOOTH
 
+# Add stm32-specific implementation of libmetal (and optionally OpenAMP's rproc).
+# Note: libmetal code is generated via a pre-processor so ensure that runs first.
 ifeq ($(MICROPY_PY_OPENAMP),1)
-SRC_C += metal/metal_port.c
+SRC_C += mpmetalport.c
+$(BUILD)/mpmetalport.o: $(BUILD)/openamp/metal/config.h
 ifeq ($(MICROPY_PY_OPENAMP_RPROC),1)
 SRC_C += mprprocport.c
+$(BUILD)/mprprocport.o: $(BUILD)/openamp/metal/config.h
 endif
 endif
 

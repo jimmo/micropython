@@ -25,8 +25,8 @@
  *
  * libmetal stm32 port.
  */
-#ifndef MICROPY_INCLUDED_STM32_METAL_PORT_H
-#define MICROPY_INCLUDED_STM32_METAL_PORT_H
+#ifndef MICROPY_INCLUDED_STM32_MPMETALPORT_H
+#define MICROPY_INCLUDED_STM32_MPMETALPORT_H
 
 #include <stdlib.h>
 #include "py/mphal.h"
@@ -35,18 +35,20 @@
 #define METAL_HAVE_STDATOMIC_H      0
 #define METAL_HAVE_FUTEX_H          0
 
-#define METAL_PROCESSOR_CPU_H       "metal/processor/arm/cpu.h"
-#define METAL_PROCESSOR_ATOMIC_H    "metal/processor/arm/atomic.h"
 #define METAL_MAX_DEVICE_REGIONS    2
 
 #define METAL_HSEM_REMOTE_ID        0
 #define METAL_HSEM_MASTER_ID        1
 
 // Note set to 1 to enable log output.
-#define METAL_LOG_HANDLER_ENABLE    0
+// #undef metal_log
+// #define metal_log(level, ...) mp_printf(&mp_plat_print, __VA_ARGS__)
 
 #define metal_cpu_yield()
-#define metal_generic_default_poll()    MICROPY_EVENT_POLL_HOOK
+
+static inline void metal_generic_default_poll(void) {
+    MICROPY_EVENT_POLL_HOOK
+}
 
 // Shared memory config
 #define METAL_SHM_NAME              "OPENAMP_SHM"
@@ -64,8 +66,12 @@
 extern const char _openamp_shm_region_start[];
 extern const char _openamp_shm_region_end[];
 
-void metal_sys_assert(bool cond);
 int metal_rproc_notify(void *priv, uint32_t id);
 extern void metal_rproc_notified(mp_sched_node_t *node);
+
+static inline int __metal_sleep_usec(unsigned int usec) {
+    mp_hal_delay_us(usec);
+    return 0;
+}
 
 #endif // MICROPY_INCLUDED_STM32_METAL_PORT_H

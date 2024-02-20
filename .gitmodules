@@ -64,4 +64,4 @@
 	url = https://github.com/OpenAMP/open-amp.git
 [submodule "lib/libmetal"]
 	path = lib/libmetal
-	url = https://github.com/iabdalkader/libmetal.git
+	url = https://github.com/OpenAMP/libmetal.git
