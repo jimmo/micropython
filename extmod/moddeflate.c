@@ -177,7 +177,12 @@ static bool deflateio_init_write(mp_obj_deflateio_t *self) {
         wbits = DEFLATEIO_DEFAULT_WBITS;
     }
     size_t window_len = 1 << wbits;
-    self->write->window = m_new(uint8_t, window_len);
+    self->write->window = m_new_maybe(uint8_t, window_len);
+    if (!self->write->window) {
+        m_del_obj(mp_obj_deflateio_write_t, self->write);
+        self->write = NULL;
+        m_malloc_fail(window_len);
+    }
 
     uzlib_lz77_init(&self->write->lz77, self->write->window, window_len);
     self->write->lz77.dest_write_data = self;
