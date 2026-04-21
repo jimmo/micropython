@@ -32,7 +32,11 @@ MP_WEAK uintptr_t mp_hal_stdio_poll(uintptr_t poll_flags) {
         const mp_stream_p_t *stream_p = mp_get_stream(pyb_stdio_uart);
         ret = stream_p->ioctl(pyb_stdio_uart, MP_STREAM_POLL, poll_flags, &errcode);
     }
+    #if MICROPY_PY_OS_DUPTERM
     return ret | mp_os_dupterm_poll(poll_flags);
+    #else
+    return ret;
+    #endif
 }
 
 MP_WEAK int mp_hal_stdin_rx_chr(void) {
@@ -49,10 +53,12 @@ MP_WEAK int mp_hal_stdin_rx_chr(void) {
         if (MP_STATE_PORT(pyb_stdio_uart) != NULL && uart_rx_any(MP_STATE_PORT(pyb_stdio_uart))) {
             return uart_rx_char(MP_STATE_PORT(pyb_stdio_uart));
         }
+        #if MICROPY_PY_OS_DUPTERM
         int dupterm_c = mp_os_dupterm_rx_chr();
         if (dupterm_c >= 0) {
             return dupterm_c;
         }
+        #endif
         MICROPY_EVENT_POLL_HOOK
     }
 }
@@ -67,11 +73,13 @@ MP_WEAK mp_uint_t mp_hal_stdout_tx_strn(const char *str, size_t len) {
     #if 0 && defined(USE_HOST_MODE) && MICROPY_HW_HAS_LCD
     lcd_print_strn(str, len);
     #endif
+    #if MICROPY_PY_OS_DUPTERM
     int dupterm_res = mp_os_dupterm_tx_strn(str, len);
     if (dupterm_res >= 0) {
         did_write = true;
         ret = MIN((mp_uint_t)dupterm_res, ret);
     }
+    #endif
     return did_write ? ret : 0;
 }
 
